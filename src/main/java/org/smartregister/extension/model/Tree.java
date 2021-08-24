@@ -52,145 +52,148 @@ public class Tree extends Type implements ICompositeType {
                 kids = parentChildren.get(i) != null && parentChildren.get(i).getIdentifier() != null &&
                         parentChildren.get(i).getIdentifier().getValue() != null &&
                         parentChildren.get(i).getIdentifier().getValue().equals(parent) ? parentChildren.get(i).getChildIdentifiers() : null;
+                System.out.println("Kids are : " + kids);
+                if (kids != null) {
+                    break;
+                }
             }
         }
 
-        if (kids == null) {
-            kids = new ArrayList<>();
-        }
-        StringType idStringType = new StringType();
-        idStringType.setValue(id);
+            if (kids == null) {
+                kids = new ArrayList<>();
+            }
+            StringType idStringType = new StringType();
+            idStringType.setValue(id);
 
-        StringType parentStringType = new StringType();
-        parentStringType.setValue(parent);
-        kids.add(idStringType);
-        Boolean setParentChildMap = false;
-        for (int i = 0; i < parentChildren.size(); i++) {
-            if (parentChildren.get(i) != null && parentChildren.get(i).getIdentifier() != null && parentChildren.get(i).getIdentifier().getValue() != null &&
-                    parentChildren.get(i).getIdentifier().getValue().equals(parent)) {
+            StringType parentStringType = new StringType();
+            parentStringType.setValue(parent);
+            kids.add(idStringType);
+            Boolean setParentChildMap = false;
+            for (int i = 0; i < parentChildren.size(); i++) {
+                if (parentChildren.get(i) != null && parentChildren.get(i).getIdentifier() != null && parentChildren.get(i).getIdentifier().getValue() != null &&
+                        parentChildren.get(i).getIdentifier().getValue().equals(parent)) {
 //              List<StringType> childIdentifiers = parentChildrenMap != null ? parentChildrenMap.getChildIdentifiers() : new ArrayList<>();
 //              childIdentifiers.add(kids);
 //                parentChildrenMap.setChildIdentifiers(kids);
-                parentChildren.get(i).setChildIdentifiers(kids);
-                setParentChildMap = true;
+                    parentChildren.get(i).setChildIdentifiers(kids);
+                    setParentChildMap = true;
+                }
             }
-        }
 
-        if (!setParentChildMap) {
-            ParentChildrenMap parentChildrenMap = new ParentChildrenMap();
-            parentChildrenMap.setIdentifier(parentStringType);
-            parentChildrenMap.setChildIdentifiers(kids);
-            parentChildren.add(parentChildrenMap);
-        }
+            if (!setParentChildMap) {
+                ParentChildrenMap parentChildrenMap = new ParentChildrenMap();
+                parentChildrenMap.setIdentifier(parentStringType);
+                parentChildrenMap.setChildIdentifiers(kids);
+                parentChildren.add(parentChildrenMap);
+            }
 
 //        parentChildren.add(parentStringType, kids);
-    }
-
-    public void addNode(String id, String label, Location node, String parentId) {
-        if (listOfNodes == null) {
-            listOfNodes = new SingleTreeNode();
         }
 
-        // if node exists we should break since user should write optimized code and also tree can not have duplicates
-        if (hasNode(id)) {
-            throw new IllegalArgumentException("Node with ID " + id + " already exists in tree");
-        }
+        public void addNode (String id, String label, Location node, String parentId){
+            if (listOfNodes == null) {
+                listOfNodes = new SingleTreeNode();
+            }
 
-        TreeNode n = makeNode(id, label, node, parentId);
+            // if node exists we should break since user should write optimized code and also tree can not have duplicates
+            if (hasNode(id)) {
+                throw new IllegalArgumentException("Node with ID " + id + " already exists in tree");
+            }
 
-        if (parentId != null) {
-            addToParentChildRelation(parentId, id);
+            TreeNode n = makeNode(id, label, node, parentId);
 
-            TreeNode p = getNode(parentId);
+            if (parentId != null) {
+                addToParentChildRelation(parentId, id);
 
-            //if parent exists add to it otherwise add as root for now
-            if (p != null) {
-                p.addChild(n);
+                TreeNode p = getNode(parentId);
+
+                //if parent exists add to it otherwise add as root for now
+                if (p != null) {
+                    p.addChild(n);
+                } else {
+                    // if no parent exists add it as root node
+                    String idString = (String) id;
+                    if (idString.contains("/_")) {
+                        idString = idString.substring(0, idString.indexOf("/_"));
+                    }
+                    SingleTreeNode singleTreeNode = new SingleTreeNode();
+                    StringType treeNodeId = new StringType();
+                    treeNodeId.setValue(idString);
+                    singleTreeNode.setTreeNodeId(treeNodeId);
+                    singleTreeNode.setTreeNode(n);
+//                listOfNodes.add(singleTreeNode);
+                }
             } else {
-                // if no parent exists add it as root node
+                // if no parent add it as root node
                 String idString = (String) id;
                 if (idString.contains("/_")) {
                     idString = idString.substring(0, idString.indexOf("/_"));
                 }
+
                 SingleTreeNode singleTreeNode = new SingleTreeNode();
                 StringType treeNodeId = new StringType();
                 treeNodeId.setValue(idString);
                 singleTreeNode.setTreeNodeId(treeNodeId);
                 singleTreeNode.setTreeNode(n);
-//                listOfNodes.add(singleTreeNode);
-            }
-        } else {
-            // if no parent add it as root node
-            String idString = (String) id;
-            if (idString.contains("/_")) {
-                idString = idString.substring(0, idString.indexOf("/_"));
+                listOfNodes = singleTreeNode;
+                //
             }
 
-            SingleTreeNode singleTreeNode = new SingleTreeNode();
-            StringType treeNodeId = new StringType();
-            treeNodeId.setValue(idString);
-            singleTreeNode.setTreeNodeId(treeNodeId);
-            singleTreeNode.setTreeNode(n);
-            listOfNodes = singleTreeNode;
-            //
-        }
-
-        List<StringType> kids = null;
-        if (parentChildren != null) {
-            for (int i = 0; i < parentChildren.size(); i++) {
-                kids = parentChildren.get(i) != null && parentChildren.get(i).getIdentifier() != null &&
-                        parentChildren.get(i).getIdentifier().getValue() != null && parentChildren.get(i).getIdentifier().getValue().equals(id) ? parentChildren.get(i).getChildIdentifiers() : null;
+            List<StringType> kids = null;
+            if (parentChildren != null) {
+                for (int i = 0; i < parentChildren.size(); i++) {
+                    kids = parentChildren.get(i) != null && parentChildren.get(i).getIdentifier() != null &&
+                            parentChildren.get(i).getIdentifier().getValue() != null && parentChildren.get(i).getIdentifier().getValue().equals(id) ? parentChildren.get(i).getChildIdentifiers() : null;
+                }
             }
-        }
 
 //         move all its child nodes preexisting
-        if (kids != null) {
-            for (StringType kid : kids) {
-                //remove node from it current position and move to parent i.e. node currently being added
-                TreeNode kn = removeNode(kid.getValue());
-                n.addChild(kn);
+            if (kids != null) {
+                for (StringType kid : kids) {
+                    //remove node from it current position and move to parent i.e. node currently being added
+                    TreeNode kn = removeNode(kid.getValue());
+                    n.addChild(kn);
+                }
             }
         }
-    }
 
-    private TreeNode makeNode(String id, String label, Location node, String parentId) {
-        TreeNode n = getNode(id);
-        if (n == null) {
-            n = new TreeNode();
-            StringType nodeId = new StringType();
+        private TreeNode makeNode (String id, String label, Location node, String parentId){
+            TreeNode n = getNode(id);
+            if (n == null) {
+                n = new TreeNode();
+                StringType nodeId = new StringType();
+                String idString = (String) id;
+                if (idString.contains("/_")) {
+                    idString = idString.substring(0, idString.indexOf("/_"));
+                }
+                nodeId.setValue((String) idString);
+//            nodeId.setValue((String) id);
+                n.setNodeId(nodeId);
+                StringType labelString = new StringType();
+                labelString.setValue(label);
+                n.setLabel(labelString);
+                n.setNode((Location) node);
+                StringType parentIdString = new StringType();
+                String parentIdStringVar = (String) parentId;
+
+
+                if (parentIdStringVar != null && parentIdStringVar.contains("/_")) {
+                    parentIdStringVar = parentIdStringVar.substring(0, parentIdStringVar.indexOf("/_"));
+                }
+                parentIdString.setValue(parentIdStringVar);
+//            parentIdString.setValue(parentId);
+                n.setParent(parentIdString);
+            }
+            return n;
+        }
+
+
+        public TreeNode getNode (String id){
+            // Check if id is any root node
             String idString = (String) id;
             if (idString.contains("/_")) {
                 idString = idString.substring(0, idString.indexOf("/_"));
             }
-            nodeId.setValue((String) idString);
-//            nodeId.setValue((String) id);
-            n.setNodeId(nodeId);
-            StringType labelString = new StringType();
-            labelString.setValue(label);
-            n.setLabel(labelString);
-            n.setNode((Location) node);
-            StringType parentIdString = new StringType();
-            String parentIdStringVar = (String) parentId;
-
-
-            if (parentIdStringVar != null && parentIdStringVar.contains("/_")) {
-                parentIdStringVar = parentIdStringVar.substring(0, parentIdStringVar.indexOf("/_"));
-            }
-            parentIdString.setValue(parentIdStringVar);
-//            parentIdString.setValue(parentId);
-            n.setParent(parentIdString);
-        }
-        return n;
-    }
-
-
-    public TreeNode getNode(String id) {
-        // Check if id is any root node
-        String idString = (String) id;
-        if (idString.contains("/_")) {
-            idString = idString.substring(0, idString.indexOf("/_"));
-        }
-
 
 
 //        for (SingleTreeNode singleTreeNode : listOfNodes) {
@@ -200,18 +203,17 @@ public class Tree extends Type implements ICompositeType {
                 return listOfNodes.getTreeNode();
 //            }
 
-        }
-            else {
-                if(listOfNodes != null && listOfNodes.getTreeNode() != null && listOfNodes.getTreeNode().getChildren() != null) {
+            } else {
+                if (listOfNodes != null && listOfNodes.getTreeNode() != null && listOfNodes.getTreeNode().getChildren() != null) {
 //                    for()
 
-                        return recursivelyFindNode(idString, listOfNodes.getTreeNode().getChildren());
+                    return recursivelyFindNode(idString, listOfNodes.getTreeNode().getChildren());
 //                    }
 //                    while (listOfNodes.getTreeNode().getChildren().size() > 0);
                 }
             }
 
-        // neither root itself nor parent of root
+            // neither root itself nor parent of root
 
 //        for (int j = 0; j < listOfNodes.size(); j++) {
 //            for (TreeNodeV2 root : map.get(j).g()) {
@@ -242,17 +244,16 @@ public class Tree extends Type implements ICompositeType {
 //            }
 //        }
 
-        return null;
-    }
-
-
-
-    TreeNode removeNode(String id) {
-        // Check if id is any root node\
-        String idString = (String) id;
-        if (idString.contains("/_")) {
-            idString = idString.substring(0, idString.indexOf("/_"));
+            return null;
         }
+
+
+        TreeNode removeNode (String id){
+            // Check if id is any root node\
+            String idString = (String) id;
+            if (idString.contains("/_")) {
+                idString = idString.substring(0, idString.indexOf("/_"));
+            }
 
 //        for (int i = 0; i < listOfNodes.size(); i++) {
 //            if (listOfNodes.get(i) != null && listOfNodes.get(i).getTreeNodeId() != null &&
@@ -264,10 +265,10 @@ public class Tree extends Type implements ICompositeType {
 //        if (map.containsKey(id)) {
 //            return map.remove(id);
 //        }
-        // neither root itself nor parent of root
+            // neither root itself nor parent of root
 
 //        for (SingleTreeNode singleTreeNode : listOfNodes) {
-        SingleTreeNode singleTreeNode = listOfNodes;
+            SingleTreeNode singleTreeNode = listOfNodes;
             if (singleTreeNode != null && singleTreeNode.getTreeNode() != null && singleTreeNode.getTreeNode().getChildren() != null) {
 //                for (ChildTreeNode childTreeNode : singleTreeNode.getTreeNode().getChildren()) {
                 for (int j = 0; j < singleTreeNode.getTreeNode().getChildren().size(); j++) {
@@ -287,14 +288,14 @@ public class Tree extends Type implements ICompositeType {
 //                return n;
 //            }
 //        }
-        return null;
-    }
+            return null;
+        }
 
 
-    public TreeNode removeChild(String id) {
-        if (listOfNodes != null) {
+        public TreeNode removeChild (String id){
+            if (listOfNodes != null) {
 //            for (SingleTreeNode singleTreeNode : listOfNodes) {
-            SingleTreeNode singleTreeNode = listOfNodes;
+                SingleTreeNode singleTreeNode = listOfNodes;
                 if (singleTreeNode != null && singleTreeNode.getTreeNode() != null)
                     for (int k = 0; k < singleTreeNode.getTreeNode().getChildren().size(); k++) {
 //                for(ChildTreeNode childTreeNode : singleTreeNode.getTreeNode().getChildren()) {
@@ -313,61 +314,60 @@ public class Tree extends Type implements ICompositeType {
 //                        return node;
 //                }
 //            }
-        }
-        return null;
-    }
-
-
-    public boolean hasNode(String id) {
-        return getNode(id) != null;
-    }
-
-    public SingleTreeNode getListOfNodes() {
-        return listOfNodes;
-    }
-
-    public void setListOfNodes(SingleTreeNode listOfNodes) {
-        this.listOfNodes = listOfNodes;
-    }
-
-    public List<ParentChildrenMap> getParentChildren() {
-        return parentChildren;
-    }
-
-    public void setParentChildren(List<ParentChildrenMap> parentChildren) {
-        this.parentChildren = parentChildren;
-    }
-
-    @Override
-    public Type copy() {
-        Tree tree = new Tree();
-        copyValues(tree);
-        return tree;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return ElementUtil.isEmpty(listOfNodes);
-    }
-
-    @Override
-    protected Type typedCopy() {
-        return copy();
-    }
-
-    private TreeNode recursivelyFindNode(String idString, List<ChildTreeNode> childTreeNodeList) {
-        for(ChildTreeNode childTreeNode : childTreeNodeList) {
-            TreeNode treeNode = childTreeNode.getChildren();
-            if(treeNode != null && treeNode.getNodeId() != null && treeNode.getNodeId().getValue().equals(idString)) {
-                return treeNode;
             }
-            else {
-                if(treeNode != null && treeNode.getChildren() != null && treeNode.getChildren().size() > 0) {
-                   return recursivelyFindNode(idString, treeNode.getChildren());
+            return null;
+        }
+
+
+        public boolean hasNode (String id){
+            return getNode(id) != null;
+        }
+
+        public SingleTreeNode getListOfNodes () {
+            return listOfNodes;
+        }
+
+        public void setListOfNodes (SingleTreeNode listOfNodes){
+            this.listOfNodes = listOfNodes;
+        }
+
+        public List<ParentChildrenMap> getParentChildren () {
+            return parentChildren;
+        }
+
+        public void setParentChildren (List < ParentChildrenMap > parentChildren) {
+            this.parentChildren = parentChildren;
+        }
+
+        @Override
+        public Type copy () {
+            Tree tree = new Tree();
+            copyValues(tree);
+            return tree;
+        }
+
+        @Override
+        public boolean isEmpty () {
+            return ElementUtil.isEmpty(listOfNodes);
+        }
+
+        @Override
+        protected Type typedCopy () {
+            return copy();
+        }
+
+        private TreeNode recursivelyFindNode (String idString, List < ChildTreeNode > childTreeNodeList){
+            for (ChildTreeNode childTreeNode : childTreeNodeList) {
+                TreeNode treeNode = childTreeNode.getChildren();
+                if (treeNode != null && treeNode.getNodeId() != null && treeNode.getNodeId().getValue().equals(idString)) {
+                    return treeNode;
+                } else {
+                    if (treeNode != null && treeNode.getChildren() != null && treeNode.getChildren().size() > 0) {
+                        return recursivelyFindNode(idString, treeNode.getChildren());
+                    }
                 }
             }
+            return null;
         }
-        return null;
-    }
 
-}
+    }
