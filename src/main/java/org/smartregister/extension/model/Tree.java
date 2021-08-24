@@ -191,6 +191,8 @@ public class Tree extends Type implements ICompositeType {
             idString = idString.substring(0, idString.indexOf("/_"));
         }
 
+
+
 //        for (SingleTreeNode singleTreeNode : listOfNodes) {
             if (listOfNodes.getTreeNodeId() != null && listOfNodes.getTreeNodeId().getValue().equals(idString)) {
 //            if (singleTreeNode.getTreeNodeId() != null && singleTreeNode.getTreeNodeId().getValue().equals(idString)) {
@@ -199,33 +201,44 @@ public class Tree extends Type implements ICompositeType {
 //            }
 
         }
+            else {
+                if(listOfNodes != null && listOfNodes.getTreeNode() != null && listOfNodes.getTreeNode().getChildren() != null) {
+//                    for()
+
+                        return recursivelyFindNode(idString, listOfNodes.getTreeNode().getChildren());
+//                    }
+//                    while (listOfNodes.getTreeNode().getChildren().size() > 0);
+                }
+            }
 
         // neither root itself nor parent of root
 
 //        for (int j = 0; j < listOfNodes.size(); j++) {
 //            for (TreeNodeV2 root : map.get(j).g()) {
-        if(listOfNodes != null && listOfNodes.getTreeNode() != null && listOfNodes.getTreeNode().getChildren() != null) {
-        for(int i =0 ;  i< listOfNodes.getTreeNode().getChildren().size() ; i++) {
-            ChildTreeNode childTreeNode = listOfNodes.getTreeNode().getChildren().get(i);
-//            TreeNode root = listOfNodes.getTreeNode().getChildren().get(i);
-//             = listOfNodes.getTreeNode();
-//            for(TreeNode root : childTreeNode.getChildren()) {
-            TreeNode root = childTreeNode.getChildren();
-            if (root != null) {
-                TreeNode n = root.findChild(id);
-                if (n != null)
-                    return n;
-            }
-        }
-//        }
 
-//            TreeNode root = listOfNodes.getTreeNode();
+//        temp close
+//        if(listOfNodes != null && listOfNodes.getTreeNode() != null && listOfNodes.getTreeNode().getChildren() != null) {
+//        for(int i =0 ;  i< listOfNodes.getTreeNode().getChildren().size() ; i++) {
+//            ChildTreeNode childTreeNode = listOfNodes.getTreeNode().getChildren().get(i);
+////            TreeNode root = listOfNodes.getTreeNode().getChildren().get(i);
+////             = listOfNodes.getTreeNode();
+////            for(TreeNode root : childTreeNode.getChildren()) {
+//            TreeNode root = childTreeNode.getChildren();
 //            if (root != null) {
 //                TreeNode n = root.findChild(id);
 //                if (n != null)
 //                    return n;
 //            }
-        }
+//        }
+////        }
+//
+////            TreeNode root = listOfNodes.getTreeNode();
+////            if (root != null) {
+////                TreeNode n = root.findChild(id);
+////                if (n != null)
+////                    return n;
+////            }
+//        }
 //            }
 //        }
 
@@ -340,6 +353,21 @@ public class Tree extends Type implements ICompositeType {
     @Override
     protected Type typedCopy() {
         return copy();
+    }
+
+    private TreeNode recursivelyFindNode(String idString, List<ChildTreeNode> childTreeNodeList) {
+        for(ChildTreeNode childTreeNode : childTreeNodeList) {
+            TreeNode treeNode = childTreeNode.getChildren();
+            if(treeNode != null && treeNode.getNodeId() != null && treeNode.getNodeId().getValue().equals(idString)) {
+                return treeNode;
+            }
+            else {
+                if(treeNode != null && treeNode.getChildren() != null && treeNode.getChildren().size() > 0) {
+                   return recursivelyFindNode(idString, treeNode.getChildren());
+                }
+            }
+        }
+        return null;
     }
 
 }
