@@ -41,6 +41,14 @@ public class TreeNode extends Type implements ICompositeType {
         children = new ArrayList<>();
     }
 
+    public TreeNode(StringType name, StringType nodeId, StringType label, Location node, StringType parent) {
+        this.name = name;
+        this.nodeId = nodeId;
+        this.label = label;
+        this.node = node;
+        this.parent = parent;
+    }
+
     public StringType getName() {
         if (name == null) {
             name = new StringType();
@@ -129,34 +137,36 @@ public class TreeNode extends Type implements ICompositeType {
         TreeNode treeNode = new TreeNode();
         treeNode.setNode(node.getNode());
         treeNode.setNodeId(node.getNodeId());
+        treeNode.setLabel(node.getLabel());
+        treeNode.setParent(node.getParent());
         treeNodeList.add(treeNode);
         childTreeNode.setChildren(treeNode);
         children.add(childTreeNode);
     }
 
-//
-//    public TreeNode findChild(String id) {
-//        String idString = (String) id;
-//        if (idString.contains("/_")) {
-//            idString = idString.substring(0, idString.indexOf("/_"));
-//        }
-//        if (children != null && children.size() > 0) {
-//            for (int i = 0; i < children.size(); i++) {
-//                    if (children.get(i) != null) {
-//                        for (ChildTreeNode child : children) {
-//                            if (child != null && child.getChildren() != null
-//                                    && child.getChildren().getNodeId() != null && child.getChildren().getNodeId().getValue().equals(idString)) {
-//                                return child.getChildren();
-//                            } else if (child != null && child != null) {
-//                                TreeNode node = child.getChildren().findChild(idString);
-//                                if (node != null)
-//                                    return node;
-//                            }
-//                        }
-//                    }
-//            }
-//        }
-//        return null;
-//    }
+
+    public TreeNode findChild(String id) {
+        String idString = (String) id;
+        if (idString.contains("/_")) {
+            idString = idString.substring(0, idString.indexOf("/_"));
+        }
+        if (children != null && children.size() > 0) {
+            for (int i = 0; i < children.size(); i++) {
+                    if (children.get(i) != null) {
+                        for (ChildTreeNode child : children) {
+                            if (child != null && child.getChildren() != null
+                                    && child.getChildren().getNodeId() != null && child.getChildren().getNodeId().getValue().equals(idString)) {
+                                return child.getChildren();
+                            } else if (child != null && child != null) {
+                                TreeNode node = child.getChildren().findChild(idString);
+                                if (node != null)
+                                    return node;
+                            }
+                        }
+                    }
+            }
+        }
+        return null;
+    }
 
 }
