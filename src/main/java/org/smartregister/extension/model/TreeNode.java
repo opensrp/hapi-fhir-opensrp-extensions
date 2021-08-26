@@ -10,163 +10,161 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-
 @DatatypeDef(name = "TreeNode")
 public class TreeNode extends Type implements ICompositeType {
 
-    @Child(name = "name", type = {StringType.class}, order = 0, min = 1, max = 1, modifier = false, summary = false)
-    protected StringType name;
+	@Child(name = "name", type = { StringType.class }, order = 0, min = 1, max = 1, modifier = false, summary = false)
+	protected StringType name;
 
-    @Child(name = "nodeId", type = {StringType.class}, order = 2)
-    private StringType nodeId;
+	@Child(name = "nodeId", type = { StringType.class }, order = 2)
+	private StringType nodeId;
 
-    @Child(name = "label", type = {StringType.class}, order = 3)
-    private StringType label;
+	@Child(name = "label", type = { StringType.class }, order = 3)
+	private StringType label;
 
-    @Child(name = "node", type = {Location.class}, order = 4)
-    private Location node;
+	@Child(name = "node", type = { Location.class }, order = 4)
+	private Location node;
 
-    @Child(name = "parent", type = {StringType.class}, order = 5)
-    private StringType parent;
+	@Child(name = "parent", type = { StringType.class }, order = 5)
+	private StringType parent;
 
-    @Child(name = "children", type = {ChildTreeNode.class},
-            order = 6,
-            min = 0,
-            max = -1,
-            modifier = false,
-            summary = false)
-    private List<ChildTreeNode> children;
+	@Child(name = "children", type = { ChildTreeNode.class },
+			order = 6,
+			min = 0,
+			max = -1,
+			modifier = false,
+			summary = false)
+	private List<ChildTreeNode> children;
 
-    public TreeNode() {
-        children = new ArrayList<>();
-    }
+	public TreeNode() {
+		children = new ArrayList<>();
+	}
 
-    public TreeNode(StringType name, StringType nodeId, StringType label, Location node, StringType parent) {
-        this.name = name;
-        this.nodeId = nodeId;
-        this.label = label;
-        this.node = node;
-        this.parent = parent;
-    }
+	public TreeNode(StringType name, StringType nodeId, StringType label, Location node, StringType parent) {
+		this.name = name;
+		this.nodeId = nodeId;
+		this.label = label;
+		this.node = node;
+		this.parent = parent;
+	}
 
-    public StringType getName() {
-        if (name == null) {
-            name = new StringType();
-        }
-        return name;
-    }
+	public StringType getName() {
+		if (name == null) {
+			name = new StringType();
+		}
+		return name;
+	}
 
-    public TreeNode setName(StringType name) {
-        this.name = name;
-        return this;
-    }
+	public TreeNode setName(StringType name) {
+		this.name = name;
+		return this;
+	}
 
+	public StringType getLabel() {
+		return label;
+	}
 
-    public StringType getLabel() {
-        return label;
-    }
+	public TreeNode setLabel(StringType label) {
+		this.label = label;
+		return this;
+	}
 
-    public TreeNode setLabel(StringType label) {
-        this.label = label;
-        return this;
-    }
+	@Override
+	public Type copy() {
+		TreeNode treeNode = new TreeNode();
+		copyValues(treeNode);
+		return treeNode;
+	}
 
-    @Override
-    public Type copy() {
-        TreeNode treeNode = new TreeNode();
-        copyValues(treeNode);
-        return treeNode;
-    }
+	@Override
+	public boolean isEmpty() {
+		return ElementUtil.isEmpty(node);
+	}
 
-    @Override
-    public boolean isEmpty() {
-        return ElementUtil.isEmpty(node);
-    }
+	@Override
+	protected Type typedCopy() {
+		return copy();
+	}
 
-    @Override
-    protected Type typedCopy() {
-        return copy();
-    }
+	public StringType getNodeId() {
+		return nodeId;
+	}
 
-    public StringType getNodeId() {
-        return nodeId;
-    }
+	public TreeNode setNodeId(StringType nodeId) {
+		this.nodeId = nodeId;
+		return this;
+	}
 
-    public TreeNode setNodeId(StringType nodeId) {
-        this.nodeId = nodeId;
-        return this;
-    }
+	public Location getNode() {
+		return node;
+	}
 
-    public Location getNode() {
-        return node;
-    }
+	public TreeNode setNode(Location node) {
+		this.node = node;
+		return this;
+	}
 
-    public TreeNode setNode(Location node) {
-        this.node = node;
-        return this;
-    }
+	public StringType getParent() {
+		return parent;
+	}
 
-    public StringType getParent() {
-        return parent;
-    }
+	public TreeNode setParent(StringType parent) {
+		this.parent = parent;
+		return this;
+	}
 
-    public TreeNode setParent(StringType parent) {
-        this.parent = parent;
-        return this;
-    }
+	public List<ChildTreeNode> getChildren() {
+		if (children == null) {
+			children = new ArrayList<>();
+		}
+		return children;
+	}
 
-    public List<ChildTreeNode> getChildren() {
-        if (children == null) {
-            children = new ArrayList<>();
-        }
-        return children;
-    }
+	public TreeNode setChildren(List<ChildTreeNode> children) {
+		this.children = children;
+		return this;
+	}
 
-    public TreeNode setChildren(List<ChildTreeNode> children) {
-        this.children = children;
-        return this;
-    }
+	public void addChild(TreeNode node) {
+		if (children == null) {
+			children = new ArrayList<>();
+		}
+		ChildTreeNode childTreeNode = new ChildTreeNode();
+		childTreeNode.setChildId(node.getNodeId());
+		List<TreeNode> treeNodeList = new ArrayList<>();
+		TreeNode treeNode = new TreeNode();
+		treeNode.setNode(node.getNode());
+		treeNode.setNodeId(node.getNodeId());
+		treeNode.setLabel(node.getLabel());
+		treeNode.setParent(node.getParent());
+		treeNodeList.add(treeNode);
+		childTreeNode.setChildren(treeNode);
+		children.add(childTreeNode);
+	}
 
-    public void addChild(TreeNode node) {
-        if (children == null) {
-            children = new ArrayList<>();
-        }
-        ChildTreeNode childTreeNode = new ChildTreeNode();
-        childTreeNode.setChildId(node.getNodeId());
-        List<TreeNode> treeNodeList = new ArrayList<>();
-        TreeNode treeNode = new TreeNode();
-        treeNode.setNode(node.getNode());
-        treeNode.setNodeId(node.getNodeId());
-        treeNode.setLabel(node.getLabel());
-        treeNode.setParent(node.getParent());
-        treeNodeList.add(treeNode);
-        childTreeNode.setChildren(treeNode);
-        children.add(childTreeNode);
-    }
-
-
-    public TreeNode findChild(String id) {
-        String idString = (String) id;
-        if (idString.contains("/_")) {
-            idString = idString.substring(0, idString.indexOf("/_"));
-        }
-        if (children != null && children.size() > 0) {
-            for (int i = 0; i < children.size(); i++) {
-                    if (children.get(i) != null) {
-                        for (ChildTreeNode child : children) {
-                            if (child != null && child.getChildren() != null
-                                    && child.getChildren().getNodeId() != null && child.getChildren().getNodeId().getValue().equals(idString)) {
-                                return child.getChildren();
-                            } else if (child != null && child != null) {
-                                TreeNode node = child.getChildren().findChild(idString);
-                                if (node != null)
-                                    return node;
-                            }
-                        }
-                    }
-            }
-        }
-        return null;
-    }
+	public TreeNode findChild(String id) {
+		String idString = (String) id;
+		if (idString.contains("/_")) {
+			idString = idString.substring(0, idString.indexOf("/_"));
+		}
+		if (children != null && children.size() > 0) {
+			for (int i = 0; i < children.size(); i++) {
+				if (children.get(i) != null) {
+					for (ChildTreeNode child : children) {
+						if (child != null && child.getChildren() != null
+								&& child.getChildren().getNodeId() != null && child.getChildren().getNodeId().getValue()
+								.equals(idString)) {
+							return child.getChildren();
+						} else if (child != null && child != null) {
+							TreeNode node = child.getChildren().findChild(idString);
+							if (node != null)
+								return node;
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
 
 }

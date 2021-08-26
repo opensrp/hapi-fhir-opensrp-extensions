@@ -10,49 +10,49 @@ import org.hl7.fhir.r4.model.Type;
 @DatatypeDef(name = "SingleTreeNode")
 public class SingleTreeNode extends Type implements ICompositeType {
 
-    @Child(name = "treeNodeId", type = {StringType.class}, order = 0)
-    private StringType treeNodeId;
+	@Child(name = "treeNodeId", type = { StringType.class }, order = 0)
+	private StringType treeNodeId;
 
-    @Child(name = "treeNode", type = {TreeNode.class},
-            order = 1,
-            min = 0,
-            max = -1,
-            modifier = false,
-            summary = false)
-    private TreeNode treeNode;
+	@Child(name = "treeNode", type = { TreeNode.class },
+			order = 1,
+			min = 0,
+			max = -1,
+			modifier = false,
+			summary = false)
+	private TreeNode treeNode;
 
-    @Override
-    public Type copy() {
-        SingleTreeNode singleTreeNode = new SingleTreeNode();
-        copyValues(singleTreeNode);
-        return singleTreeNode;
-    }
+	@Override
+	public Type copy() {
+		SingleTreeNode singleTreeNode = new SingleTreeNode();
+		copyValues(singleTreeNode);
+		return singleTreeNode;
+	}
 
-    @Override
-    public boolean isEmpty() {
-        return ElementUtil.isEmpty(treeNodeId, treeNode);
-    }
+	@Override
+	public boolean isEmpty() {
+		return ElementUtil.isEmpty(treeNodeId, treeNode);
+	}
 
-    @Override
-    protected Type typedCopy() {
-        return copy();
-    }
+	@Override
+	protected Type typedCopy() {
+		return copy();
+	}
 
-    public StringType getTreeNodeId() {
-        return treeNodeId;
-    }
+	public StringType getTreeNodeId() {
+		return treeNodeId;
+	}
 
-    public SingleTreeNode setTreeNodeId(StringType treeNodeId) {
-        this.treeNodeId = treeNodeId;
-        return this;
-    }
+	public SingleTreeNode setTreeNodeId(StringType treeNodeId) {
+		this.treeNodeId = treeNodeId;
+		return this;
+	}
 
-    public TreeNode getTreeNode() {
-        return treeNode;
-    }
+	public TreeNode getTreeNode() {
+		return treeNode;
+	}
 
-    public SingleTreeNode setTreeNode(TreeNode treeNode) {
-        this.treeNode = treeNode;
-        return this;
-    }
+	public SingleTreeNode setTreeNode(TreeNode treeNode) {
+		this.treeNode = treeNode;
+		return this;
+	}
 }
