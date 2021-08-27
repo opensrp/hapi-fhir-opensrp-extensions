@@ -3,6 +3,7 @@ package org.smartregister.extension.model;
 import ca.uhn.fhir.model.api.annotation.Child;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import ca.uhn.fhir.util.ElementUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.ICompositeType;
@@ -48,7 +49,7 @@ public class Tree extends Type implements ICompositeType {
 		if (parentChildren != null) {
 			for (int i = 0; i < parentChildren.size(); i++) {
 				kids = parentChildren.get(i) != null && parentChildren.get(i).getIdentifier() != null &&
-						parentChildren.get(i).getIdentifier().getValue() != null &&
+						StringUtils.isNotBlank(parentChildren.get(i).getIdentifier().getValue()) &&
 						parentChildren.get(i).getIdentifier().getValue().equals(parent) ?
 						parentChildren.get(i).getChildIdentifiers() :
 						null;
@@ -75,7 +76,7 @@ public class Tree extends Type implements ICompositeType {
 		Boolean setParentChildMap = false;
 		for (int i = 0; i < parentChildren.size(); i++) {
 			if (parentChildren.get(i) != null && parentChildren.get(i).getIdentifier() != null
-					&& parentChildren.get(i).getIdentifier().getValue() != null &&
+					&& StringUtils.isNotBlank(parentChildren.get(i).getIdentifier().getValue()) &&
 					parentChildren.get(i).getIdentifier().getValue().equals(parent)) {
 				parentChildren.get(i).setChildIdentifiers(kids);
 				setParentChildMap = true;
@@ -101,16 +102,16 @@ public class Tree extends Type implements ICompositeType {
 			throw new IllegalArgumentException("Node with ID " + id + " already exists in tree");
 		}
 
-		TreeNode n = makeNode(id, label, node, parentId);
+		TreeNode treeNode = makeNode(id, label, node, parentId);
 
 		if (parentId != null) {
 			addToParentChildRelation(parentId, id);
 
-			TreeNode p = getNode(parentId);
+			TreeNode parentNode = getNode(parentId);
 
 			//if parent exists add to it otherwise add as root for now
-			if (p != null) {
-				p.addChild(n);
+			if (parentNode != null) {
+				parentNode.addChild(treeNode);
 			} else {
 				// if no parent exists add it as root node
 				String idString = (String) id;
@@ -121,7 +122,7 @@ public class Tree extends Type implements ICompositeType {
 				StringType treeNodeId = new StringType();
 				treeNodeId.setValue(idString);
 				singleTreeNode.setTreeNodeId(treeNodeId);
-				singleTreeNode.setTreeNode(n);
+				singleTreeNode.setTreeNode(treeNode);
 				listOfNodes = singleTreeNode;
 			}
 		} else {
@@ -135,26 +136,26 @@ public class Tree extends Type implements ICompositeType {
 			StringType treeNodeId = new StringType();
 			treeNodeId.setValue(idString);
 			singleTreeNode.setTreeNodeId(treeNodeId);
-			singleTreeNode.setTreeNode(n);
+			singleTreeNode.setTreeNode(treeNode);
 			listOfNodes = singleTreeNode;
 		}
 	}
 
 	private TreeNode makeNode(String id, String label, Location node, String parentId) {
-		TreeNode n = getNode(id);
-		if (n == null) {
-			n = new TreeNode();
+		TreeNode treenode = getNode(id);
+		if (treenode == null) {
+			treenode = new TreeNode();
 			StringType nodeId = new StringType();
 			String idString = (String) id;
 			if (idString.contains(SLASH_UNDERSCORE)) {
 				idString = idString.substring(0, idString.indexOf(SLASH_UNDERSCORE));
 			}
 			nodeId.setValue((String) idString);
-			n.setNodeId(nodeId);
+			treenode.setNodeId(nodeId);
 			StringType labelString = new StringType();
 			labelString.setValue(label);
-			n.setLabel(labelString);
-			n.setNode(node);
+			treenode.setLabel(labelString);
+			treenode.setNode(node);
 			StringType parentIdString = new StringType();
 			String parentIdStringVar = parentId;
 
@@ -162,9 +163,9 @@ public class Tree extends Type implements ICompositeType {
 				parentIdStringVar = parentIdStringVar.substring(0, parentIdStringVar.indexOf(SLASH_UNDERSCORE));
 			}
 			parentIdString.setValue(parentIdStringVar);
-			n.setParent(parentIdString);
+			treenode.setParent(parentIdString);
 		}
-		return n;
+		return treenode;
 	}
 
 	public TreeNode getNode(String id) {
@@ -174,7 +175,8 @@ public class Tree extends Type implements ICompositeType {
 			idString = idString.substring(0, idString.indexOf(SLASH_UNDERSCORE));
 		}
 
-		if (listOfNodes.getTreeNodeId() != null && listOfNodes.getTreeNodeId().getValue().equals(idString)) {
+		if (listOfNodes.getTreeNodeId() != null && StringUtils.isNotBlank(listOfNodes.getTreeNodeId().getValue()) &&
+				listOfNodes.getTreeNodeId().getValue().equals(idString)) {
 			return listOfNodes.getTreeNode();
 
 		} else {
@@ -226,7 +228,8 @@ public class Tree extends Type implements ICompositeType {
 	private TreeNode recursivelyFindNode(String idString, List<ChildTreeNode> childTreeNodeList) {
 		for (ChildTreeNode childTreeNode : childTreeNodeList) {
 			TreeNode treeNode = childTreeNode.getChildren();
-			if (treeNode != null && treeNode.getNodeId() != null && treeNode.getNodeId().getValue().equals(idString)) {
+			if (treeNode != null && treeNode.getNodeId() != null && StringUtils.isNotBlank(treeNode.getNodeId().getValue()) &&
+					treeNode.getNodeId().getValue().equals(idString)) {
 				return treeNode;
 			} else {
 				if (treeNode != null && treeNode.getChildren() != null && treeNode.getChildren().size() > 0) {

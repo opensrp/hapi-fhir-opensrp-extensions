@@ -3,6 +3,7 @@ package org.smartregister.extension.model;
 import ca.uhn.fhir.model.api.annotation.Child;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import ca.uhn.fhir.util.ElementUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.ICompositeType;
 import org.hl7.fhir.r4.model.*;
 
@@ -154,7 +155,9 @@ public class TreeNode extends Type implements ICompositeType {
 				if (children.get(i) != null) {
 					for (ChildTreeNode child : children) {
 						if (child != null && child.getChildren() != null
-								&& child.getChildren().getNodeId() != null && child.getChildren().getNodeId().getValue()
+								&& child.getChildren().getNodeId() != null && StringUtils.isNotBlank(
+								child.getChildren().getNodeId().getValue())
+								&& child.getChildren().getNodeId().getValue()
 								.equals(idString)) {
 							return child.getChildren();
 						} else if (child != null && child != null) {
