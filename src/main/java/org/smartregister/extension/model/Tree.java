@@ -9,9 +9,10 @@ import org.hl7.fhir.instance.model.api.ICompositeType;
 import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Type;
-import org.smartregister.extension.rest.LocationHierarchyResourceProvider;
 
 import java.util.*;
+
+import static org.smartregister.extension.utils.Constants.SLASH_UNDERSCORE;
 
 @DatatypeDef(name = "Tree")
 public class Tree extends Type implements ICompositeType {
@@ -63,8 +64,8 @@ public class Tree extends Type implements ICompositeType {
 		}
 		StringType idStringType = new StringType();
 		String idString = id;
-		if (idString.contains("/_")) {
-			idString = idString.substring(0, idString.indexOf("/_"));
+		if (idString.contains(SLASH_UNDERSCORE)) {
+			idString = idString.substring(0, idString.indexOf(SLASH_UNDERSCORE));
 		}
 		idStringType.setValue(idString);
 
@@ -113,8 +114,8 @@ public class Tree extends Type implements ICompositeType {
 			} else {
 				// if no parent exists add it as root node
 				String idString = (String) id;
-				if (idString.contains("/_")) {
-					idString = idString.substring(0, idString.indexOf("/_"));
+				if (idString.contains(SLASH_UNDERSCORE)) {
+					idString = idString.substring(0, idString.indexOf(SLASH_UNDERSCORE));
 				}
 				SingleTreeNode singleTreeNode = new SingleTreeNode();
 				StringType treeNodeId = new StringType();
@@ -126,8 +127,8 @@ public class Tree extends Type implements ICompositeType {
 		} else {
 			// if no parent add it as root node
 			String idString = id;
-			if (idString.contains("/_")) {
-				idString = idString.substring(0, idString.indexOf("/_"));
+			if (idString.contains(SLASH_UNDERSCORE)) {
+				idString = idString.substring(0, idString.indexOf(SLASH_UNDERSCORE));
 			}
 
 			SingleTreeNode singleTreeNode = new SingleTreeNode();
@@ -145,8 +146,8 @@ public class Tree extends Type implements ICompositeType {
 			n = new TreeNode();
 			StringType nodeId = new StringType();
 			String idString = (String) id;
-			if (idString.contains("/_")) {
-				idString = idString.substring(0, idString.indexOf("/_"));
+			if (idString.contains(SLASH_UNDERSCORE)) {
+				idString = idString.substring(0, idString.indexOf(SLASH_UNDERSCORE));
 			}
 			nodeId.setValue((String) idString);
 			n.setNodeId(nodeId);
@@ -157,8 +158,8 @@ public class Tree extends Type implements ICompositeType {
 			StringType parentIdString = new StringType();
 			String parentIdStringVar = parentId;
 
-			if (parentIdStringVar != null && parentIdStringVar.contains("/_")) {
-				parentIdStringVar = parentIdStringVar.substring(0, parentIdStringVar.indexOf("/_"));
+			if (parentIdStringVar != null && parentIdStringVar.contains(SLASH_UNDERSCORE)) {
+				parentIdStringVar = parentIdStringVar.substring(0, parentIdStringVar.indexOf(SLASH_UNDERSCORE));
 			}
 			parentIdString.setValue(parentIdStringVar);
 			n.setParent(parentIdString);
@@ -169,8 +170,8 @@ public class Tree extends Type implements ICompositeType {
 	public TreeNode getNode(String id) {
 		// Check if id is any root node
 		String idString = id;
-		if (idString != null && idString.contains("/_")) {
-			idString = idString.substring(0, idString.indexOf("/_"));
+		if (idString != null && idString.contains(SLASH_UNDERSCORE)) {
+			idString = idString.substring(0, idString.indexOf(SLASH_UNDERSCORE));
 		}
 
 		if (listOfNodes.getTreeNodeId() != null && listOfNodes.getTreeNodeId().getValue().equals(idString)) {

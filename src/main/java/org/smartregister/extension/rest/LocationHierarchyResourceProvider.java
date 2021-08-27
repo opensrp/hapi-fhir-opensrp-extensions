@@ -14,8 +14,9 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-//import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+
+import static org.smartregister.extension.utils.Constants.*;
 
 public class LocationHierarchyResourceProvider implements IResourceProvider {
 
@@ -30,10 +31,10 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
 	}
 
 	@Search
-	public LocationHierarchy getLocationHierarchy(@RequiredParam(name = "identifier") TokenParam identifier) {
+	public LocationHierarchy getLocationHierarchy(@RequiredParam(name = IDENTIFIER) TokenParam identifier) {
 
 		SearchParameterMap paramMap = new SearchParameterMap();
-		paramMap.add("identifier", identifier);
+		paramMap.add(IDENTIFIER, identifier);
 
 		IBundleProvider locationBundle = locationIFhirResourceDao.search(paramMap);
 		List<IBaseResource> locations = locationBundle != null ?
@@ -50,11 +51,11 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
 			locationHierarchyTree.buildTreeFromList(getLocationHierarchy(id, locations.get(0)));
 			StringType locationIdString = new StringType().setId(id.toString()).getIdElement();
 			locationHierarchy.setLocationId(locationIdString);
-			locationHierarchy.setId("Location Resource:" + id);
+			locationHierarchy.setId(LOCATION_RESOURCE + id);
 
 			locationHierarchy.setLocationHierarchyTree(locationHierarchyTree);
 		} else {
-			locationHierarchy.setId("Location Resource : Not Found");
+			locationHierarchy.setId(LOCATION_RESOURCE_NOT_FOUND);
 		}
 		return locationHierarchy;
 
@@ -69,11 +70,11 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
 		SearchParameterMap paramMap = new SearchParameterMap();
 		ReferenceAndListParam thePartOf = new ReferenceAndListParam();
 		ReferenceParam partOf = new ReferenceParam();
-		partOf.setValue("Location/" + id);
+		partOf.setValue(LOCATION + FORWARD_SLASH + id);
 		ReferenceOrListParam referenceOrListParam = new ReferenceOrListParam();
 		referenceOrListParam.add(partOf);
 		thePartOf.addValue(referenceOrListParam);
-		paramMap.add("partof", thePartOf);
+		paramMap.add(PART_OF, thePartOf);
 
 		IBundleProvider childLocationBundle = locationIFhirResourceDao.search(paramMap);
 		List<Location> allLocations = new ArrayList<>();

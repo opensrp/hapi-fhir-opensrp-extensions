@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import static org.smartregister.extension.utils.Constants.SLASH_UNDERSCORE;
+
 @DatatypeDef(name = "TreeNode")
 public class TreeNode extends Type implements ICompositeType {
 
@@ -144,8 +146,8 @@ public class TreeNode extends Type implements ICompositeType {
 
 	public TreeNode findChild(String id) {
 		String idString = (String) id;
-		if (idString.contains("/_")) {
-			idString = idString.substring(0, idString.indexOf("/_"));
+		if (idString.contains(SLASH_UNDERSCORE)) {
+			idString = idString.substring(0, idString.indexOf(SLASH_UNDERSCORE));
 		}
 		if (children != null && children.size() > 0) {
 			for (int i = 0; i < children.size(); i++) {

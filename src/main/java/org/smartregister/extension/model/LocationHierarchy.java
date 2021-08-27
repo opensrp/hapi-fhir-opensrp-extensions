@@ -35,15 +35,15 @@ public class LocationHierarchy extends Location {
 
 	@Override
 	public Location copy() {
-		Location dst = new Location();
+		Location location = new Location();
 		Bundle bundle = new Bundle();
 		List<Bundle.BundleEntryComponent> theEntry = new ArrayList<>();
 		Bundle.BundleEntryComponent entryComponent = new Bundle.BundleEntryComponent();
 		entryComponent.setResource(new Bundle());
 		theEntry.add(entryComponent);
 		bundle.setEntry(theEntry);
-		this.copyValues(dst);
-		return dst;
+		this.copyValues(location);
+		return location;
 	}
 
 	@Override
