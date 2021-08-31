@@ -21,3 +21,20 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# Default ignored files
+/shelf/
+/workspace.xml
+target/
+.project
+.classpath
+.settings/
+.DS_Store
+.idea/
+*.iml
+*.ipr
+*.iws
+logfile
+*.log*
+.springBeans
+.gradle/
