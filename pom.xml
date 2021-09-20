@@ -6,7 +6,7 @@
 	<artifactId>hapi-fhir-opensrp-extensions</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>hapi-fhir-opensrp-extensions</name>
+	<name>HAPI FHIR OpenSRP Extensions</name>
 	<description>This repository holds all the code extensions on top of Hapi-FHIR</description>
 	<url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
 
