@@ -9,11 +9,10 @@
 
 	<description>The repository holds the location extensions on the HAPI server</description>
 	<groupId>org.smartregister.hapi-fhir-opensrp-extensions.location</groupId>
-	<name>hapi-fhir-opensrp-extensions.location</name>
+	<name>hapi-fhir-opensrp-extensions-location</name>
 	<packaging>jar</packaging>
 	<url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
 	<version>0.0.1-SNAPSHOT</version>
-
 	<artifactId>location</artifactId>
 
 </project>
