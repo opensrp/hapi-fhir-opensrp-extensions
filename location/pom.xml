@@ -1,0 +1,18 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>hapi-fhir-opensrp-extensions</artifactId>
+		<groupId>org.smartregister</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<description>The repository holds the location extensions on the HAPI server</description>
+	<groupId>org.smartregister.hapi-fhir-opensrp-extensions</groupId>
+	<name>HAPI FHIR OpenSRP Extensions (Locations)</name>
+	<packaging>jar</packaging>
+	<url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
+	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>location</artifactId>
+
+</project>
