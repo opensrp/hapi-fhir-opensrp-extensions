@@ -104,8 +104,7 @@
 	</dependencies>
 
 	<build>
-		<plugins>
-        <sourceDirectory>src/main/java</sourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.jacoco</groupId>
