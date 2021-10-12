@@ -11,8 +11,8 @@ public class patient {
     }
 
     @Given("I am Testing Case : {string}")
-    public void i_am_Testing_Case(String string) {
-
+    public void i_am_Testing_Case(String caseId) {
+         Hooks.caseID = caseId;
     }
     @When("users send post request for patient")
     public void users_send_post_request_for_patient() {

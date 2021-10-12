@@ -46,6 +46,9 @@ public class ApplicationConfigReader {
     @Property("Environment")
     private String Environment;
 
+    @Property("UpdateCase")
+    private String UpdateCase;
+
     public ApplicationConfigReader() {
         PropertyLoader.newInstance().populate(this);
     }
@@ -114,5 +117,9 @@ public class ApplicationConfigReader {
 
     public String getEnviroment() {
         return this.Environment;
+    }
+
+    public String getUpdateTestRail() {
+        return this.UpdateCase;
     }
 }

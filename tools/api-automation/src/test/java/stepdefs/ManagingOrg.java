@@ -50,4 +50,9 @@ public class ManagingOrg {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
         System.out.println(ReusableFunctions.getResponse());
     }
+
+    @Then("verify the response body")
+    public void verify_the_response_body() {
+        validation.ManagingOrg.validatePostResponse();
+    }
 }

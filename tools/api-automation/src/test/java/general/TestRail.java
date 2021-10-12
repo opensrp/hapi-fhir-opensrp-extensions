@@ -1,11 +1,13 @@
 package general;
 
 import com.google.common.base.Throwables;
+import config.ConfigProperties;
 import cucumber.api.Result;
 import cucumber.api.Scenario;
 import cucumber.runtime.ScenarioImpl;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.json.JSONObject;
+
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.IOException;
@@ -32,13 +34,14 @@ public class TestRail {
     static {
         TestRunName = "API"+ "-Automation-Test-" + LocalDate.now();
         jsonParser = new JSONParser();
-        if (!Stream.of("https://ona.testrail.io/", "naveen.zehra@venturedive.com", "Donny!Donny1").anyMatch(Objects::isNull) && !Stream.of("https://ona.testrail.io/", "naveen.zehra@venturedive.com", "Donny!Donny1").anyMatch((i) -> {
+        if (!Stream.of(ConfigProperties.testRailUrl, ConfigProperties.testRailUsername, ConfigProperties.testRailPassword).anyMatch(Objects::isNull) && !Stream.of(ConfigProperties.testRailUrl, ConfigProperties.testRailUsername, ConfigProperties.testRailPassword).anyMatch((i) -> {
             return i.isEmpty();
         })) {
             try {
-                client = new APIClient("https://ona.testrail.io/");
-                client.setUser("naveen.zehra@venturedive.com");
-                client.setPassword("Donny!Donny1");
+                client = new APIClient(ConfigProperties
+                        .testRailUrl);
+                client.setUser(ConfigProperties.testRailUsername);
+                client.setPassword(ConfigProperties.testRailPassword);
             } catch (Exception var1) {
                 System.out.println(Throwables.getStackTraceAsString(var1));
             }
@@ -115,28 +118,28 @@ public class TestRail {
             }
         }
     }
-//    public static void updateTestRail() throws IOException, APIException {
-//        if (client != null) {
-//            System.out.println(DataList.caseid);
-//
-//            for(int i = 0; i < DataList.caseid.size(); ++i) {
-//                System.out.println(DataList.caseid.get(i) + "" + DataList.result.get(i));
-//                if (BaseConfigProperties.UpdateCase.toLowerCase().equals("true")) {
-//                    try {
-//                        client.sendPost("update_case/" + DataList.caseid.get(i), DataList.updateData.get(i));
-//                    } catch (Exception var3) {
-//                        System.out.println(Throwables.getStackTraceAsString(var3));
-//                    }
-//                }
-//
-//                try {
-//                    client.sendPost("add_result_for_case/" + suiteId + "/" + DataList.caseid.get(i), DataList.result.get(i));
-//                } catch (Exception var2) {
-//                    System.out.println(Throwables.getStackTraceAsString(var2));
-//                }
-//            }
-//        }
+    public static void updateTestRail() throws IOException, APIException {
+        if (client != null) {
+            System.out.println(DataList.caseid);
 
- //   }
+            for(int i = 0; i < DataList.caseid.size(); ++i) {
+                System.out.println(DataList.caseid.get(i) + "" + DataList.result.get(i));
+                if (ConfigProperties.UpdateCase.toLowerCase().equals("true")) {
+                    try {
+                        client.sendPost("update_case/" + DataList.caseid.get(i), DataList.updateData.get(i));
+                    } catch (Exception var3) {
+                        System.out.println(Throwables.getStackTraceAsString(var3));
+                    }
+                }
+
+                try {
+                    client.sendPost("add_result_for_case/" + suiteId + "/" + DataList.caseid.get(i), DataList.result.get(i));
+                } catch (Exception var2) {
+                    System.out.println(Throwables.getStackTraceAsString(var2));
+                }
+            }
+        }
+
+    }
 
 }

@@ -5,6 +5,7 @@ import config.ConfigProperties;
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 
+import general.APIException;
 import general.SendEmailAfterExecution;
 import general.TestRail;
 import org.junit.AfterClass;
@@ -17,6 +18,7 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 
 
 import static config.ConfigProperties.sendEmail;
@@ -70,15 +72,14 @@ public  class RunCukesTest
     }
 
     @AfterClass
-    public static void AfterClass() throws IOException, MessagingException {
+    public static void AfterClass() throws IOException, MessagingException, APIException {
         if(ConfigProperties.isReportingEnable.toLowerCase().equals("true")) {
             Reports.getExtentReport().flush();
             Reports.getExtentReport().close();
         }
         if(ConfigProperties.logTestRail.toLowerCase().equals("true")) {
             TestRail.createSuite();
-//            TestRail.updateTestRail();
-//            TestRail.AttachImagesWithTestResults(screenShotCollection);
+            TestRail.updateTestRail();
         }
         if (sendEmail.toLowerCase().equals("true")) {
             System.out.println("sendEmail");
@@ -86,4 +87,7 @@ public  class RunCukesTest
         }
 
     }
+
+
+
 }

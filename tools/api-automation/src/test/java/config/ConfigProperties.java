@@ -25,6 +25,7 @@ public class ConfigProperties {
     public static String Project = appConfig.getProject();
     public static String Platform = appConfig.getPlatform();
     public static String Environment = appConfig.getEnviroment();
+    public static String UpdateCase = appConfig.getUpdateTestRail();
 
 
 
