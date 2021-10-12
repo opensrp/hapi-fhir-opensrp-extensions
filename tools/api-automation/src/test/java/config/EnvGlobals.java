@@ -11,5 +11,6 @@ public class EnvGlobals {
     public static StringBuilder difference = new StringBuilder();
 
     public static RequestSpecification requestSpecification;
+    public static String managingOrgId;
 
  }
