@@ -1,8 +1,8 @@
 package payloads;
 
-public class ManigingOrgPayload {
+public class OrganizationPayload {
 
-    public static String createManagingOrg()
+    public static String createOrganization(String name)
     {
         return "{\n" +
                 "  \"resourceType\": \"Organization\",\n" +
@@ -10,12 +10,12 @@ public class ManigingOrgPayload {
                 "    \"status\": \"generated\",\n" +
                 "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">\\n      \\n      <p>Ministry of Health</p>\\n    \\n    </div>\"\n" +
                 "  },\n" +
-                "  \"name\": \"Ministry of Health\"\n" +
+                "  \"name\": \""+name+"\"\n" +
                 "}";
     }
 
 
-    public static String updateManagingOrg(String id)
+    public static String updateOrganization(String id,String name)
     {
         return "{\n" +
                 "  \"resourceType\": \"Organization\",\n" +
@@ -28,7 +28,7 @@ public class ManigingOrgPayload {
                 "    \"status\": \"generated\",\n" +
                 "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">\\n      \\n      <p>Ministry of Health</p>\\n    \\n    </div>\"\n" +
                 "  },\n" +
-                "  \"name\": \"Ministry of Health\",\n" +
+                "  \"name\": \""+name+"\",\n" +
                 "\t\t \"address\": [\n" +
                 "    {\n" +
                 "      \"line\": [\n" +

@@ -58,9 +58,6 @@ public class ReusableFunctions {
         return general.EnvGlobals.response != null ? general.EnvGlobals.response.getBody().asString() : null;
     }
 
-    public static int getResponseLengthByKey(String Key) {
-        return (Integer) general.EnvGlobals.response.body().path(Key, new String[0]);
-    }
 
     private static JSONArray sortApiResponse(JSONArray jsonArr, final String sortBy, boolean sortOrder) {
         JSONArray sortedJsonArray = new JSONArray();
@@ -93,23 +90,12 @@ public class ReusableFunctions {
         return sortedJsonArray;
     }
 
-    public static void givenHeadersWithBasicAuth(String username, String password, String Cookie) {
-        System.out.println(username + "" + password);
-        contentType("application/json");
-        general.EnvGlobals.requestSpecification = REQUEST.given().auth().basic(username, password).cookie(Cookie);
-    }
 
     public static String getResponsePath(String key) {
         return general.EnvGlobals.response.getBody().path(key, new String[0]).toString();
     }
 
-    public static int getLength(String Path) {
-        return (Integer) general.EnvGlobals.response.body().path(Path, new String[0]);
-    }
 
-    public static void verifySchema(String jsonFile) {
-        ((ValidatableResponse)((ValidatableResponse)((ValidatableResponse) general.EnvGlobals.response.then()).log().all()).assertThat()).body(JsonSchemaValidator.matchesJsonSchemaInClasspath(jsonFile), new Matcher[0]);
-    }
 
     public static JSONArray getResponseJson(String... params) {
         JsonPath jsonPathEvaluator = general.EnvGlobals.response.jsonPath();
@@ -143,23 +129,13 @@ public class ReusableFunctions {
        general.EnvGlobals.requestSpecification = REQUEST.given();
     }
 
-    public static void givenFormData(Map<String, String> formData) {
-        contentType("multipart/form-data");
-        Iterator it = formData.entrySet().iterator();
 
-        while(it.hasNext()) {
-            Entry<String, String> pair = (Entry)it.next();
-            general.EnvGlobals.requestSpecification = REQUEST.given().multiPart((String)pair.getKey(), (String)pair.getValue());
-            it.remove();
-        }
 
-    }
 
-    public static void givenHeaders(Map<String, String> headers) {
+    public static void givenHeaders() {
         contentType("application/json");
-        general.EnvGlobals.requestSpecification = REQUEST.given().headers(headers);
+        general.EnvGlobals.requestSpecification = REQUEST.given();
     }
-
     public static void givenHeaderPayload(Map<String, String> headers, String payload) {
         contentType("application/json");
         general.EnvGlobals.requestSpecification = REQUEST.given();
@@ -173,53 +149,7 @@ public class ReusableFunctions {
 
     }
 
-    public static void givenHeaderFormData(Map<String, String> headers, Map<String, String> formData) {
-        contentType("multipart/form-data");
-        Iterator<Entry<String, String>> it = formData.entrySet().iterator();
-        Entry pair;
-        if (headers == null) {
-            general.EnvGlobals.requestSpecification = REQUEST.given();
 
-            while(it.hasNext()) {
-                pair = (Entry)it.next();
-                general.EnvGlobals.requestSpecification = REQUEST.given().multiPart((String)pair.getKey(), (String)pair.getValue());
-                it.remove();
-            }
-        } else {
-            general.EnvGlobals.requestSpecification = REQUEST.given().headers(headers);
-
-            while(it.hasNext()) {
-                pair = (Entry)it.next();
-                general.EnvGlobals.requestSpecification = REQUEST.given().multiPart((String)pair.getKey(), pair.getValue());
-                it.remove();
-            }
-        }
-
-    }
-
-    public static void givenHeaderFormDataWithParam(Map<String, String> headers, Map<String, String> params, Map<String, String> formData) {
-        contentType("multipart/form-data");
-        Iterator<Entry<String, String>> it = formData.entrySet().iterator();
-        Entry pair;
-        if (headers == null) {
-            general.EnvGlobals.requestSpecification = REQUEST.given();
-
-            while(it.hasNext()) {
-                pair = (Entry)it.next();
-               general.EnvGlobals.requestSpecification = REQUEST.given().multiPart((String)pair.getKey(), (String)pair.getValue());
-                it.remove();
-            }
-        } else {
-            general.EnvGlobals.requestSpecification = REQUEST.given().queryParams(params).headers(headers);
-
-            while(it.hasNext()) {
-                pair = (Entry)it.next();
-                general.EnvGlobals.requestSpecification = REQUEST.given().multiPart((String)pair.getKey(), pair.getValue());
-                it.remove();
-            }
-        }
-
-    }
 
     public static void whenFunction(String requestType, String endPoint) {
         byte var3 = -1;
@@ -273,14 +203,6 @@ public class ReusableFunctions {
         ((ValidatableResponse)((ValidatableResponse) general.EnvGlobals.response.then()).log().all()).statusCode(statusCode);
     }
 
-    public static void thenFunction(int statusCode, int statusCode2) {
-        ((ValidatableResponse)((ValidatableResponse) general.EnvGlobals.response.then()).log().all()).statusCode(anyOf(is(statusCode),is(statusCode2)));
-    }
-
-    public static void thenObjectmatch(String path, String matchers) {
-        ((ValidatableResponse) general.EnvGlobals.response.then()).body(path, Matchers.hasItem(matchers), new Object[0]);
-    }
-
     public static <K, V> Map<K, V> headers(Object... keyValues) {
         Map<K, V> map = new HashMap();
 
@@ -311,62 +233,6 @@ public class ReusableFunctions {
         return map;
     }
 
-    public static void compareFile(String apiResponse, String jsonFile, String[] ignoreFields) {
-        JSONParser jsonParser = new JSONParser();
-        ObjectMapper mapper = new ObjectMapper();
-
-        try {
-            org.json.simple.JSONObject jsonObject = (org.json.simple.JSONObject)jsonParser.parse(new FileReader(jsonFile));
-            String expectedResponse = jsonObject.toString();
-            general.FlatMapUtil.patterns = ignoreFields;
-            apiResponse = general.FlatMapUtil.transformJson(apiResponse);
-            expectedResponse = general.FlatMapUtil.transformJson(expectedResponse);
-            Map<String, Object> mapActual = (Map)mapper.readValue(apiResponse, Map.class);
-            Map<String, Object> mapExpected = (Map)mapper.readValue(expectedResponse, Map.class);
-            Map<String, Object> actualFlatMap = general.FlatMapUtil.flatten(mapActual);
-            Map<String, Object> ExpectedFlatMap = FlatMapUtil.flatten(mapExpected);
-            MapDifference<String, Object> difference = Maps.difference(actualFlatMap, ExpectedFlatMap);
-            System.out.println("Entries only on left\n--------------------------");
-            difference.entriesOnlyOnLeft().forEach((key, value) -> {
-                System.out.println(key + ": " + value);
-            });
-            System.out.println("\n\nEntries only on right\n--------------------------");
-            difference.entriesOnlyOnRight().forEach((key, value) -> {
-                System.out.println(key + ": " + value);
-            });
-            System.out.println("\n\nEntries differing\n--------------------------");
-            difference.entriesDiffering().forEach((key, value) -> {
-                System.out.println(key + ": " + value);
-            });
-            System.out.println("\n\nEntries differing\n--------------------------");
-            difference.entriesDiffering().forEach((key, value) -> {
-                general.EnvGlobals.difference.append(key + ": " + value);
-            });
-            System.out.println("\n\nEntries in common\n--------------------------");
-            difference.entriesInCommon().forEach((key, value) -> {
-                System.out.println(key + ": " + value);
-            });
-            Assert.assertEquals(difference.entriesDiffering().size(), 0);
-            Assert.assertEquals(difference.entriesOnlyOnLeft().size(), difference.entriesOnlyOnRight().size());
-        } catch (ParseException | IOException var12) {
-            var12.printStackTrace();
-        }
-
-    }
-
-    public static void givenParamHeader(Map<String, String> params, Map<String, String> headers) {
-        contentType("application/json");
-        general.EnvGlobals.requestSpecification = REQUEST.given().queryParams(params).headers(headers);
-    }
-
-    public static String Allocation(String EmployeeStartDate, String EmployeeEndDate, int Year, int Month, int AllocationPercent, int SpecialHolidays) throws ParseException, java.text.ParseException {
-        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
-        int EmpWorkingDays = WorkingDays(DateFor.parse(EmployeeStartDate), DateFor.parse(EmployeeEndDate), SpecialHolidays);
-        int TotalWorkingDaysInMonth = WorkingDayinMonth(Year, Month, SpecialHolidays);
-        double all = EmployeeAllocation((double)EmpWorkingDays, (double)TotalWorkingDaysInMonth, (double)AllocationPercent);
-        DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(all);
-    }
 
     private static int WorkingDays(Date startDate, Date endDate, int SpecialHolidays) {
         Calendar startCal = Calendar.getInstance();
@@ -396,23 +262,5 @@ public class ReusableFunctions {
                 return workDays;
             }
         }
-    }
-
-    private static double EmployeeAllocation(double WorkingDays, double TotalWorkingDayinMonth, double employeeAllocation) {
-        double Allocation = 0.0D;
-        Allocation = WorkingDays * (employeeAllocation / 100.0D) / TotalWorkingDayinMonth;
-        return Allocation;
-    }
-
-    private static int WorkingDayinMonth(int year, int month, int specialHolidays) throws ParseException, java.text.ParseException {
-        YearMonth yearMonth = YearMonth.of(year, month);
-        LocalDate firstOfMonth = yearMonth.atDay(1);
-        LocalDate last = yearMonth.atEndOfMonth();
-        String StartDate = firstOfMonth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        String EndDate = last.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        Date Start = (new SimpleDateFormat("dd/MM/yyyy")).parse(StartDate);
-        Date End = (new SimpleDateFormat("dd/MM/yyyy")).parse(EndDate);
-        int count = WorkingDays(Start, End, specialHolidays);
-        return count;
     }
 }

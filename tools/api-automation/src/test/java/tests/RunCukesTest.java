@@ -1,6 +1,8 @@
 package tests;
 
 
+
+import com.vimalselvam.cucumber.listener.Reporter;
 import config.ConfigProperties;
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
@@ -15,6 +17,7 @@ import utils.Reports;
 
 
 import javax.mail.MessagingException;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,10 +31,10 @@ import static config.ConfigProperties.sendEmail;
 @CucumberOptions(features = { "src/test/resources/feature" },
         glue = {"stepdefs"},
         plugin = { "pretty", "html:target/cucumber" },
+       // plugin = { "com.cucumber.listener.ExtentCucumberFormatter:target/cucumber-reports/report.html"},
         tags={"@test"})
 
 public  class RunCukesTest
-
 {
     static Integer passedCount = 0;
     static Integer failedCount = 0;
@@ -48,7 +51,6 @@ public  class RunCukesTest
     {
         return skippedCount;
     }
-
     public static void setPassCount(Integer passCount)
     {
         passedCount=passCount;
@@ -73,6 +75,7 @@ public  class RunCukesTest
 
     @AfterClass
     public static void AfterClass() throws IOException, MessagingException, APIException {
+        //Reporter.loadXMLConfig(new File(Reports.getReportConfigPath()));
         if(ConfigProperties.isReportingEnable.toLowerCase().equals("true")) {
             Reports.getExtentReport().flush();
             Reports.getExtentReport().close();
@@ -82,7 +85,6 @@ public  class RunCukesTest
             TestRail.updateTestRail();
         }
         if (sendEmail.toLowerCase().equals("true")) {
-            System.out.println("sendEmail");
             SendEmailAfterExecution.sendReportAfterExecution(passedCount, failedCount, skippedCount);
         }
 

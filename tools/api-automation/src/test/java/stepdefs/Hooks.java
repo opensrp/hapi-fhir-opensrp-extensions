@@ -35,6 +35,8 @@ public class Hooks extends RunCukesTest {
     public static Integer afterAddingStepsLength;
     public static Integer beforeAddingExpectedResultLength;
     public static Integer afterAddingExpectedResultLength;
+    public static String RequestPayLoad;
+    public static String endPoint;
 
     @Before
     public static void testStart(Scenario scenario) throws Throwable {

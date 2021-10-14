@@ -18,4 +18,10 @@ public class Reports {
             throw new IllegalStateException("Extent Report object not initialized");
         }
     }
+    public static String getReportConfigPath(){
+        String reportConfigPath = System.getProperty("user.dir")+"/extend-config2.xml";
+        if(reportConfigPath!= null) return reportConfigPath;
+        else throw new RuntimeException("Report Config Path not specified in the Configuration.properties file for the Key:reportConfigPath");
+    }
+
 }
