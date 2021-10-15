@@ -8,7 +8,7 @@ public class OrganizationPayload {
                 "  \"resourceType\": \"Organization\",\n" +
                 "  \"text\": {\n" +
                 "    \"status\": \"generated\",\n" +
-                "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">\\n      \\n      <p>Ministry of Health</p>\\n    \\n    </div>\"\n" +
+                "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">\\n      \\n      <p>"+name+"</p>\\n    \\n    </div>\"\n" +
                 "  },\n" +
                 "  \"name\": \""+name+"\"\n" +
                 "}";
@@ -26,10 +26,10 @@ public class OrganizationPayload {
                 "  },\n" +
                 "  \"text\": {\n" +
                 "    \"status\": \"generated\",\n" +
-                "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">\\n      \\n      <p>Ministry of Health</p>\\n    \\n    </div>\"\n" +
+                "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">\\n      \\n      <p>"+name+"</p>\\n    \\n    </div>\"\n" +
                 "  },\n" +
                 "  \"name\": \""+name+"\",\n" +
-                "\t\t \"address\": [\n" +
+                "  \"address\": [\n" +
                 "    {\n" +
                 "      \"line\": [\n" +
                 "        \"3300 Washtenaw Avenue, Suite 227\"\n" +
@@ -43,5 +43,7 @@ public class OrganizationPayload {
                 "}";
 
     }
+
+
 
 }

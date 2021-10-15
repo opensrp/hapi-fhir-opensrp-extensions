@@ -32,7 +32,7 @@ import static config.ConfigProperties.sendEmail;
         glue = {"stepdefs"},
         plugin = { "pretty", "html:target/cucumber" },
        // plugin = { "com.cucumber.listener.ExtentCucumberFormatter:target/cucumber-reports/report.html"},
-        tags={"@test"})
+        tags={"@FacilityLocation"})
 
 public  class RunCukesTest
 {

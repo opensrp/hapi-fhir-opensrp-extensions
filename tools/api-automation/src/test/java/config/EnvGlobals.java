@@ -12,5 +12,6 @@ public class EnvGlobals {
 
     public static RequestSpecification requestSpecification;
     public static String managingOrgId;
+    public static String LocationOrgId;
 
  }

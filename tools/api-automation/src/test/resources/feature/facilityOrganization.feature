@@ -10,7 +10,7 @@
     Then I receive valid Response for POST facility Organization service
 
   @GET
-  Scenario: Read Managing Organization
+  Scenario: Read Facility Organization
     Given I am Testing Case : "209"
     And I Set GET Organization service api endpoint
     When I Set request HEADER
@@ -19,7 +19,7 @@
 
 
   @PUT
-  Scenario: Update Managing Organization
+  Scenario: Update Facility Organization
     Given I am Testing Case : "210"
     And I Set PUT Facility Organization service api endpoint
     When I Set request HEADER and PAYLOAD
@@ -27,7 +27,7 @@
     Then I receive valid Response for PUT facility Organization service
 
   @GET @test
-  Scenario: Read Managing Organization with invalid id
+  Scenario: Read Facility Organization with invalid id
     Given I am Testing Case : "211"
     And I Set GET Organization service api endpoint with invalid id
     When I Set request HEADER
