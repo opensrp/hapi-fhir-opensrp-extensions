@@ -3,7 +3,7 @@
 Feature: Facility Organization
 
 
-  @POST
+  @POST @test
   Scenario: Create Managing Organization
     Given I am Testing Case : "115"
     And I Set POST Organization service api endpoint

@@ -14,5 +14,6 @@ public class EnvGlobals {
     public static String managingOrgId;
     public static String LocationOrgId;
     public static String PractitionerId;
+    public static String healthCaeServiceId;
 
  }
