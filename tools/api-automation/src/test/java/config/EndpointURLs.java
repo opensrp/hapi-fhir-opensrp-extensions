@@ -14,4 +14,7 @@ public class EndpointURLs {
     public static  String GET_LOCATION_BY_STATE = "/Location?address-state=MI";
 
 
+    public static  String PRACTITIONER_URL = "/Practitioner";
+    public static  String GET_PRACTITIONER_URL = "/Practitioner/%s";
+
 }
