@@ -78,9 +78,6 @@ public class ApplicationConfigReader {
         return this.TestRailpassword;
     }
 
-    public String getTestRailprojectid() {
-        return this.TestRailprojectid;
-    }
 
     public String getIsEnableReporting() {
         return this.isEnableReporting;
@@ -103,9 +100,6 @@ public class ApplicationConfigReader {
         return this.To;
     }
 
-    public String getProjectDescription() {
-        return this.ProjectDescription;
-    }
 
     public String getProject() {
         return this.Project;

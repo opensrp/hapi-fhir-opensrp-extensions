@@ -36,7 +36,7 @@ Feature: PractitionerRole
   @GET
   Scenario: Read Practitioner Role for specific practitioner
     Given I am Testing Case : "465"
-    And I Set GET Practitioner Role api endpoint for specific Organization
+    And I Set GET Practitioner Role api endpoint for specific practitioner
     When I Set request HEADER
     And Send a GET HTTP request
     Then I receive valid Response for GET Practitioner Role service
