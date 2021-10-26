@@ -4,7 +4,6 @@ package general;
 import config.ConfigProperties;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -21,8 +20,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 public class SendEmailAfterExecution {
-    public static String bodyData = "";
-    public static String path = "";
+
 
     public SendEmailAfterExecution() {
     }

@@ -12,5 +12,10 @@ public class EnvGlobals {
     public static String healthCaeServiceId;
     public static String practitionerRoleId;
     public static String patientId;
-
+    public static String relatedPersonId;
+    public static String encounterId;
+    public static String conditionId;
+    public static String observationId;
+    public static String goalId;
+    public static String careTeamId;
  }

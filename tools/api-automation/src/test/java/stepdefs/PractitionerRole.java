@@ -53,7 +53,7 @@ public class PractitionerRole {
         endPoint= String.format(endPoint, EnvGlobals.PractitionerId);
     }
 
-    @Given("I Set PUT Facility Practitioner Role api endpoint")
+    @Given("I Set PUT Practitioner Role api endpoint")
     public void i_Set_PUT_Facility_Practitioner_Role_api_endpoint() {
         endPoint = EndpointURLs.GET_PRACTITIONER_ROLE_URL;
         endPoint= String.format(endPoint, EnvGlobals.practitionerRoleId);

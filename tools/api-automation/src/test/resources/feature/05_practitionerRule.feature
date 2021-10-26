@@ -19,7 +19,7 @@ Feature: PractitionerRole
 
   @GET
   Scenario: Read Practitioner Role for specific location
-    Given I am Testing Case : "463"
+    Given I am Testing Case : "465"
     And I Set GET Practitioner Role api endpoint for specific location
     When I Set request HEADER
     And Send a GET HTTP request
@@ -35,7 +35,7 @@ Feature: PractitionerRole
 
   @GET
   Scenario: Read Practitioner Role for specific practitioner
-    Given I am Testing Case : "465"
+    Given I am Testing Case : "466"
     And I Set GET Practitioner Role api endpoint for specific practitioner
     When I Set request HEADER
     And Send a GET HTTP request
@@ -43,8 +43,8 @@ Feature: PractitionerRole
 
   @PUT
   Scenario: Update Practitioner Role
-    Given I am Testing Case : "466"
-    And I Set PUT Facility Practitioner Role api endpoint
+    Given I am Testing Case : "463"
+    And I Set PUT Practitioner Role api endpoint
     When I Set request HEADER and PAYLOAD
     And Send a PUT HTTP request
     Then I receive valid Response for PUT Practitioner Role service

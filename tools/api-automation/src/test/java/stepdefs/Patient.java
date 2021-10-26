@@ -4,9 +4,7 @@ import config.EndpointURLs;
 import config.EnvGlobals;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
 import general.ReusableFunctions;
-import payloads.OrganizationPayload;
 import payloads.PatientPayload;
 
 import static stepdefs.Hooks.RequestPayLoad;
@@ -42,7 +40,7 @@ public class Patient {
         endPoint= String.format(endPoint, EnvGlobals.managingOrgId);
     }
 
-    @Given("I Set PUT Facility Patient api endpoint")
+    @Given("I Set PUT Patient api endpoint")
     public void i_Set_PUT_Facility_Patient_api_endpoint() {
         endPoint = EndpointURLs.GET_PATIENT_ROLE_URL;
         endPoint= String.format(endPoint, EnvGlobals.patientId);

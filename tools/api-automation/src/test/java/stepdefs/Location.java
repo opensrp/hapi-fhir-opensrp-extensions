@@ -6,8 +6,6 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import general.ReusableFunctions;
 import payloads.LocationPayload;
-import payloads.OrganizationPayload;
-
 import static stepdefs.Hooks.RequestPayLoad;
 import static stepdefs.Hooks.endPoint;
 

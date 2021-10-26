@@ -19,7 +19,7 @@ Feature: HealthCareService
 
   @GET
   Scenario: Read Health Care Service for specific location
-    Given I am Testing Case : "439"
+    Given I am Testing Case : "441"
     And I Set GET Health Care Service api endpoint for specific location
     When I Set request HEADER
     And Send a GET HTTP request
@@ -35,7 +35,7 @@ Feature: HealthCareService
 
   @PUT
   Scenario: Update Practitioner
-    Given I am Testing Case : "441"
+    Given I am Testing Case : "439"
     And I Set PUT Facility Health Care Service api endpoint
     When I Set request HEADER and PAYLOAD
     And Send a PUT HTTP request

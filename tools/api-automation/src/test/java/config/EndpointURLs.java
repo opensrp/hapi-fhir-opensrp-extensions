@@ -33,4 +33,35 @@ public class EndpointURLs {
     public static String GET_PATIENT_ROLE_URL = "/Patient/%s";
     public static String GET_PATIENT_BY_ORGANIZATION_URL = "/Patient?organization=%s";
 
+
+    public static String RELATED_PERSON_URL = "/RelatedPerson";
+    public static String GET_RELATED_PERSON_URL = "/RelatedPerson/%s";
+    public static String GET_RELATED_PERSON_BY_PATIENT_URL = "/RelatedPerson?patient=%s";
+
+
+
+    public static String ENCOUNTER_URL = "/Encounter";
+    public static String GET_ENCOUNTER_URL = "/Encounter/%s";
+    public static String GET_ENCOUNTER_BY_PATIENT_URL = "/Encounter?patient=%s";
+
+
+    public static String CONDITION_URL = "/Condition";
+    public static String GET_CONDITION_URL = "/Condition/%s";
+    public static String GET_CONDITION_BY_PATIENT_URL = "/Condition?patient=%s";
+
+
+    public static String OBSERVATION_URL = "/Observation";
+    public static String GET_OBSERVATION_URL = "/Observation/%s";
+    public static String GET_OBSERVATION_BY_PATIENT_URL = "/Observation?patient=%s";
+
+
+    public static String GOAL_URL = "/Goal";
+    public static String GET_GOAL_URL = "/Goal/%s";
+    public static String GET_GOAL_BY_PATIENT_URL = "/Goal?patient=%s";
+
+    public static String CARE_TEAM_URL = "/CareTeam";
+    public static String GET_CARE_TEAM_URL = "/CareTeam/%s";
+    public static String GET_CARE_TEAM_BY_PATIENT_URL = "/CareTeam?patient=%s";
+
+
 }

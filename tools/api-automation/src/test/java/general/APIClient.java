@@ -30,44 +30,18 @@ public class APIClient {
         this.m_url = base_url + "index.php?/api/v2/";
     }
 
-    public String getUser() {
-        return this.m_user;
-    }
 
     public void setUser(String user) {
         this.m_user = user;
-    }
-
-    public String getPassword() {
-        return this.m_password;
     }
 
     public void setPassword(String password) {
         this.m_password = password;
     }
 
-    public Object sendGet(String uri, String data) throws MalformedURLException, IOException, APIException {
-        return this.sendRequest("GET", uri, data);
-    }
-
-    public Object sendGet(String uri) throws MalformedURLException, IOException, APIException {
-        return this.sendRequest("GET", uri, (Object)null);
-    }
-
-    public Object sendGets(String uri) throws MalformedURLException, IOException, APIException {
-        return this.sendRequest("GET", uri, (Object)null);
-    }
 
     public Object sendPost(String uri, Object data) throws MalformedURLException, IOException, APIException {
         return this.sendRequest("POST", uri, data);
-    }
-
-    public Object sendPost1(String uri, Object data) throws MalformedURLException, IOException, APIException {
-        return this.sendRequest("POST", uri, data);
-    }
-
-    public Object sendPostWithoutData(String uri) throws MalformedURLException, IOException, APIException {
-        return this.sendRequest("POST", uri, (Object)null);
     }
 
     private Object sendRequest(String method, String uri, Object data) throws MalformedURLException, IOException, APIException {

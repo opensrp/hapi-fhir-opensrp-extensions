@@ -20,7 +20,7 @@ Feature: Patient
 
   @GET
   Scenario: Read Patient for specific Organization
-    Given I am Testing Case : "482"
+    Given I am Testing Case : "483"
     And I Set GET Patient api endpoint for specific Organization
     When I Set request HEADER
     And Send a GET HTTP request
@@ -29,8 +29,8 @@ Feature: Patient
 
   @PUT
   Scenario: Update Patient
-    Given I am Testing Case : "483"
-    And I Set PUT Facility Patient api endpoint
+    Given I am Testing Case : "482"
+    And I Set PUT Patient api endpoint
     When I Set request HEADER and PAYLOAD
     And Send a PUT HTTP request
     Then I receive valid Response for PUT Patient service
