@@ -4,6 +4,7 @@ import config.EndpointURLs;
 import config.EnvGlobals;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
+import cucumber.runtime.Env;
 import general.ReusableFunctions;
 import payloads.OrganizationPayload;
 import static stepdefs.Hooks.RequestPayLoad;
@@ -38,6 +39,8 @@ public class Organization {
     @Then("I receive valid Response for GET Organization service")
     public void i_receive_valid_Response_for_GET_Organization_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.ManagingOrg.validatePostResponse(MANAGING_ORGANIZATION_NAME);
+        validation.ManagingOrg.validateOrganizationId(EnvGlobals.managingOrgId);
     }
 
     @Given("I Set PUT Organization service api endpoint")
@@ -51,6 +54,8 @@ public class Organization {
     public void i_receive_valid_Response_for_PUT_Organization_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
         validation.ManagingOrg.validatePostResponse(MANAGING_ORGANIZATION_NAME);
+        validation.ManagingOrg.validateOrganizationId(EnvGlobals.managingOrgId);
+        validation.ManagingOrg.validateOrganizationAddress();
     }
     @Given("I Set GET Organization service api endpoint with invalid id")
     public void i_Set_GET_Organization_service_api_endpoint_with_invalid_id() {
@@ -62,7 +67,6 @@ public class Organization {
     public void i_receive_Invalid_Response_for_GET_Organization_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
     }
-
 
     @Given("I Set POST Facility Organization service api endpoint")
     public void i_Set_POST_Facility_Organization_service_api_endpoint() {
@@ -90,5 +94,12 @@ public class Organization {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
         validation.ManagingOrg.validatePostResponse(FACILITY_ORGANIZATION_NAME);
     }
+
+    @Then("I receive valid Response for GET Organization service with specific Location")
+    public void i_receive_valid_Response_for_GET_Organization_service_with_specific_Location() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.ManagingOrg.validateLocation();
+    }
+
 
 }

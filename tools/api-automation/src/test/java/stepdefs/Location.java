@@ -24,6 +24,7 @@ public class Location {
     public void i_receive_valid_Response_for_POST_Location_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_CREATED);
         EnvGlobals.LocationOrgId = ReusableFunctions.getResponsePath("id");
+        validation.Location.validatePostResponse(ORGANIZATION_LOCATION_NAME);
     }
 
     @Given("I Set GET Location service api endpoint")
@@ -36,6 +37,16 @@ public class Location {
     @Then("I receive valid Response for GET Location service")
     public void i_receive_valid_Response_for_GET_Location_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Location.validatePostResponse(ORGANIZATION_LOCATION_NAME);
+        validation.Location.validateLocationId(EnvGlobals.LocationOrgId);
+
+    }
+
+    @Then("I receive valid Response for GET Location service with specific state")
+    public void i_receive_valid_Response_for_GET_Location_service_with_specific_state() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Location.validateLocation();
+
     }
 
     @Given("I Set PUT Location service api endpoint")
@@ -48,6 +59,7 @@ public class Location {
     @Then("I receive valid Response for PUT Location service")
     public void i_receive_valid_Response_for_PUT_Location_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Location.validateLocationTelecom();
     }
 
     @Given("I Set GET Location service api endpoint with invalid id")

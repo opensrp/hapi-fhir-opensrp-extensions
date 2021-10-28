@@ -89,7 +89,7 @@ public class LocationPayload {
                 "  \"telecom\": [\n" +
                 "    {\n" +
                 "      \"system\": \"phone\",\n" +
-                "      \"value\": \"(+1) 734-677-7777\"\n" +
+                "      \"value\": \"(+1) 734-677-0000\"\n" +
                 "    },\n" +
                 "    {\n" +
                 "      \"system\": \"fax\",\n" +

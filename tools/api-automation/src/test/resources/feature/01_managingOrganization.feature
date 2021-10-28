@@ -42,4 +42,4 @@ Feature: Facility Organization
     And I Set GET Organization service api endpoint for specific state
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Organization service
+    Then I receive valid Response for GET Organization service with specific Location

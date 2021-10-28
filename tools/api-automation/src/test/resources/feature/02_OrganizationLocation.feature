@@ -39,4 +39,4 @@ Feature: Location Organization
     And I Set Location service api endpoint for specific state
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Location service
+    Then I receive valid Response for GET Location service with specific state
