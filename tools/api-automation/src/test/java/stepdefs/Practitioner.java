@@ -23,6 +23,7 @@ public class Practitioner {
     public void i_receive_valid_Response_for_POST_Practitioner_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_CREATED);
         EnvGlobals.PractitionerId = ReusableFunctions.getResponsePath("id");
+        validation.Practitioner.validatePostResponse();
     }
 
     @Given("I Set GET Practitioner api endpoint")
@@ -34,6 +35,8 @@ public class Practitioner {
     @Then("I receive valid Response for GET Practitioner service")
     public void i_receive_valid_Response_for_GET_Practitioner_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Practitioner.validatePostResponse();
+        validation.Practitioner.validatePractitionerId(EnvGlobals.PractitionerId);
     }
 
     @Given("I Set PUT Facility Practitioner api endpoint")
@@ -46,6 +49,7 @@ public class Practitioner {
     @Then("I receive valid Response for PUT Practitioner service")
     public void i_receive_valid_Response_for_PUT_Practitioner_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Practitioner.validateTextField();
     }
 
 }

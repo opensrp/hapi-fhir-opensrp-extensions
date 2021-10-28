@@ -22,6 +22,7 @@ public class PractitionerRole {
     public void i_receive_valid_Response_for_POST_Practitioner_Role_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_CREATED);
         EnvGlobals.practitionerRoleId = ReusableFunctions.getResponsePath("id");
+        validation.PractitionerRule.validatePostResponse(EnvGlobals.managingOrgId,EnvGlobals.LocationOrgId,EnvGlobals.PractitionerId,EnvGlobals.healthCaeServiceId);
     }
 
     @Given("I Set GET Practitioner Role api endpoint")
@@ -33,6 +34,27 @@ public class PractitionerRole {
     @Then("I receive valid Response for GET Practitioner Role service")
     public void i_receive_valid_Response_for_GET_Practitioner_Role_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.PractitionerRule.validatePostResponse(EnvGlobals.managingOrgId,EnvGlobals.LocationOrgId,EnvGlobals.PractitionerId,EnvGlobals.healthCaeServiceId);
+        validation.PractitionerRule.validatePractitionerRuleId(EnvGlobals.practitionerRoleId);
+    }
+
+
+    @Then("I receive valid Response for GET Practitioner Role service for specific location")
+    public void i_receive_valid_Response_for_GET_Practitioner_Role_service_for_specific_location() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.PractitionerRule.validateLocation(EnvGlobals.LocationOrgId);
+    }
+
+    @Then("I receive valid Response for GET Practitioner Role service for specific Organization")
+    public void i_receive_valid_Response_for_GET_Practitioner_Role_service_organization() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.PractitionerRule.validateOrganization(EnvGlobals.managingOrgId);
+    }
+
+    @Then("I receive valid Response for GET Practitioner Role service for specific practitioner")
+    public void i_receive_valid_Response_for_GET_Practitioner_Role_service_practitioner() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.PractitionerRule.validatePractitioner(EnvGlobals.PractitionerId);
     }
 
     @Given("I Set GET Practitioner Role api endpoint for specific location")
@@ -63,6 +85,9 @@ public class PractitionerRole {
     @Then("I receive valid Response for PUT Practitioner Role service")
     public void i_receive_valid_Response_for_PUT_Practitioner_Role_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.PractitionerRule.validatePractitionerRuleId(EnvGlobals.practitionerRoleId);
+        validation.PractitionerRule.validateAvailabilityExceptions();
+
     }
 
 }

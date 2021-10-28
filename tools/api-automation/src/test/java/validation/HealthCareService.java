@@ -38,4 +38,7 @@ public class HealthCareService {
         Assert.assertEquals(ReusableFunctions.getResponsePath(String.format(RESPONSE_ENTRY+RESPONSE_LOCATION,0)), "[Location/"+location+"]");
 
     }
+
+
+
 }

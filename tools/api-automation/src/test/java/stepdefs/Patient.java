@@ -21,6 +21,7 @@ public class Patient {
     public void i_receive_valid_Response_for_POST_Patient_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_CREATED);
         EnvGlobals.patientId = ReusableFunctions.getResponsePath("id");
+        validation.Patient.validatePostResponse(EnvGlobals.managingOrgId);
     }
 
     @Given("I Set GET Patient api endpoint")
@@ -32,6 +33,17 @@ public class Patient {
     @Then("I receive valid Response for GET Patient service")
     public void i_receive_valid_Response_for_GET_Patient_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Patient.validatePostResponse(EnvGlobals.managingOrgId);
+        validation.Patient.validatePatientId(EnvGlobals.patientId);
+
+    }
+
+    @Then("I receive valid Response for GET Patient service for specific Organization")
+    public void i_receive_valid_Response_for_GET_Patient_service_org() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Patient.validateOrganization(EnvGlobals.managingOrgId);
+
+
     }
 
     @Given("I Set GET Patient api endpoint for specific Organization")
@@ -50,6 +62,7 @@ public class Patient {
     @Then("I receive valid Response for PUT Patient service")
     public void i_receive_valid_Response_for_PUT_Patient_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Patient.validateGender();
     }
 
 

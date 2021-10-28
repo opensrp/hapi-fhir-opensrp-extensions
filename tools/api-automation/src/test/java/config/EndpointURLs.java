@@ -27,7 +27,7 @@ public class EndpointURLs {
     public static String GET_PRACTITIONER_ROLE_BY_ORGANIZATION_URL = "/PractitionerRole?organization=%s";
     public static String GET_PRACTITIONER_ROLE_BY_LOCATION_URL = "/PractitionerRole?location=%s";
     public static String GET_PRACTITIONER_ROLE_BY_HEALTHCARESERVICE_URL = "/PractitionerRole?healthcareService=%s";
-    public static String GET_PRACTITIONER_ROLE_BY_PRACTITIONER_URL = "/PractitionerRole?organization=%s";
+    public static String GET_PRACTITIONER_ROLE_BY_PRACTITIONER_URL = "/PractitionerRole?practitioner=%s";
 
     public static String PATIENT_ROLE_URL = "/Patient";
     public static String GET_PATIENT_ROLE_URL = "/Patient/%s";

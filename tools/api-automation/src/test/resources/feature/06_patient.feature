@@ -24,7 +24,7 @@ Feature: Patient
     And I Set GET Patient api endpoint for specific Organization
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Patient service
+    Then I receive valid Response for GET Patient service for specific Organization
 
 
   @PUT
