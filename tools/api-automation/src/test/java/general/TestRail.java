@@ -124,13 +124,13 @@ public class TestRail {
 
             for(int i = 0; i < DataList.caseid.size(); ++i) {
                 System.out.println(DataList.caseid.get(i) + "" + DataList.result.get(i));
-                if (ConfigProperties.UpdateCase.toLowerCase().equals("true")) {
-                    try {
-                        client.sendPost("update_case/" + DataList.caseid.get(i), DataList.updateData.get(i));
-                    } catch (Exception var3) {
-                        System.out.println(Throwables.getStackTraceAsString(var3));
-                    }
-                }
+//                if (ConfigProperties.UpdateCase.toLowerCase().equals("true")) {
+//                    try {
+//                        client.sendPost("update_case/" + DataList.caseid.get(i), DataList.updateData.get(i));
+//                    } catch (Exception var3) {
+//                        System.out.println(Throwables.getStackTraceAsString(var3));
+//                    }
+//                }
 
                 try {
                     client.sendPost("add_result_for_case/" + suiteId + "/" + DataList.caseid.get(i), DataList.result.get(i));
