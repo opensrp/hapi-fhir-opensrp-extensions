@@ -1,8 +1,5 @@
 package tests;
 
-
-
-import com.vimalselvam.cucumber.listener.Reporter;
 import config.ConfigProperties;
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
@@ -17,7 +14,6 @@ import utils.Reports;
 
 
 import javax.mail.MessagingException;
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,7 +28,8 @@ import static config.ConfigProperties.sendEmail;
         glue = {"stepdefs"},
         plugin = { "pretty", "html:target/cucumber" },
        // plugin = { "com.cucumber.listener.ExtentCucumberFormatter:target/cucumber-reports/report.html"},
-        tags={"@FacilityLocation"})
+     tags={"@ManagingOrganization,@LocationOrganization,@HealthCareService,@Practitioner,@PractitionerRole,@Patient,@RelatedPerson,@Encounter,@Condition,@Observation,@Goal,@CareTeam,@CarePlan"})
+    //  tags = {"@CarePlan"})
 
 public  class RunCukesTest
 {

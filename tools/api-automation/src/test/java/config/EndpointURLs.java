@@ -63,5 +63,12 @@ public class EndpointURLs {
     public static String GET_CARE_TEAM_URL = "/CareTeam/%s";
     public static String GET_CARE_TEAM_BY_PATIENT_URL = "/CareTeam?patient=%s";
 
+    public static String CARE_PLAN_URL = "/CarePlan";
+    public static String GET_CARE_PLAN_URL = "/CarePlan/%s";
+    public static String GET_CARE_PLAN_BY_PATIENT_URL = "/CarePlan?patient=%s";
+    public static String GET_CARE_PLAN_BY_CARE_TEAM_URL = "/CarePlan?care-team=%s";
+    public static String GET_CARE_PLAN_BY_CONDITION_URL = "/CarePlan?condition=%s";
+    public static String GET_CARE_PLAN_BY_ENCOUNTER_URL = "/CarePlan?encounter=%s";
+
 
 }

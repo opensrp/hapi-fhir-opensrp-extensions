@@ -18,4 +18,5 @@ public class EnvGlobals {
     public static String observationId;
     public static String goalId;
     public static String careTeamId;
+    public static String carePlan;
  }
