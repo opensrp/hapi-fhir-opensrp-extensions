@@ -21,6 +21,7 @@ public class Condition {
     public void i_receive_valid_Response_for_POST_Condition_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_CREATED);
         EnvGlobals.conditionId = ReusableFunctions.getResponsePath("id");
+        validation.Condition.validatePostResponse(EnvGlobals.patientId);
     }
 
     @Given("I Set GET Condition api endpoint")
@@ -32,6 +33,14 @@ public class Condition {
     @Then("I receive valid Response for GET Condition service")
     public void i_receive_valid_Response_for_GET_Condition_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Condition.validatePostResponse(EnvGlobals.patientId);
+        validation.Condition.validateConditionId(EnvGlobals.conditionId);
+    }
+
+    @Then("I receive valid Response for GET Condition service for specific Patient")
+    public void i_receive_valid_Response_for_GET_Condition_service_patient() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Condition.validatePatient(EnvGlobals.patientId);
     }
 
     @Given("I Set GET Condition api endpoint for specific Patient")
@@ -50,6 +59,7 @@ public class Condition {
     @Then("I receive valid Response for PUT Condition service")
     public void i_receive_valid_Response_for_PUT_Condition_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Condition.validateCode();
     }
 
 }

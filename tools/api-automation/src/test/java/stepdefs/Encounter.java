@@ -21,6 +21,8 @@ public class Encounter {
     public void i_receive_valid_Response_for_POST_Encounter_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_CREATED);
         EnvGlobals.encounterId = ReusableFunctions.getResponsePath("id");
+        validation.Encounter.validatePostResponse(EnvGlobals.patientId);
+
     }
 
     @Given("I Set GET Encounter api endpoint")
@@ -32,7 +34,16 @@ public class Encounter {
     @Then("I receive valid Response for GET Encounter service")
     public void i_receive_valid_Response_for_GET_Encounter_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Encounter.validatePostResponse(EnvGlobals.patientId);
+        validation.Encounter.validateEncounterId(EnvGlobals.encounterId);
     }
+
+    @Then("I receive valid Response for GET Encounter service for specific Patient")
+    public void i_receive_valid_Response_for_GET_Encounter_service_patient() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Encounter.validatePatient(EnvGlobals.patientId);
+    }
+
 
     @Given("I Set GET Encounter api endpoint for specific Patient")
     public void i_Set_GET_Encounter_api_endpoint_for_specific_Patient() {
@@ -51,5 +62,7 @@ public class Encounter {
     @Then("I receive valid Response for PUT Encounter service")
     public void i_receive_valid_Response_for_PUT_Encounter_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Encounter.validateEncounterId(EnvGlobals.encounterId);
+        validation.Encounter.validateStatus();
     }
 }

@@ -24,7 +24,7 @@ Feature: RelatedPerson
     And I Set GET Related Person api endpoint for specific Patient
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Related Person service
+    Then I receive valid Response for GET Related Person service for specific Patient
 
 
   @PUT

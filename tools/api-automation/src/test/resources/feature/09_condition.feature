@@ -24,7 +24,7 @@ Feature: Condition
     And I Set GET Condition api endpoint for specific Patient
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Condition service
+    Then I receive valid Response for GET Condition service for specific Patient
 
 
   @PUT

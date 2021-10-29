@@ -23,6 +23,7 @@ public class Observation {
     public void i_receive_valid_Response_for_POST_Observation_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_CREATED);
         EnvGlobals.observationId = ReusableFunctions.getResponsePath("id");
+        validation.Observation.validatePostResponse(EnvGlobals.patientId);
     }
 
     @Given("I Set GET Observation api endpoint")
@@ -34,6 +35,13 @@ public class Observation {
     @Then("I receive valid Response for GET Observation service")
     public void i_receive_valid_Response_for_GET_Observation_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Observation.validatePostResponse(EnvGlobals.patientId);
+        validation.Observation.validateObservationId(EnvGlobals.observationId);
+    }
+    @Then("I receive valid Response for GET Observation service for specific Patient")
+    public void i_receive_valid_Response_for_GET_Observation_service_patient() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Observation.validatePatient(EnvGlobals.patientId);
     }
 
     @Given("I Set GET Observation api endpoint for specific Patient")
@@ -53,6 +61,7 @@ public class Observation {
     @Then("I receive valid Response for PUT Observation service")
     public void i_receive_valid_Response_for_PUT_Observation_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Observation.validateCode();
     }
 
 

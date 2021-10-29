@@ -24,7 +24,7 @@ Feature: Observation
     And I Set GET Observation api endpoint for specific Patient
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Observation service
+    Then I receive valid Response for GET Observation service for specific Patient
 
 
   @PUT

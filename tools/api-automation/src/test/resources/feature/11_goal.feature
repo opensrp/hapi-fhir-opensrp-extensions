@@ -24,7 +24,7 @@ Feature: Goal
     And I Set GET Goal api endpoint for specific Patient
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Goal service
+    Then I receive valid Response for GET Goal service for specific Patient
 
 
   @PUT

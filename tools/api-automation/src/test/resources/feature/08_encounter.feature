@@ -24,7 +24,7 @@ Feature: Encounter
     And I Set GET Encounter api endpoint for specific Patient
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Encounter service
+    Then I receive valid Response for GET Encounter service for specific Patient
 
 
   @PUT

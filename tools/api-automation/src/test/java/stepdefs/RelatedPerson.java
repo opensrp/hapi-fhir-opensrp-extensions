@@ -23,6 +23,7 @@ public class RelatedPerson {
     public void i_receive_valid_Response_for_POST_Related_Person_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_CREATED);
         EnvGlobals.relatedPersonId = ReusableFunctions.getResponsePath("id");
+        validation.RelatedPerson.validatePostResponse(EnvGlobals.patientId);
     }
 
     @Given("I Set GET Related Person api endpoint")
@@ -34,6 +35,14 @@ public class RelatedPerson {
     @Then("I receive valid Response for GET Related Person service")
     public void i_receive_valid_Response_for_GET_Related_Person_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.RelatedPerson.validatePostResponse(EnvGlobals.patientId);
+        validation.RelatedPerson.validateRelatedPersonId(EnvGlobals.relatedPersonId);
+    }
+
+    @Then("I receive valid Response for GET Related Person service for specific Patient")
+    public void i_receive_valid_Response_for_GET_Related_Person_service_patient() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.RelatedPerson.validatePatient(EnvGlobals.patientId);
     }
 
     @Given("I Set GET Related Person api endpoint for specific Patient")
@@ -49,10 +58,11 @@ public class RelatedPerson {
         RequestPayLoad = RelatedPersonPayload.updateRelatedPerson(EnvGlobals.patientId,EnvGlobals.relatedPersonId);
 
     }
-
     @Then("I receive valid Response for PUT Related Person service")
     public void i_receive_valid_Response_for_PUT_Related_Person_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.RelatedPerson.validateRelatedPersonId(EnvGlobals.relatedPersonId);
+        validation.RelatedPerson.validateGender();
     }
 
 }

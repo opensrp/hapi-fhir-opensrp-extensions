@@ -22,8 +22,9 @@ public class Goal {
     public void i_receive_valid_Response_for_POST_Goal_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_CREATED);
         EnvGlobals.goalId= ReusableFunctions.getResponsePath("id");
-    }
+        validation.Goal.validatePostResponse(EnvGlobals.patientId,EnvGlobals.observationId);
 
+    }
     @Given("I Set GET Goal api endpoint")
     public void i_Set_GET_Goal_api_endpoint() {
         endPoint = EndpointURLs.GET_GOAL_URL;
@@ -33,6 +34,14 @@ public class Goal {
     @Then("I receive valid Response for GET Goal service")
     public void i_receive_valid_Response_for_GET_Goal_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Goal.validatePostResponse(EnvGlobals.patientId,EnvGlobals.observationId);
+        validation.Goal.validateGoalId(EnvGlobals.goalId);
+    }
+
+    @Then("I receive valid Response for GET Goal service for specific Patient")
+    public void i_receive_valid_Response_for_GET_Goal_service_patient() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Goal.validatePatient(EnvGlobals.patientId);
     }
 
     @Given("I Set GET Goal api endpoint for specific Patient")
@@ -50,6 +59,6 @@ public class Goal {
     @Then("I receive valid Response for PUT Goal service")
     public void i_receive_valid_Response_for_PUT_Goal_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Goal.validateLifeCycle();
     }
-
 }
