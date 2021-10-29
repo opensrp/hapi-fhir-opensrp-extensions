@@ -131,7 +131,7 @@ public class CareTeamPayload {
                 "      ]\n" +
                 "    }\n" +
                 "  ],\n" +
-                "  \"name\": \"Peter James Charlmers Care team\",\n" +
+                "  \"name\": \"Peter Charlmers Care team\",\n" +
                 "  \"subject\": {\n" +
                 "    \"reference\": \"Patient/"+patientId+"\",\n" +
                 "    \"display\": \"Peter James Chalmers\"\n" +

@@ -21,6 +21,7 @@ public class CareTeam {
     public void i_receive_valid_Response_for_POST_Care_Team_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_CREATED);
         EnvGlobals.careTeamId = ReusableFunctions.getResponsePath("id");
+        validation.CareTeam.validatePostResponse(EnvGlobals.patientId,EnvGlobals.managingOrgId,EnvGlobals.encounterId,EnvGlobals.PractitionerId);
     }
 
     @Given("I Set GET Care Team api endpoint")
@@ -32,6 +33,15 @@ public class CareTeam {
     @Then("I receive valid Response for GET Care Team service")
     public void i_receive_valid_Response_for_GET_Care_Team_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.CareTeam.validatePostResponse(EnvGlobals.patientId,EnvGlobals.managingOrgId,EnvGlobals.encounterId,EnvGlobals.PractitionerId);
+        validation.CareTeam.validateCareTeamId(EnvGlobals.careTeamId);
+    }
+
+    @Then("I receive valid Response for GET Care Team service for specific Patient")
+    public void i_receive_valid_Response_for_GET_Care_Team_service_patient() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.CareTeam.validatePatient(EnvGlobals.patientId);
+
     }
 
     @Given("I Set GET Care Team api endpoint for specific Patient")
@@ -50,6 +60,7 @@ public class CareTeam {
     @Then("I receive valid Response for PUT Care Team service")
     public void i_receive_valid_Response_for_PUT_Care_Team_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.CareTeam.validateName();
     }
 
 }

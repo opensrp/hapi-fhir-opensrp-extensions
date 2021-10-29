@@ -16,8 +16,6 @@ Feature: Care Plan
     When I Set request HEADER
     And Send a GET HTTP request
     Then I receive valid Response for GET Care Plan service
-
-
   @GET
   Scenario: Read Care Plan for specific Patient
     Given I am Testing Case : "511"
@@ -33,8 +31,6 @@ Feature: Care Plan
     When I Set request HEADER
     And Send a GET HTTP request
     Then I receive valid Response for GET Care Plan service
-
-
   @GET
   Scenario: Read Care Plan for specific Condition
     Given I am Testing Case : "513"
@@ -42,8 +38,6 @@ Feature: Care Plan
     When I Set request HEADER
     And Send a GET HTTP request
     Then I receive valid Response for GET Care Plan service
-
-
   @GET
   Scenario: Read Care Plan for specific Encounter
     Given I am Testing Case : "514"
@@ -51,7 +45,6 @@ Feature: Care Plan
     When I Set request HEADER
     And Send a GET HTTP request
     Then I receive valid Response for GET Care Plan service
-
   @PUT
   Scenario: Update Care Plan
     Given I am Testing Case : "510"

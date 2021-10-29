@@ -24,7 +24,7 @@ Feature: Care Team
     And I Set GET Care Team api endpoint for specific Patient
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Care Team service
+    Then I receive valid Response for GET Care Team service for specific Patient
 
 
   @PUT
