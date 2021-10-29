@@ -22,6 +22,7 @@ public class CarePlan {
     public void i_receive_valid_Response_for_POST_Care_Plan_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_CREATED);
         EnvGlobals.carePlan = ReusableFunctions.getResponsePath("id");
+        validation.CarePlan.validatePostResponse(EnvGlobals.patientId,EnvGlobals.careTeamId,EnvGlobals.encounterId,EnvGlobals.PractitionerId,EnvGlobals.conditionId,EnvGlobals.goalId);
     }
 
     @Given("I Set GET Care Plan api endpoint")
@@ -33,6 +34,32 @@ public class CarePlan {
     @Then("I receive valid Response for GET Care Plan service")
     public void i_receive_valid_Response_for_GET_Care_Plan_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.CarePlan.validatePostResponse(EnvGlobals.patientId,EnvGlobals.careTeamId,EnvGlobals.encounterId,EnvGlobals.PractitionerId,EnvGlobals.conditionId,EnvGlobals.goalId);
+        validation.CarePlan.validateCarePlanId(EnvGlobals.carePlan);
+    }
+
+    @Then("I receive valid Response for GET Care Plan service for specific Patient")
+    public void i_receive_valid_Response_for_GET_Care_Plan_service_patient() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.CarePlan.validatePatient(EnvGlobals.patientId);
+    }
+
+    @Then("I receive valid Response for GET Care Plan service for specific Care Team")
+    public void i_receive_valid_Response_for_GET_Care_Plan_service_patient_care_Team() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.CarePlan.validateCareTeam(EnvGlobals.careTeamId);
+    }
+
+    @Then("I receive valid Response for GET Care Plan service for specific Condition")
+    public void i_receive_valid_Response_for_GET_Care_Plan_service_patient_condition() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.CarePlan.validateCondition(EnvGlobals.conditionId);
+    }
+
+    @Then("I receive valid Response for GET Care Plan service for specific Encounter")
+    public void i_receive_valid_Response_for_GET_Care_Plan_service_patient_encounter() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.CarePlan.validateEncounetr(EnvGlobals.encounterId);
     }
 
     @Given("I Set GET Care Plan api endpoint for specific Patient")
@@ -70,6 +97,7 @@ public class CarePlan {
     @Then("I receive valid Response for PUT Care Plan service")
     public void i_receive_valid_Response_for_PUT_Care_Plan_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.CarePlan.validateDescription();
     }
 
 

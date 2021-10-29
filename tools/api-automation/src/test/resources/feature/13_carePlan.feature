@@ -16,13 +16,14 @@ Feature: Care Plan
     When I Set request HEADER
     And Send a GET HTTP request
     Then I receive valid Response for GET Care Plan service
+
   @GET
   Scenario: Read Care Plan for specific Patient
     Given I am Testing Case : "511"
     And I Set GET Care Plan api endpoint for specific Patient
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Care Plan service
+    Then I receive valid Response for GET Care Plan service for specific Patient
 
   @GET
   Scenario: Read Care Plan for specific Care Team
@@ -30,21 +31,21 @@ Feature: Care Plan
     And I Set GET Care Plan api endpoint for specific care Team
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Care Plan service
+    Then I receive valid Response for GET Care Plan service for specific Care Team
   @GET
   Scenario: Read Care Plan for specific Condition
     Given I am Testing Case : "513"
     And I Set GET Care Plan api endpoint for specific condition
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Care Plan service
+    Then I receive valid Response for GET Care Plan service for specific Condition
   @GET
   Scenario: Read Care Plan for specific Encounter
     Given I am Testing Case : "514"
     And I Set GET Care Plan api endpoint for specific encounter
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Care Plan service
+    Then I receive valid Response for GET Care Plan service for specific Encounter
   @PUT
   Scenario: Update Care Plan
     Given I am Testing Case : "510"
