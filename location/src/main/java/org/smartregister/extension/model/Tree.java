@@ -250,23 +250,4 @@ public class Tree extends Type implements ICompositeType {
     protected Type typedCopy() {
         return copy();
     }
-
-    private TreeNode recursivelyFindNode(String idString, List<ChildTreeNode> childTreeNodeList) {
-        for (ChildTreeNode childTreeNode : childTreeNodeList) {
-            TreeNode treeNode = childTreeNode.getChildren();
-            if (treeNode != null
-                    && treeNode.getNodeId() != null
-                    && StringUtils.isNotBlank(treeNode.getNodeId().getValue())
-                    && treeNode.getNodeId().getValue().equals(idString)) {
-                return treeNode;
-            } else {
-                if (treeNode != null
-                        && treeNode.getChildren() != null
-                        && treeNode.getChildren().size() > 0) {
-                    return recursivelyFindNode(idString, treeNode.getChildren());
-                }
-            }
-        }
-        return null;
-    }
 }
