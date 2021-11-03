@@ -12,7 +12,7 @@
 	<name>HAPI FHIR OpenSRP Extensions (Locations)</name>
 	<packaging>jar</packaging>
 	<url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<artifactId>location</artifactId>
 
 </project>
