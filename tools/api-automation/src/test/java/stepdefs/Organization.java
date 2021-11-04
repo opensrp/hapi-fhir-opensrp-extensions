@@ -43,6 +43,14 @@ public class Organization {
         validation.ManagingOrg.validateOrganizationId(EnvGlobals.managingOrgId);
     }
 
+
+    @Then("I receive valid Response for GET facility Organization service")
+    public void i_receive_valid_Response_for_GET_facility_Organization_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.ManagingOrg.validatePostResponse(FACILITY_ORGANIZATION_NAME);
+        validation.ManagingOrg.validateOrganizationId(EnvGlobals.managingOrgId);
+    }
+
     @Given("I Set PUT Organization service api endpoint")
     public void i_Set_PUT_Organization_service_api_endpoint() {
         endPoint = EndpointURLs.GET_MANAGING_ORGANIZATION_URL;
@@ -88,6 +96,7 @@ public class Organization {
         EnvGlobals.managingOrgId = ReusableFunctions.getResponsePath("id");
         validation.ManagingOrg.validatePostResponse(FACILITY_ORGANIZATION_NAME);
     }
+
 
     @Then("I receive valid Response for PUT facility Organization service")
     public void i_receive_valid_Response_for_PUT_facility_Organization_service() {

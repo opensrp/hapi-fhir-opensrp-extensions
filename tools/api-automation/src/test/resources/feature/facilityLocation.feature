@@ -15,7 +15,7 @@ Given I am Testing Case : "216"
 And I Set GET Location service api endpoint
 When I Set request HEADER
 And Send a GET HTTP request
-Then I receive valid Response for GET Location service
+Then I receive valid Response for GET facility Location service
 
 
 @PUT

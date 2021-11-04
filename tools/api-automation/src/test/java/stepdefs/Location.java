@@ -34,6 +34,14 @@ public class Location {
     }
 
 
+    @Then("I receive valid Response for GET facility Location service")
+    public void i_receive_valid_Response_for_GET_facility_Location_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
+        validation.Location.validatePostResponse(FACILITY_LOCATION_NAME);
+        validation.Location.validateLocationId(EnvGlobals.LocationOrgId);
+
+    }
+
     @Then("I receive valid Response for GET Location service")
     public void i_receive_valid_Response_for_GET_Location_service() {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);

@@ -12,11 +12,11 @@ public class CarePlan {
     public static final String RESPONSE_CONDITION = "addresses.reference";
     public static final String RESPONSE_GOAL = "goal.reference";
     public static final String RESPONSE_ENCOUNTER = "activity.outcomeReference.reference";
-    public static final String RESPONSE_PRACTITIONER = "activity.performer.reference";
+    public static final String RESPONSE_PRACTITIONER = "activity.detail[0].performer.reference";
 
 
     public static final String RESPONSE_ENTRY = "entry[%s].resource.";
-    public static final String RESPONSE_DESCRIPTION = "activity[1].description";
+    public static final String RESPONSE_DESCRIPTION = "activity.detail[1].description";
 
     public static void validatePostResponse(String patientID,String careTeam,String encounter,String practitioner,String condition,String goal) {
         Assert.assertNotNull(ReusableFunctions.getResponsePath(RESPONSE_ID));
@@ -26,7 +26,7 @@ public class CarePlan {
         Assert.assertEquals(ReusableFunctions.getResponsePath(RESPONSE_CONDITION), "[Condition/"+condition+"]");
         Assert.assertEquals(ReusableFunctions.getResponsePath(RESPONSE_ENCOUNTER), "[[Encounter/"+encounter+"]]");
         Assert.assertEquals(ReusableFunctions.getResponsePath(RESPONSE_GOAL), "[Goal/"+goal+"]");
-        Assert.assertEquals(ReusableFunctions.getResponsePath(RESPONSE_PRACTITIONER), "Practitioner/"+practitioner);
+        Assert.assertEquals(ReusableFunctions.getResponsePath(RESPONSE_PRACTITIONER), "[Practitioner/"+practitioner+"]");
     }
 
     public static void validateCarePlanId(String id) {

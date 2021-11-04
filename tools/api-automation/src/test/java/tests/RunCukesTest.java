@@ -28,8 +28,7 @@ import static config.ConfigProperties.sendEmail;
         glue = {"stepdefs"},
         plugin = { "pretty", "html:target/cucumber" },
        // plugin = { "com.cucumber.listener.ExtentCucumberFormatter:target/cucumber-reports/report.html"},
-     tags={"@ManagingOrganization,@LocationOrganization,@HealthCareService,@Practitioner,@PractitionerRole,@Patient,@RelatedPerson,@Encounter,@Condition,@Observation,@Goal,@CareTeam,@CarePlan"})
-    //  tags = {"@CarePlan"})
+     tags={"@ManagingOrganization,@LocationOrganization,@HealthCareService,@Practitioner,@PractitionerRole,@Patient,@RelatedPerson,@Encounter,@Condition,@Observation,@Goal,@CareTeam,@CarePlan,@FacilityLocation,@FacilityOrganization"})
 
 public  class RunCukesTest
 {
@@ -80,6 +79,7 @@ public  class RunCukesTest
         if(ConfigProperties.logTestRail.toLowerCase().equals("true")) {
             TestRail.createSuite();
             TestRail.updateTestRail();
+
         }
         if (sendEmail.toLowerCase().equals("true")) {
             SendEmailAfterExecution.sendReportAfterExecution(passedCount, failedCount, skippedCount);

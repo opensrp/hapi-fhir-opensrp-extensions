@@ -15,7 +15,7 @@
     And I Set GET Organization service api endpoint
     When I Set request HEADER
     And Send a GET HTTP request
-    Then I receive valid Response for GET Organization service
+    Then I receive valid Response for GET facility Organization service
 
 
   @PUT
