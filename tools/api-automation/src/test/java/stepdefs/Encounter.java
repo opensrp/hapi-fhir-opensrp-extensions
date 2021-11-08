@@ -65,4 +65,16 @@ public class Encounter {
         validation.Encounter.validateEncounterId(EnvGlobals.encounterId);
         validation.Encounter.validateStatus();
     }
+
+    @Given("I Set GET Encounter api endpoint with invalid id")
+    public void i_Set_GET_Encounter_api_endpoint_with_invalid_id() {
+        endPoint = EndpointURLs.GET_ENCOUNTER_URL;
+        endPoint = String.format(endPoint, "000");
+    }
+
+    @Then("I receive Invalid Response for GET Encounter service")
+    public void i_receive_Invalid_Response_for_GET_Encounter_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
+    }
+
 }

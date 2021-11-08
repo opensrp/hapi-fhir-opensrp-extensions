@@ -63,4 +63,16 @@ public class CareTeam {
         validation.CareTeam.validateName();
     }
 
+    @Given("I Set GET Care Team api endpoint with invalid id")
+    public void i_Set_GET_Care_Team_api_endpoint_with_invalid_id() {
+        endPoint = EndpointURLs.GET_CARE_TEAM_URL;
+        endPoint = String.format(endPoint, "000");
+    }
+
+    @Then("I receive Invalid Response for GET Care Team service")
+    public void i_receive_Invalid_Response_for_GET_Care_Team_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
+    }
+
+
 }

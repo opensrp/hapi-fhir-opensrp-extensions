@@ -64,5 +64,17 @@ public class RelatedPerson {
         validation.RelatedPerson.validateRelatedPersonId(EnvGlobals.relatedPersonId);
         validation.RelatedPerson.validateGender();
     }
+    @Given("I Set GET Related Person api endpoint with invalid id")
+    public void i_Set_GET_Related_Person_api_endpoint_with_invalid_id() {
+        endPoint = EndpointURLs.GET_RELATED_PERSON_URL;
+        endPoint= String.format(endPoint, "000");
+    }
+
+    @Then("I receive Invalid Response for GET Related Person service")
+    public void i_receive_Invalid_Response_for_GET_Related_Person_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
+    }
+
+
 
 }

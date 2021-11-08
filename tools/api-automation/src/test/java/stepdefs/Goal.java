@@ -61,4 +61,17 @@ public class Goal {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
         validation.Goal.validateLifeCycle();
     }
+
+    @Given("I Set GET Goal api endpoint with invalid id")
+    public void i_Set_GET_Goal_api_endpoint_with_invalid_id() {
+        endPoint = EndpointURLs.GET_GOAL_URL;
+        endPoint = String.format(endPoint, "000");
+    }
+
+    @Then("I receive Invalid Response for GET Goal service")
+    public void i_receive_Invalid_Response_for_GET_Goal_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
+    }
+
+
 }

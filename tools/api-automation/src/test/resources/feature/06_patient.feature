@@ -34,3 +34,11 @@ Feature: Patient
     When I Set request HEADER and PAYLOAD
     And Send a PUT HTTP request
     Then I receive valid Response for PUT Patient service
+
+  @GET @NegTest
+  Scenario: Read Patient for Invalid data
+    Given I am Testing Case : "736"
+    And I Set GET Patient api endpoint with invalid id
+    When I Set request HEADER
+    And Send a GET HTTP request
+    Then I receive Invalid Response for GET Patient service

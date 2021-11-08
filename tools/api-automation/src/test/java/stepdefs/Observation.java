@@ -63,6 +63,18 @@ public class Observation {
         ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_SUCCESS);
         validation.Observation.validateCode();
     }
+    @Given("I Set GET Observation api endpoint with invalid id")
+    public void i_Set_GET_Observation_api_endpoint_with_invalid_id() {
+        endPoint = EndpointURLs.GET_OBSERVATION_URL;
+        endPoint= String.format(endPoint, "000");
+    }
+
+    @Then("I receive Invalid Response for GET Observation service")
+    public void i_receive_Invalid_Response_for_GET_Observation_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
+    }
+
+
 
 
 

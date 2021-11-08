@@ -34,3 +34,11 @@ Feature: Condition
     When I Set request HEADER and PAYLOAD
     And Send a PUT HTTP request
     Then I receive valid Response for PUT Condition service
+
+  @GET @NegTest
+  Scenario: Read Condition for Invalid data
+    Given I am Testing Case : "739"
+    And I Set GET Condition api endpoint with invalid id
+    When I Set request HEADER
+    And Send a GET HTTP request
+    Then I receive Invalid Response for GET Condition service

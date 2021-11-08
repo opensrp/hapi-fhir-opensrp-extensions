@@ -100,5 +100,17 @@ public class CarePlan {
         validation.CarePlan.validateDescription();
     }
 
+    @Given("I Set GET Care Plan api endpoint with invalid id")
+    public void i_Set_GET_Care_Plan_api_endpoint_with_invalid_id() {
+        endPoint = EndpointURLs.GET_CARE_PLAN_URL;
+        endPoint = String.format(endPoint, "000");
+    }
+
+    @Then("I receive Invalid Response for GET Care Plan service")
+    public void i_receive_Invalid_Response_for_GET_Care_Plan_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
+    }
+
+
 
 }

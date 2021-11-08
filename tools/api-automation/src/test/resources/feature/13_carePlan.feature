@@ -53,3 +53,10 @@ Feature: Care Plan
     When I Set request HEADER and PAYLOAD
     And Send a PUT HTTP request
     Then I receive valid Response for PUT Care Plan service
+  @GET @NegTest
+  Scenario: Read Care Plan for Invalid data
+    Given I am Testing Case : "743"
+    And I Set GET Care Plan api endpoint with invalid id
+    When I Set request HEADER
+    And Send a GET HTTP request
+    Then I receive Invalid Response for GET Care Plan service

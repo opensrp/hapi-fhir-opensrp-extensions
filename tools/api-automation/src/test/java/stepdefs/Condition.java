@@ -62,5 +62,17 @@ public class Condition {
         validation.Condition.validateCode();
     }
 
+    @Given("I Set GET Condition api endpoint with invalid id")
+    public void i_Set_GET_Condition_api_endpoint_with_invalid_id() {
+        endPoint = EndpointURLs.GET_CONDITION_URL;
+        endPoint = String.format(endPoint, "000");
+    }
+
+    @Then("I receive Invalid Response for GET Condition service")
+    public void i_receive_Invalid_Response_for_GET_Condition_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
+    }
+
+
 }
 

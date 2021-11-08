@@ -34,3 +34,12 @@ Feature: Care Team
     When I Set request HEADER and PAYLOAD
     And Send a PUT HTTP request
     Then I receive valid Response for PUT Care Team service
+
+
+  @GET @NegTest
+  Scenario: Read Care Team for Invalid data
+    Given I am Testing Case : "742"
+    And I Set GET Care Team api endpoint with invalid id
+    When I Set request HEADER
+    And Send a GET HTTP request
+    Then I receive Invalid Response for GET Care Team service

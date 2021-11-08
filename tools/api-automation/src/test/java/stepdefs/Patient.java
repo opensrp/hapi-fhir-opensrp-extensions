@@ -65,5 +65,17 @@ public class Patient {
         validation.Patient.validateGender();
     }
 
+    @Given("I Set GET Patient api endpoint with invalid id")
+    public void i_Set_GET_Patient_api_endpoint_with_invalid_id() {
+        endPoint = EndpointURLs.GET_PATIENT_ROLE_URL;
+        endPoint= String.format(endPoint,"000");
+    }
+
+    @Then("I receive Invalid Response for GET Patient service")
+    public void i_receive_Invalid_Response_for_GET_Patient_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
+    }
+
+
 
 }
