@@ -89,5 +89,15 @@ public class PractitionerRole {
         validation.PractitionerRule.validateAvailabilityExceptions();
 
     }
+    @Given("I Set GET Practitioner Role api endpoint with invalid id")
+    public void i_Set_GET_Practitioner_Role_api_endpoint_with_invalid_id() {
+        endPoint = EndpointURLs.GET_PRACTITIONER_ROLE_URL;
+        endPoint= String.format(endPoint, "000");
+    }
+    @Then("I receive Invalid Response for GET Practitioner Role service")
+    public void i_receive_Invalid_Response_for_GET_Practitioner_Role_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
+    }
+
 
 }

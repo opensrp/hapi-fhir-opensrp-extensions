@@ -77,5 +77,17 @@ public class HealthCareServices {
         validation.HealthCareService.validateAvailabilityExceptions();
     }
 
+    @Given("I Set GET HealthCare service api endpoint with invalid id")
+    public void i_Set_GET_HealthCare_service_api_endpoint_with_invalid_id() {
+        endPoint = EndpointURLs.GET_HEALTHCARESERVICES_URL;
+        endPoint= String.format(endPoint, "01");
+    }
+
+    @Then("I receive Invalid Response for GET HealthCare service")
+    public void i_receive_HealthCare_Response_for_GET_Organization_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
+    }
+
+
 
 }

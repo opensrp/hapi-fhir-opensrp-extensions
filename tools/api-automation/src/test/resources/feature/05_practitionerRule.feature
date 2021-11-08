@@ -48,3 +48,12 @@ Feature: PractitionerRole
     When I Set request HEADER and PAYLOAD
     And Send a PUT HTTP request
     Then I receive valid Response for PUT Practitioner Role service
+
+
+  @GET @NegTest
+  Scenario: Read Practitioner Role for Invalid data
+    Given I am Testing Case : "735"
+    And I Set GET Practitioner Role api endpoint with invalid id
+    When I Set request HEADER
+    And Send a GET HTTP request
+    Then I receive Invalid Response for GET Practitioner Role service

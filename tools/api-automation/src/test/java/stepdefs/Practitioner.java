@@ -52,4 +52,16 @@ public class Practitioner {
         validation.Practitioner.validateTextField();
     }
 
+    @Given("I Set GET Practitioner api endpoint with invalid id")
+    public void i_Set_GET_Practitioner_api_endpoint_with_invalid_id() {
+        endPoint = EndpointURLs.GET_PRACTITIONER_URL;
+        endPoint= String.format(endPoint, "000");
+    }
+
+    @Then("I receive Invalid Response for GET Practitioner service")
+    public void i_receive_Practitioner_Response_for_GET_Organization_service() {
+        ReusableFunctions.thenFunction(Hooks.HTTP_RESPONSE_NOT_FOUND);
+    }
+
+
 }

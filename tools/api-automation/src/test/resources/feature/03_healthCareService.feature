@@ -42,3 +42,10 @@ Feature: HealthCareService
     And Send a GET HTTP request
     Then I receive valid Response for GET Health Care Service service for specific Organization
 
+  @GET @NegTest
+  Scenario: Read Health Care Service for invalid Id
+    Given I am Testing Case : "733"
+    And I Set GET HealthCare service api endpoint with invalid id
+    When I Set request HEADER
+    And Send a GET HTTP request
+    Then I receive Invalid Response for GET HealthCare service
