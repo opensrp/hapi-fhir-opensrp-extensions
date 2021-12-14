@@ -41,6 +41,7 @@
 
 	<modules>
 		<module>location</module>
+		<module>practitioner</module>
 	</modules>
 
 	<dependencies>
