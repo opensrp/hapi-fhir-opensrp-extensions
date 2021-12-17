@@ -35,7 +35,7 @@
 		<spring.version>5.2.4.RELEASE</spring.version>
 		<spotless.version>2.13.0</spotless.version>
 		<servlet.version>2.5</servlet.version>
-		<hapi.fhir.base.version>5.7.0-PRE7-SNAPSHOT</hapi.fhir.base.version>
+		<hapi.fhir.base.version>5.7.0-PRE8-SNAPSHOT</hapi.fhir.base.version>
 		<junit.version>4.13.1</junit.version>
 	</properties>
 
