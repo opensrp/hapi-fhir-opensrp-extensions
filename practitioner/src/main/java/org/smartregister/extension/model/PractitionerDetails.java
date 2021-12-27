@@ -32,8 +32,18 @@ public class PractitionerDetails extends Practitioner {
     @Child(
             name = "KeycloakUserDetails",
             type = {KeycloakUserDetails.class})
-    @Description(shortDefinition = "Complete KeycloakUserDetails", formalDefinition = "KeycloakUserDetails")
+    @Description(
+            shortDefinition = "Complete KeycloakUserDetails",
+            formalDefinition = "KeycloakUserDetails")
     private KeycloakUserDetails keycloakUserDetails;
+
+    @Child(
+            name = "fhir",
+            type = {FhirPractitionerDetails.class})
+    @Description(
+            shortDefinition = "Get data from FHIR Server",
+            formalDefinition = "Get data from FHIR Server")
+    private FhirPractitionerDetails fhirPractitionerDetails;
 
     @Override
     public Practitioner copy() {
@@ -59,5 +69,13 @@ public class PractitionerDetails extends Practitioner {
 
     public void setUserDetail(KeycloakUserDetails keycloakUserDetails) {
         this.keycloakUserDetails = keycloakUserDetails;
+    }
+
+    public FhirPractitionerDetails getFhirPractitionerDetails() {
+        return fhirPractitionerDetails;
+    }
+
+    public void setFhirPractitionerDetails(FhirPractitionerDetails fhirPractitionerDetails) {
+        this.fhirPractitionerDetails = fhirPractitionerDetails;
     }
 }

@@ -18,7 +18,9 @@ package org.smartregister.extension.utils;
 public interface Constants {
 
     String SLASH_UNDERSCORE = "/_";
-    String PRACTITIONER = "Practitioner";
     String FORWARD_SLASH = "/";
     String KEYCLOAK_UUID = "keycloak-uuid";
+    String IDENTIFIER = "identifier";
+    String PRACTITIONER = "practitioner";
+    String PARTICIPANT = "participant";
 }

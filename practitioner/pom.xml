@@ -30,6 +30,12 @@
 			<artifactId>keycloak-spring-security-adapter</artifactId>
 			<version>9.0.3</version>
 		</dependency>
+		<!-- This dependency holds all the code extensions for LOcation-->
+		<dependency>
+			<groupId>org.smartregister.hapi-fhir-opensrp-extensions</groupId>
+			<artifactId>location</artifactId>
+			<version>0.0.3-SNAPSHOT</version>
+		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.springframework.security</groupId>-->
 <!--			<artifactId>spring-security-web</artifactId>-->
