@@ -36,51 +36,51 @@ public class FhirCareTeamExtension extends CareTeam {
         return careTeam;
     }
 
-    public FhirCareTeamExtension mapValues(CareTeam dst) {
+    public FhirCareTeamExtension mapValues(CareTeam careTeam) {
         FhirCareTeamExtension fhirCareTeamExtension = new FhirCareTeamExtension();
-        if (dst != null) {
-            if (dst.getId() != null) {
-                fhirCareTeamExtension.setId(dst.getId());
+        if (careTeam != null) {
+            if (careTeam.getId() != null) {
+                fhirCareTeamExtension.setId(careTeam.getId());
             }
-            if (dst.getIdentifier() != null) {
-                fhirCareTeamExtension.setIdentifier(dst.getIdentifier());
+            if (careTeam.getIdentifier() != null) {
+                fhirCareTeamExtension.setIdentifier(careTeam.getIdentifier());
             }
-            if (dst.getStatus() != null) {
-                fhirCareTeamExtension.setStatus(dst.getStatus());
+            if (careTeam.getStatus() != null) {
+                fhirCareTeamExtension.setStatus(careTeam.getStatus());
             }
-            if (dst.getCategory() != null) {
-                fhirCareTeamExtension.setCategory(dst.getCategory());
+            if (careTeam.getCategory() != null) {
+                fhirCareTeamExtension.setCategory(careTeam.getCategory());
             }
-            if (dst.getName() != null) {
-                fhirCareTeamExtension.setName(dst.getName());
+            if (careTeam.getName() != null) {
+                fhirCareTeamExtension.setName(careTeam.getName());
             }
-            if (dst.getSubject() != null) {
-                fhirCareTeamExtension.setSubject(dst.getSubject());
+            if (careTeam.getSubject() != null) {
+                fhirCareTeamExtension.setSubject(careTeam.getSubject());
             }
-            if (dst.getEncounter() != null) {
-                fhirCareTeamExtension.setEncounter(dst.getEncounter());
+            if (careTeam.getEncounter() != null) {
+                fhirCareTeamExtension.setEncounter(careTeam.getEncounter());
             }
-            if (dst.getPeriod() != null) {
-                fhirCareTeamExtension.setPeriod(dst.getPeriod());
+            if (careTeam.getPeriod() != null) {
+                fhirCareTeamExtension.setPeriod(careTeam.getPeriod());
             }
-            if (dst.getParticipant() != null) {
-                fhirCareTeamExtension.setParticipant(dst.getParticipant());
+            if (careTeam.getParticipant() != null) {
+                fhirCareTeamExtension.setParticipant(careTeam.getParticipant());
             }
 
-            if (dst.getReasonCode() != null) {
-                fhirCareTeamExtension.setReasonCode(dst.getReasonCode());
+            if (careTeam.getReasonCode() != null) {
+                fhirCareTeamExtension.setReasonCode(careTeam.getReasonCode());
             }
-            if (dst.getReasonReference() != null) {
-                fhirCareTeamExtension.setReasonReference(dst.getReasonReference());
+            if (careTeam.getReasonReference() != null) {
+                fhirCareTeamExtension.setReasonReference(careTeam.getReasonReference());
             }
-            if (dst.getManagingOrganization() != null) {
-                fhirCareTeamExtension.setManagingOrganization(dst.getManagingOrganization());
+            if (careTeam.getManagingOrganization() != null) {
+                fhirCareTeamExtension.setManagingOrganization(careTeam.getManagingOrganization());
             }
-            if (dst.getTelecom() != null) {
-                fhirCareTeamExtension.setTelecom(dst.getTelecom());
+            if (careTeam.getTelecom() != null) {
+                fhirCareTeamExtension.setTelecom(careTeam.getTelecom());
             }
-            if (dst.getNote() != null) {
-                fhirCareTeamExtension.setNote(dst.getNote());
+            if (careTeam.getNote() != null) {
+                fhirCareTeamExtension.setNote(careTeam.getNote());
             }
         }
 
