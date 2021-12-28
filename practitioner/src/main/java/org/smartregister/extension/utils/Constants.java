@@ -17,10 +17,22 @@ package org.smartregister.extension.utils;
 
 public interface Constants {
 
-    String SLASH_UNDERSCORE = "/_";
     String FORWARD_SLASH = "/";
     String KEYCLOAK_UUID = "keycloak-uuid";
     String IDENTIFIER = "identifier";
     String PRACTITIONER = "practitioner";
     String PARTICIPANT = "participant";
+    String KEYCLOAK_USER_NOT_FOUND = "Keycloak User Not Found";
+    String PRACTITIONER_NOT_FOUND = "Practitioner Not Found";
+    String PRIMARY_ORGANIZATION = "primary-organization";
+    String ID = "_id";
+    String PREFFERED_USERNAME = "Preferred Username";
+    String FAMILY_NAME = "Family Name";
+    String GIVEN_NAME = "Given Name";
+    String EMAIL = "Email";
+    String EMAIL_VERIFIED = "Email verified";
+    String ROLE = "Role";
+    String COLON = ":";
+    String SPACE = " ";
+    String EMPTY_STRING = "";
 }

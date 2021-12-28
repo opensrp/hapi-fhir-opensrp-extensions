@@ -33,16 +33,16 @@ public class PractitionerDetails extends Practitioner {
             name = "KeycloakUserDetails",
             type = {KeycloakUserDetails.class})
     @Description(
-            shortDefinition = "Complete KeycloakUserDetails",
-            formalDefinition = "KeycloakUserDetails")
+            shortDefinition = "Get Keycloak User details from the Keycloak server",
+            formalDefinition = "Get Keycloak User details from the Keycloak server")
     private KeycloakUserDetails keycloakUserDetails;
 
     @Child(
             name = "fhir",
             type = {FhirPractitionerDetails.class})
     @Description(
-            shortDefinition = "Get data from FHIR Server",
-            formalDefinition = "Get data from FHIR Server")
+            shortDefinition = "Get resources from FHIR Server",
+            formalDefinition = "Get resources from FHIR Server")
     private FhirPractitionerDetails fhirPractitionerDetails;
 
     @Override

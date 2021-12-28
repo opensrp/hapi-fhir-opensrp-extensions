@@ -16,8 +16,10 @@
 package org.smartregister.extension.model;
 
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.hl7.fhir.r4.model.*;
 
 @DatatypeDef(name = "FhirOrganizationExtension")
@@ -38,14 +40,15 @@ public class FhirOrganizationExtension extends Organization {
 
     public FhirOrganizationExtension mapValues(Organization organization) {
         FhirOrganizationExtension fhirOrganizationExtension = new FhirOrganizationExtension();
-        super.copyValues(organization);
         if (organization != null) {
+            if (organization.getId() != null) {
+                fhirOrganizationExtension.setId(organization.getId());
+            }
             if (organization.getIdentifier() != null) {
                 fhirOrganizationExtension.setIdentifier(organization.getIdentifier());
             }
-            //            if (organization.getActive() != null) {
+
             fhirOrganizationExtension.setActive(organization.getActive());
-            //            }
             if (organization.getType() != null) {
                 fhirOrganizationExtension.setType(organization.getType());
             }

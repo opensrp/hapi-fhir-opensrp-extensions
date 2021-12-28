@@ -18,8 +18,9 @@ package org.smartregister.extension.model;
 import ca.uhn.fhir.model.api.annotation.Child;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import ca.uhn.fhir.util.ElementUtil;
+
 import java.util.List;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+
 import org.hl7.fhir.instance.model.api.ICompositeType;
 import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Type;
@@ -48,42 +49,24 @@ public class FhirPractitionerDetails extends Type implements ICompositeType {
     List<FhirOrganizationExtension> fhirOrganizationExtensions;
 
     @Child(
-            name = "practitionerId",
-            type = {StringType.class},
+            name = "locationHierarchyList",
+            type = {LocationHierarchy.class},
             order = 3,
             min = 0,
             max = -1,
             modifier = false,
             summary = false)
+    private List<LocationHierarchy> locationHierarchyList;
+
+    @Child(
+            name = "practitionerId",
+            type = {StringType.class},
+            order = 4,
+            min = 0,
+            max = -1,
+            modifier = false,
+            summary = false)
     private StringType practitionerId;
-
-    //    @Child(
-    //            name = "teams",
-    //            type = {IBaseResource.class},
-    //            order = 1,
-    //            min = 0,
-    //            max = -1,
-    //            modifier = false,
-    //            summary = false)
-    private List<IBaseResource> team;
-
-    //    @Child(
-    //            name = "locationHierarchy",
-    //            type = {LocationHierarchy.class},
-    //            order = 3,
-    //            min = 0,
-    //            max = -1,
-    //            modifier = false,
-    //            summary = false)
-    private LocationHierarchy locationHierarchy;
-
-    public LocationHierarchy getLocationHierarchy() {
-        return locationHierarchy;
-    }
-
-    public void setLocationHierarchy(LocationHierarchy locationHierarchy) {
-        this.locationHierarchy = locationHierarchy;
-    }
 
     public List<FhirCareTeamExtension> getFhirCareTeamExtensionList() {
         return fhirCareTeamExtensionList;
@@ -101,6 +84,14 @@ public class FhirPractitionerDetails extends Type implements ICompositeType {
     public void setFhirOrganizationExtensions(
             List<FhirOrganizationExtension> fhirOrganizationExtensions) {
         this.fhirOrganizationExtensions = fhirOrganizationExtensions;
+    }
+
+    public List<LocationHierarchy> getLocationHierarchyList() {
+        return locationHierarchyList;
+    }
+
+    public void setLocationHierarchyList(List<LocationHierarchy> locationHierarchyList) {
+        this.locationHierarchyList = locationHierarchyList;
     }
 
     public StringType getPractitionerId() {

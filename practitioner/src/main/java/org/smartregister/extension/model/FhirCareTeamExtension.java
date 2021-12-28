@@ -38,8 +38,10 @@ public class FhirCareTeamExtension extends CareTeam {
 
     public FhirCareTeamExtension mapValues(CareTeam dst) {
         FhirCareTeamExtension fhirCareTeamExtension = new FhirCareTeamExtension();
-        super.copyValues(dst);
         if (dst != null) {
+            if (dst.getId() != null) {
+                fhirCareTeamExtension.setId(dst.getId());
+            }
             if (dst.getIdentifier() != null) {
                 fhirCareTeamExtension.setIdentifier(dst.getIdentifier());
             }
