@@ -95,7 +95,8 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
             IBaseResource practitioner =
                     practitioners.size() > 0 ? practitioners.get(0) : new Practitioner();
-            Long practitionerId = practitioner.getIdElement() != null
+            Long practitionerId =
+                    practitioner.getIdElement() != null
                             && practitioner.getIdElement().getIdPart() != null
                             ? practitioner.getIdElement().getIdPartAsLong()
                             : 0;

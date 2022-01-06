@@ -35,4 +35,10 @@ public interface Constants {
     String COLON = ":";
     String SPACE = " ";
     String EMPTY_STRING = "";
+    String _PRACTITIONER = "Practitioner";
+    String PRACTITIONER_ROLE = "PractitionerRole";
+    String CARE_TEAM = "CareTeam";
+    String ORGANIZATION = "Organization";
+    String ORGANIZATION_AFFILIATION = "OrganizationAffiliation";
+
 }

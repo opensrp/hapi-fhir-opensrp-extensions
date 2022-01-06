@@ -16,8 +16,10 @@
 package org.smartregister.extension.model;
 
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.hl7.fhir.r4.model.*;
 
 @DatatypeDef(name = "FhirCareTeamExtension")
