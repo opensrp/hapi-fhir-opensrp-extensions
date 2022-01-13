@@ -150,6 +150,11 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             UserBioData userBioData = new UserBioData();
             userBioData.setIdentifier(authenticationIdentifier);
 
+            StringType userName = new StringType();
+            userName.setId(USERNAME);
+            userName.setValue(token.getPreferredUsername());
+            userBioData.setUserName(userName);
+
             StringType preferredUserName = new StringType();
             preferredUserName.setId(PREFFERED_USERNAME);
             preferredUserName.setValue(token.getPreferredUsername());

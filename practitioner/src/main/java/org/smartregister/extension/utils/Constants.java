@@ -27,6 +27,7 @@ public interface Constants {
     String PRIMARY_ORGANIZATION = "primary-organization";
     String ID = "_id";
     String PREFFERED_USERNAME = "Preferred Username";
+    String USERNAME = "Username";
     String FAMILY_NAME = "Family Name";
     String GIVEN_NAME = "Given Name";
     String EMAIL = "Email";
