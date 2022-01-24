@@ -15,7 +15,7 @@
  */
 package org.smartregister.extension.rest;
 
-import static org.smartregister.extension.utils.Constants.*;
+import static org.smartregister.utils.Constants.*;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
@@ -28,8 +28,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
-import org.smartregister.extension.model.LocationHierarchy;
-import org.smartregister.extension.model.LocationHierarchyTree;
+import org.smartregister.model.location.LocationHierarchy;
+import org.smartregister.model.location.LocationHierarchyTree;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class LocationHierarchyResourceProvider implements IResourceProvider {

@@ -41,6 +41,7 @@
 
 	<modules>
 		<module>location</module>
+		<module>practitioner</module>
 	</modules>
 
 	<dependencies>
@@ -92,6 +93,12 @@
 			</exclusions>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<version>5.5.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.smartregister</groupId>
+			<artifactId>fhir-common-utils</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
 		<!--        Test Dependencies-->
