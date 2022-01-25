@@ -27,12 +27,10 @@ import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.TokenParam;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.junit.Before;
@@ -51,56 +49,39 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class PractitionerDetailsResourceProviderTest {
 
-    @Mock
-    private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
+    @Mock private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
 
-    @Mock
-    private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
+    @Mock private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
 
-    @Mock
-    private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
+    @Mock private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
 
-    @Mock
-    private IFhirResourceDao<OrganizationAffiliation> organizationAffiliationIFhirResourceDao;
+    @Mock private IFhirResourceDao<OrganizationAffiliation> organizationAffiliationIFhirResourceDao;
 
-    @Mock
-    private IFhirResourceDao<Organization> organizationIFhirResourceDao;
+    @Mock private IFhirResourceDao<Organization> organizationIFhirResourceDao;
 
-    @Mock
-    private IFhirResourceDao<Location> locationIFhirResourceDao;
+    @Mock private IFhirResourceDao<Location> locationIFhirResourceDao;
 
-    @Mock
-    private KeycloakPrincipal<KeycloakSecurityContext> keycloakPrincipal;
+    @Mock private KeycloakPrincipal<KeycloakSecurityContext> keycloakPrincipal;
 
-    @Mock
-    private RefreshableKeycloakSecurityContext securityContext;
+    @Mock private RefreshableKeycloakSecurityContext securityContext;
 
-    @Mock
-    private AccessToken token;
+    @Mock private AccessToken token;
 
-    @Mock
-    private Authentication authentication;
+    @Mock private Authentication authentication;
 
-    @Mock
-    private IBundleProvider practitionersBundleProvider;
+    @Mock private IBundleProvider practitionersBundleProvider;
 
-    @Mock
-    private IBundleProvider careTeamsBundleProvider;
+    @Mock private IBundleProvider careTeamsBundleProvider;
 
-    @Mock
-    private IBundleProvider practitionerRolesBundleProvider;
+    @Mock private IBundleProvider practitionerRolesBundleProvider;
 
-    @Mock
-    private IBundleProvider organizationsBundleProvider;
+    @Mock private IBundleProvider organizationsBundleProvider;
 
-    @Mock
-    private IBundleProvider organizationsAffiliationBundleProvider;
+    @Mock private IBundleProvider organizationsAffiliationBundleProvider;
 
-    @Mock
-    private IBundleProvider locationsBundleProvider;
+    @Mock private IBundleProvider locationsBundleProvider;
 
-    @Mock
-    private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
+    @Mock private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
 
     private PractitionerDetailsResourceProvider practitionerDetailsResourceProvider;
 
@@ -110,12 +91,17 @@ public class PractitionerDetailsResourceProviderTest {
     public void setup() {
         initMocks(this);
         practitionerDetailsResourceProvider = new PractitionerDetailsResourceProvider();
-        practitionerDetailsResourceProvider.setPractitionerIFhirResourceDao(practitionerIFhirResourceDao);
+        practitionerDetailsResourceProvider.setPractitionerIFhirResourceDao(
+                practitionerIFhirResourceDao);
         practitionerDetailsResourceProvider.setCareTeamIFhirResourceDao(careTeamIFhirResourceDao);
-        practitionerDetailsResourceProvider.setPractitionerRoleIFhirResourceDao(practitionerRoleIFhirResourceDao);
-        practitionerDetailsResourceProvider.setOrganizationIFhirResourceDao(organizationIFhirResourceDao);
-        practitionerDetailsResourceProvider.setOrganizationAffiliationIFhirResourceDao(organizationAffiliationIFhirResourceDao);
-        practitionerDetailsResourceProvider.setLocationHierarchyResourceProvider(locationHierarchyResourceProvider);
+        practitionerDetailsResourceProvider.setPractitionerRoleIFhirResourceDao(
+                practitionerRoleIFhirResourceDao);
+        practitionerDetailsResourceProvider.setOrganizationIFhirResourceDao(
+                organizationIFhirResourceDao);
+        practitionerDetailsResourceProvider.setOrganizationAffiliationIFhirResourceDao(
+                organizationAffiliationIFhirResourceDao);
+        practitionerDetailsResourceProvider.setLocationHierarchyResourceProvider(
+                locationHierarchyResourceProvider);
         practitionerDetailsResourceProvider.setLocationIFhirResourceDao(locationIFhirResourceDao);
         when(keycloakPrincipal.getKeycloakSecurityContext()).thenReturn(securityContext);
     }
@@ -124,7 +110,11 @@ public class PractitionerDetailsResourceProviderTest {
     public void testGetPractitionerDetailsWhenKeycloakUserNotFound() {
         TokenParam identifierParam = new TokenParam();
         identifierParam.setValue("0000-11111-2222-3333");
-        PractitionerDetails practitionerDetails = practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(null);
+        PractitionerDetails practitionerDetails =
+                practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam);
         assertNotNull(practitionerDetails);
         assertEquals("Keycloak User Not Found", practitionerDetails.getId());
     }
@@ -145,19 +135,30 @@ public class PractitionerDetailsResourceProviderTest {
         when(token.getEmail()).thenReturn("user@testing.com");
         when(token.getEmailVerified()).thenReturn(Boolean.TRUE);
         when(authentication.getName()).thenReturn("Beta Test User");
-        when(authentication.getAuthorities()).thenAnswer(a -> roles.stream().map(role -> new GrantedAuthority() {
+        when(authentication.getAuthorities())
+                .thenAnswer(
+                        a ->
+                                roles.stream()
+                                        .map(
+                                                role ->
+                                                        new GrantedAuthority() {
 
-            private static final long serialVersionUID = 1L;
+                                                            private static final long
+                                                                    serialVersionUID = 1L;
 
-            @Override
-            public String getAuthority() {
-                return role;
-            }
-        }).collect(Collectors.toList()));
-        when(practitionerIFhirResourceDao.search(any(SearchParameterMap.class))).thenReturn(practitionersBundleProvider);
+                                                            @Override
+                                                            public String getAuthority() {
+                                                                return role;
+                                                            }
+                                                        })
+                                        .collect(Collectors.toList()));
+        when(practitionerIFhirResourceDao.search(any(SearchParameterMap.class)))
+                .thenReturn(practitionersBundleProvider);
         List<IBaseResource> practitioners = new ArrayList<>();
-        when(practitionersBundleProvider.getResources(anyInt(), anyInt())).thenReturn(practitioners);
-        PractitionerDetails practitionerDetails = practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam);
+        when(practitionersBundleProvider.getResources(anyInt(), anyInt()))
+                .thenReturn(practitioners);
+        PractitionerDetails practitionerDetails =
+                practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam);
         assertNotNull(practitionerDetails);
         assertEquals("Practitioner Not Found", practitionerDetails.getId());
     }
@@ -177,25 +178,41 @@ public class PractitionerDetailsResourceProviderTest {
         when(token.getEmail()).thenReturn("user@testing.com");
         when(token.getEmailVerified()).thenReturn(Boolean.TRUE);
         when(authentication.getName()).thenReturn("Beta Test User");
-        when(authentication.getAuthorities()).thenAnswer(a -> roles.stream().map(role -> new GrantedAuthority() {
+        when(authentication.getAuthorities())
+                .thenAnswer(
+                        a ->
+                                roles.stream()
+                                        .map(
+                                                role ->
+                                                        new GrantedAuthority() {
 
-            private static final long serialVersionUID = 1L;
+                                                            private static final long
+                                                                    serialVersionUID = 1L;
 
-            @Override
-            public String getAuthority() {
-                return role;
-            }
-        }).collect(Collectors.toList()));
+                                                            @Override
+                                                            public String getAuthority() {
+                                                                return role;
+                                                            }
+                                                        })
+                                        .collect(Collectors.toList()));
 
         LocationHierarchy locationHierarchy = new LocationHierarchy();
-        when(practitionerIFhirResourceDao.search(any(SearchParameterMap.class))).thenReturn(practitionersBundleProvider);
-        when(careTeamIFhirResourceDao.search(any(SearchParameterMap.class))).thenReturn(careTeamsBundleProvider);
-        when(practitionerRoleIFhirResourceDao.search(any(SearchParameterMap.class))).thenReturn(practitionerRolesBundleProvider);
-        when(organizationIFhirResourceDao.search(any(SearchParameterMap.class))).thenReturn(organizationsBundleProvider);
-        when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class))).thenReturn(organizationsAffiliationBundleProvider);
-        when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class))).thenReturn(organizationsAffiliationBundleProvider);
-        when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class))).thenReturn(organizationsAffiliationBundleProvider);
-        when(locationIFhirResourceDao.search(any(SearchParameterMap.class))).thenReturn(locationsBundleProvider);
+        when(practitionerIFhirResourceDao.search(any(SearchParameterMap.class)))
+                .thenReturn(practitionersBundleProvider);
+        when(careTeamIFhirResourceDao.search(any(SearchParameterMap.class)))
+                .thenReturn(careTeamsBundleProvider);
+        when(practitionerRoleIFhirResourceDao.search(any(SearchParameterMap.class)))
+                .thenReturn(practitionerRolesBundleProvider);
+        when(organizationIFhirResourceDao.search(any(SearchParameterMap.class)))
+                .thenReturn(organizationsBundleProvider);
+        when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class)))
+                .thenReturn(organizationsAffiliationBundleProvider);
+        when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class)))
+                .thenReturn(organizationsAffiliationBundleProvider);
+        when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class)))
+                .thenReturn(organizationsAffiliationBundleProvider);
+        when(locationIFhirResourceDao.search(any(SearchParameterMap.class)))
+                .thenReturn(locationsBundleProvider);
         List<IBaseResource> practitioners = getPractitioners();
 
         List<IBaseResource> careTeams = getCareTeams();
@@ -208,29 +225,47 @@ public class PractitionerDetailsResourceProviderTest {
 
         List<IBaseResource> locations = getLocations();
 
-        when(practitionersBundleProvider.getResources(anyInt(), anyInt())).thenReturn(practitioners);
+        when(practitionersBundleProvider.getResources(anyInt(), anyInt()))
+                .thenReturn(practitioners);
         when(careTeamsBundleProvider.getResources(anyInt(), anyInt())).thenReturn(careTeams);
-        when(practitionerRolesBundleProvider.getResources(anyInt(), anyInt())).thenReturn(practitionerRoles);
-        when(organizationsBundleProvider.getResources(anyInt(), anyInt())).thenReturn(organizations);
-        when(organizationsAffiliationBundleProvider.getResources(anyInt(), anyInt())).thenReturn(organizationsAffiliations);
+        when(practitionerRolesBundleProvider.getResources(anyInt(), anyInt()))
+                .thenReturn(practitionerRoles);
+        when(organizationsBundleProvider.getResources(anyInt(), anyInt()))
+                .thenReturn(organizations);
+        when(organizationsAffiliationBundleProvider.getResources(anyInt(), anyInt()))
+                .thenReturn(organizationsAffiliations);
         when(locationsBundleProvider.getResources(anyInt(), anyInt())).thenReturn(locations);
 
         TokenParam identifierParam = new TokenParam();
         identifierParam.setValue("0000-11111-2222-3333");
-        PractitionerDetails practitionerDetails = practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam);
+        PractitionerDetails practitionerDetails =
+                practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam);
         assertNotNull(practitionerDetails);
         assertNotNull(practitionerDetails.getUserDetail());
         assertNotNull(practitionerDetails.getUserDetail().getUserBioData());
         assertNotNull(practitionerDetails.getUserDetail().getRoles());
-        assertEquals("TestUser", practitionerDetails.getUserDetail().getUserBioData().getUserName().getValue());
-        assertEquals("Test User Family", practitionerDetails.getUserDetail().getUserBioData().getFamilyName().getValue());
-        assertEquals("TestUser", practitionerDetails.getUserDetail().getUserBioData().getPreferredName().getValue());
-        assertEquals("Test User", practitionerDetails.getUserDetail().getUserBioData().getGivenName().getValue());
-        assertEquals("user@testing.com", practitionerDetails.getUserDetail().getUserBioData().getEmail().getValue());
-        assertEquals("true", practitionerDetails.getUserDetail().getUserBioData().getEmailVerified().getValue());
+        assertEquals(
+                "TestUser",
+                practitionerDetails.getUserDetail().getUserBioData().getUserName().getValue());
+        assertEquals(
+                "Test User Family",
+                practitionerDetails.getUserDetail().getUserBioData().getFamilyName().getValue());
+        assertEquals(
+                "TestUser",
+                practitionerDetails.getUserDetail().getUserBioData().getPreferredName().getValue());
+        assertEquals(
+                "Test User",
+                practitionerDetails.getUserDetail().getUserBioData().getGivenName().getValue());
+        assertEquals(
+                "user@testing.com",
+                practitionerDetails.getUserDetail().getUserBioData().getEmail().getValue());
+        assertEquals(
+                "true",
+                practitionerDetails.getUserDetail().getUserBioData().getEmailVerified().getValue());
         assertEquals(2, practitionerDetails.getUserDetail().getRoles().size());
         assertEquals("ROLE_USER", practitionerDetails.getUserDetail().getRoles().get(0).getValue());
-        assertEquals("ROLE_ADMIN", practitionerDetails.getUserDetail().getRoles().get(1).getValue());
+        assertEquals(
+                "ROLE_ADMIN", practitionerDetails.getUserDetail().getRoles().get(1).getValue());
     }
 
     private List<IBaseResource> getPractitioners() {
