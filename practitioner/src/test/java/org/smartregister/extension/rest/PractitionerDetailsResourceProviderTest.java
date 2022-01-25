@@ -27,12 +27,10 @@ import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.TokenParam;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.junit.Before;
@@ -51,56 +49,39 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class PractitionerDetailsResourceProviderTest {
 
-    @Mock
-    private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
+    @Mock private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
 
-    @Mock
-    private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
+    @Mock private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
 
-    @Mock
-    private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
+    @Mock private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
 
-    @Mock
-    private IFhirResourceDao<OrganizationAffiliation> organizationAffiliationIFhirResourceDao;
+    @Mock private IFhirResourceDao<OrganizationAffiliation> organizationAffiliationIFhirResourceDao;
 
-    @Mock
-    private IFhirResourceDao<Organization> organizationIFhirResourceDao;
+    @Mock private IFhirResourceDao<Organization> organizationIFhirResourceDao;
 
-    @Mock
-    private IFhirResourceDao<Location> locationIFhirResourceDao;
+    @Mock private IFhirResourceDao<Location> locationIFhirResourceDao;
 
-    @Mock
-    private KeycloakPrincipal<KeycloakSecurityContext> keycloakPrincipal;
+    @Mock private KeycloakPrincipal<KeycloakSecurityContext> keycloakPrincipal;
 
-    @Mock
-    private RefreshableKeycloakSecurityContext securityContext;
+    @Mock private RefreshableKeycloakSecurityContext securityContext;
 
-    @Mock
-    private AccessToken token;
+    @Mock private AccessToken token;
 
-    @Mock
-    private Authentication authentication;
+    @Mock private Authentication authentication;
 
-    @Mock
-    private IBundleProvider practitionersBundleProvider;
+    @Mock private IBundleProvider practitionersBundleProvider;
 
-    @Mock
-    private IBundleProvider careTeamsBundleProvider;
+    @Mock private IBundleProvider careTeamsBundleProvider;
 
-    @Mock
-    private IBundleProvider practitionerRolesBundleProvider;
+    @Mock private IBundleProvider practitionerRolesBundleProvider;
 
-    @Mock
-    private IBundleProvider organizationsBundleProvider;
+    @Mock private IBundleProvider organizationsBundleProvider;
 
-    @Mock
-    private IBundleProvider organizationsAffiliationBundleProvider;
+    @Mock private IBundleProvider organizationsAffiliationBundleProvider;
 
-    @Mock
-    private IBundleProvider locationsBundleProvider;
+    @Mock private IBundleProvider locationsBundleProvider;
 
-    @Mock
-    private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
+    @Mock private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
 
     private PractitionerDetailsResourceProvider practitionerDetailsResourceProvider;
 
