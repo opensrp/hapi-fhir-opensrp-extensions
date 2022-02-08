@@ -96,29 +96,27 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
             if (practitionerId != null && practitionerId > 0) {
                 List<IBaseResource> careTeams = getCareTeams(practitionerId);
-                List<FhirCareTeamExtension> careTeamExtensions =
-                        mapToCareTeamExtensionsList(careTeams);
-
-                fhirPractitionerDetails.setFhirCareTeamExtensionList(careTeamExtensions);
+                List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
+                fhirPractitionerDetails.setCareTeams(careTeamsList);
                 StringType practitionerIdString = new StringType();
                 practitionerIdString.setValue(String.valueOf(practitionerId));
                 fhirPractitionerDetails.setPractitionerId(practitionerIdString);
                 List<IBaseResource> organizationTeams =
                         getOrganizationsOfPractitioner(practitionerId);
-                List<FhirOrganizationExtension> teamExtensions =
-                        mapToTeamExtensionsList(organizationTeams);
-                fhirPractitionerDetails.setFhirOrganizationExtensions(teamExtensions);
+                List<Organization> teams = mapToTeams(organizationTeams);
+                fhirPractitionerDetails.setOrganizations(teams);
                 keycloakUserDetails.setId(identifier.getValue());
                 practitionerDetails.setId(keycloakUserDetails.getId());
                 practitionerDetails.setUserDetail(keycloakUserDetails);
                 fhirPractitionerDetails.setId(practitionerIdString.getValue());
-                List<String> locationsIdReferences =
-                        getLocationIdentifiersByOrganizations(teamExtensions);
+                List<String> locationsIdReferences = getLocationIdentifiersByOrganizations(teams);
                 List<Long> locationIds = getLocationIdsFromReferences(locationsIdReferences);
                 List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
                 List<LocationHierarchy> locationHierarchyList =
                         getLocationsHierarchy(locationsIdentifiers);
                 fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
+                List<Location> locationsList = getLocationsByIds(locationIds);
+                fhirPractitionerDetails.setLocations(locationsList);
                 practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
             } else {
                 practitionerDetails.setId(PRACTITIONER_NOT_FOUND);
@@ -207,16 +205,37 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 : new ArrayList<>();
     }
 
-    private List<FhirCareTeamExtension> mapToCareTeamExtensionsList(List<IBaseResource> careTeams) {
-        List<FhirCareTeamExtension> fhirCareTeamExtensionList = new ArrayList<>();
+    private List<Location> getLocationsByIds(List<Long> locationIds) {
+        List<Location> locations = new ArrayList<>();
+        SearchParameterMap searchParameterMap = new SearchParameterMap();
+        for (Long locationId : locationIds) {
+            TokenAndListParam idParam = new TokenAndListParam();
+            TokenParam id = new TokenParam();
+            id.setValue(String.valueOf(locationId));
+            idParam.addAnd(id);
+            searchParameterMap.add(ID, idParam);
+            IBundleProvider locationsBundle = locationIFhirResourceDao.search(searchParameterMap);
+            List<IBaseResource> locationsResources =
+                    locationsBundle != null
+                            ? locationsBundle.getResources(0, locationsBundle.size())
+                            : new ArrayList<>();
+            Location locationObj;
+            for (IBaseResource loc : locationsResources) {
+                locationObj = (Location) loc;
+                locations.add(locationObj);
+            }
+        }
+        return locations;
+    }
+
+    private List<CareTeam> mapToCareTeams(List<IBaseResource> careTeams) {
+        List<CareTeam> careTeamList = new ArrayList<>();
         CareTeam careTeamObj;
-        FhirCareTeamExtension fhirCareTeamExtensionObj = new FhirCareTeamExtension();
         for (IBaseResource careTeam : careTeams) {
             careTeamObj = (CareTeam) careTeam;
-            fhirCareTeamExtensionObj = fhirCareTeamExtensionObj.mapValues(careTeamObj);
-            fhirCareTeamExtensionList.add(fhirCareTeamExtensionObj);
+            careTeamList.add(careTeamObj);
         }
-        return fhirCareTeamExtensionList;
+        return careTeamList;
     }
 
     private List<String> getOrganizationIdentifiers(Long practitionerId) {
@@ -266,16 +285,14 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 : new ArrayList<>();
     }
 
-    private List<FhirOrganizationExtension> mapToTeamExtensionsList(List<IBaseResource> teams) {
-        List<FhirOrganizationExtension> fhirOrganizationExtensions = new ArrayList<>();
+    private List<Organization> mapToTeams(List<IBaseResource> teams) {
+        List<Organization> organizations = new ArrayList<>();
         Organization organizationObj;
-        FhirOrganizationExtension fhirOrganizationExtension = new FhirOrganizationExtension();
         for (IBaseResource team : teams) {
             organizationObj = (Organization) team;
-            fhirOrganizationExtension = fhirOrganizationExtension.mapValues(organizationObj);
-            fhirOrganizationExtensions.add(fhirOrganizationExtension);
+            organizations.add(organizationObj);
         }
-        return fhirOrganizationExtensions;
+        return organizations;
     }
 
     private List<LocationHierarchy> getLocationsHierarchy(List<String> locationsIdentifiers) {
@@ -291,11 +308,10 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         return locationHierarchyList;
     }
 
-    private List<String> getLocationIdentifiersByOrganizations(
-            List<FhirOrganizationExtension> teamExtensions) {
+    private List<String> getLocationIdentifiersByOrganizations(List<Organization> organizations) {
         List<String> locationsIdentifiers = new ArrayList<>();
         SearchParameterMap searchParameterMap = new SearchParameterMap();
-        for (FhirOrganizationExtension team : teamExtensions) {
+        for (Organization team : organizations) {
             ReferenceAndListParam thePrimaryOrganization = new ReferenceAndListParam();
             ReferenceOrListParam primaryOrganizationRefParam = new ReferenceOrListParam();
             ReferenceParam primaryOrganization = new ReferenceParam();
