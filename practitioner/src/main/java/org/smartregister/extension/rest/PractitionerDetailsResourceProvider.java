@@ -80,6 +80,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             FhirPractitionerDetails fhirPractitionerDetails = new FhirPractitionerDetails();
             SearchParameterMap paramMap = new SearchParameterMap();
             paramMap.add(IDENTIFIER, identifier);
+            logger.info("Searching for practitioner with identifier: " + identifier.getValue());
             IBundleProvider practitionerBundle = practitionerIFhirResourceDao.search(paramMap);
             List<IBaseResource> practitioners =
                     practitionerBundle != null
@@ -95,12 +96,14 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                             : 0;
 
             if (practitionerId != null && practitionerId > 0) {
+                logger.info("Searching for care teams for practitioner with id: " + practitionerId);
                 List<IBaseResource> careTeams = getCareTeams(practitionerId);
                 List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
                 fhirPractitionerDetails.setCareTeams(careTeamsList);
                 StringType practitionerIdString = new StringType();
                 practitionerIdString.setValue(String.valueOf(practitionerId));
                 fhirPractitionerDetails.setPractitionerId(practitionerIdString);
+                logger.info("Searching for organizations of practitioner with id: " + practitionerId);
                 List<IBaseResource> organizationTeams =
                         getOrganizationsOfPractitioner(practitionerId);
                 List<Organization> teams = mapToTeams(organizationTeams);
@@ -109,19 +112,24 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 practitionerDetails.setId(keycloakUserDetails.getId());
                 practitionerDetails.setUserDetail(keycloakUserDetails);
                 fhirPractitionerDetails.setId(practitionerIdString.getValue());
+                logger.info("Searching for locations by organizations");
                 List<String> locationsIdReferences = getLocationIdentifiersByOrganizations(teams);
                 List<Long> locationIds = getLocationIdsFromReferences(locationsIdReferences);
                 List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
+                logger.info("Searching for location heirarchy list by locations identifiers");
                 List<LocationHierarchy> locationHierarchyList =
                         getLocationsHierarchy(locationsIdentifiers);
                 fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
+                logger.info("Searching for locations by ids");
                 List<Location> locationsList = getLocationsByIds(locationIds);
                 fhirPractitionerDetails.setLocations(locationsList);
                 practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
             } else {
+                logger.error("Practitioner with identifier: " + identifier.getValue() + " not found");
                 practitionerDetails.setId(PRACTITIONER_NOT_FOUND);
             }
         } else {
+            logger.error("User details are null");
             practitionerDetails.setId(KEYCLOAK_USER_NOT_FOUND);
         }
         return practitionerDetails;
@@ -130,6 +138,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
     private KeycloakUserDetails getKeycloakUserDetails(Authentication authentication) {
         KeycloakUserDetails keycloakUserDetails = new KeycloakUserDetails();
         if (authentication != null) {
+            logger.info("Authentication is not null");
             KeycloakPrincipal<KeycloakSecurityContext> kp =
                     (KeycloakPrincipal<KeycloakSecurityContext>) authentication.getPrincipal();
             AccessToken token = kp.getKeycloakSecurityContext().getToken();
