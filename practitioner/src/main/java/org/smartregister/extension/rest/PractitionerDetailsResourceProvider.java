@@ -103,7 +103,8 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 StringType practitionerIdString = new StringType();
                 practitionerIdString.setValue(String.valueOf(practitionerId));
                 fhirPractitionerDetails.setPractitionerId(practitionerIdString);
-                logger.info("Searching for organizations of practitioner with id: " + practitionerId);
+                logger.info(
+                        "Searching for organizations of practitioner with id: " + practitionerId);
                 List<IBaseResource> organizationTeams =
                         getOrganizationsOfPractitioner(practitionerId);
                 List<Organization> teams = mapToTeams(organizationTeams);
@@ -125,7 +126,8 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 fhirPractitionerDetails.setLocations(locationsList);
                 practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
             } else {
-                logger.error("Practitioner with identifier: " + identifier.getValue() + " not found");
+                logger.error(
+                        "Practitioner with identifier: " + identifier.getValue() + " not found");
                 practitionerDetails.setId(PRACTITIONER_NOT_FOUND);
             }
         } else {
