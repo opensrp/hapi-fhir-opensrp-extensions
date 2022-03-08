@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Ona Systems, Inc
+ * Copyright 2022 Ona Systems, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
     @Autowired private IFhirResourceDao<Location> locationIFhirResourceDao;
 
-    private static Logger logger =
+    private static final Logger logger =
             LogManager.getLogger(PractitionerDetailsResourceProvider.class.toString());
 
     @Override
@@ -113,17 +113,25 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 practitionerDetails.setId(keycloakUserDetails.getId());
                 practitionerDetails.setUserDetail(keycloakUserDetails);
                 fhirPractitionerDetails.setId(practitionerIdString.getValue());
-                logger.info("Searching for locations by organizations");
-                List<String> locationsIdReferences = getLocationIdentifiersByOrganizations(teams);
-                List<Long> locationIds = getLocationIdsFromReferences(locationsIdReferences);
-                List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
-                logger.info("Searching for location heirarchy list by locations identifiers");
-                List<LocationHierarchy> locationHierarchyList =
-                        getLocationsHierarchy(locationsIdentifiers);
-                fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
-                logger.info("Searching for locations by ids");
-                List<Location> locationsList = getLocationsByIds(locationIds);
-                fhirPractitionerDetails.setLocations(locationsList);
+                if (!teams.isEmpty()) {
+                    logger.info("Searching for locations by organizations");
+                    List<String> locationsIdReferences =
+                            getLocationIdentifiersByOrganizations(teams);
+                    List<Long> locationIds = getLocationIdsFromReferences(locationsIdReferences);
+                    List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
+                    if (!locationsIdentifiers.isEmpty()) {
+                        logger.info(
+                                "Searching for location hierarchy list by locations identifiers");
+                        List<LocationHierarchy> locationHierarchyList =
+                                getLocationsHierarchy(locationsIdentifiers);
+                        fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
+                    }
+                    if (!locationIds.isEmpty()) {
+                        logger.info("Searching for locations by ids");
+                        List<Location> locationsList = getLocationsByIds(locationIds);
+                        fhirPractitionerDetails.setLocations(locationsList);
+                    }
+                }
                 practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
             } else {
                 logger.error(
@@ -253,8 +261,6 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         SearchParameterMap practitionerRoleSearchParamMap = new SearchParameterMap();
         ReferenceParam practitionerRef = new ReferenceParam();
         practitionerRef.setValue(String.valueOf(practitionerId));
-        ReferenceOrListParam careTeamRefParam = new ReferenceOrListParam();
-        careTeamRefParam.addOr(practitionerRef);
         practitionerRoleSearchParamMap.add(PRACTITIONER, practitionerRef);
         IBundleProvider practitionerRoleBundle =
                 practitionerRoleIFhirResourceDao.search(practitionerRoleSearchParamMap);
@@ -263,7 +269,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                         ? practitionerRoleBundle.getResources(0, practitionerRoleBundle.size())
                         : new ArrayList<>();
         List<String> organizationIds = new ArrayList<>();
-        if (practitionerRoles != null && practitionerRoles.size() > 0) {
+        if (practitionerRoles.size() > 0) {
             for (IBaseResource practitionerRole : practitionerRoles) {
                 PractitionerRole pRole = (PractitionerRole) practitionerRole;
                 if (pRole.getOrganization() != null
@@ -357,9 +363,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         List<Long> locationIds = new ArrayList<>();
         for (String locationRef : locationReferences) {
             if (locationRef.contains(FORWARD_SLASH)) {
-                locationRef =
-                        locationRef.substring(
-                                locationRef.indexOf(FORWARD_SLASH) + 1, locationRef.length());
+                locationRef = locationRef.substring(locationRef.indexOf(FORWARD_SLASH) + 1);
             }
             locationIds.add(Long.valueOf(locationRef));
         }

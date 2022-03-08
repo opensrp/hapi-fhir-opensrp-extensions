@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>hapi-fhir-opensrp-extensions</artifactId>
 		<groupId>org.smartregister</groupId>
-		<version>0.0.10-SNAPSHOT</version>
+		<version>0.0.11-SNAPSHOT</version>
 	</parent>
 
 	<description>The repository holds the practitioner details extensions on the HAPI server</description>
@@ -12,11 +12,11 @@
 	<name>HAPI FHIR OpenSRP Extensions (Practitioner)</name>
 	<packaging>jar</packaging>
 	<url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<artifactId>practitioner</artifactId>
 
 	<properties>
-		<spring.security.version>5.3.3.RELEASE</spring.security.version>
+		<spring.security.version>5.6.2</spring.security.version>
 	</properties>
 
 	<dependencies>
@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-spring-security-adapter</artifactId>
-			<version>9.0.3</version>
+			<version>17.0.0</version>
 		</dependency>
 		<!-- This dependency holds all the code extensions for Location-->
 		<dependency>
@@ -38,4 +38,48 @@
 		</dependency>
 
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
+				<version>${spotless.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<phase>compile</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<formats>
+						<format>
+							<includes>
+								<include>*.factories</include>
+								<include>*.xml</include>
+								<include>.gitignore</include>
+							</includes>
+							<trimTrailingWhitespace />
+							<endWithNewline />
+							<indent>
+								<tabs>true</tabs>
+								<spacesPerTab>4</spacesPerTab>
+							</indent>
+						</format>
+					</formats>
+					<java>
+						<googleJavaFormat>
+							<version>1.8</version>
+							<style>AOSP</style>
+						</googleJavaFormat>
+						<licenseHeader>
+							<file>${basedir}/src/license-header.txt</file>
+						</licenseHeader>
+					</java>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
