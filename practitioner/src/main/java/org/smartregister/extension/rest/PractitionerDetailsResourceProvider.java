@@ -30,6 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
+import org.jetbrains.annotations.NotNull;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
@@ -96,19 +97,11 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                             : 0;
 
             if (practitionerId != null && practitionerId > 0) {
-                logger.info("Searching for care teams for practitioner with id: " + practitionerId);
-                List<IBaseResource> careTeams = getCareTeams(practitionerId);
-                List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
-                fhirPractitionerDetails.setCareTeams(careTeamsList);
-                StringType practitionerIdString = new StringType();
-                practitionerIdString.setValue(String.valueOf(practitionerId));
-                fhirPractitionerDetails.setPractitionerId(practitionerIdString);
-                logger.info(
-                        "Searching for organizations of practitioner with id: " + practitionerId);
-                List<IBaseResource> organizationTeams =
-                        getOrganizationsOfPractitioner(practitionerId);
-                List<Organization> teams = mapToTeams(organizationTeams);
-                fhirPractitionerDetails.setOrganizations(teams);
+                getPractitionerCareTeams(fhirPractitionerDetails, practitionerId);
+                StringType practitionerIdString =
+                        getPractitionerIdString(fhirPractitionerDetails, practitionerId);
+                List<Organization> teams =
+                        getPractitionerOrganizations(fhirPractitionerDetails, practitionerId);
                 keycloakUserDetails.setId(identifier.getValue());
                 practitionerDetails.setId(keycloakUserDetails.getId());
                 practitionerDetails.setUserDetail(keycloakUserDetails);
@@ -143,6 +136,33 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             practitionerDetails.setId(KEYCLOAK_USER_NOT_FOUND);
         }
         return practitionerDetails;
+    }
+
+    @NotNull
+    private List<Organization> getPractitionerOrganizations(
+            FhirPractitionerDetails fhirPractitionerDetails, Long practitionerId) {
+        logger.info("Searching for organizations of practitioner with id: " + practitionerId);
+        List<IBaseResource> organizationTeams = getOrganizationsOfPractitioner(practitionerId);
+        List<Organization> teams = mapToTeams(organizationTeams);
+        fhirPractitionerDetails.setOrganizations(teams);
+        return teams;
+    }
+
+    @NotNull
+    private StringType getPractitionerIdString(
+            FhirPractitionerDetails fhirPractitionerDetails, Long practitionerId) {
+        StringType practitionerIdString = new StringType();
+        practitionerIdString.setValue(String.valueOf(practitionerId));
+        fhirPractitionerDetails.setPractitionerId(practitionerIdString);
+        return practitionerIdString;
+    }
+
+    private void getPractitionerCareTeams(
+            FhirPractitionerDetails fhirPractitionerDetails, Long practitionerId) {
+        logger.info("Searching for care teams for practitioner with id: " + practitionerId);
+        List<IBaseResource> careTeams = getCareTeams(practitionerId);
+        List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
+        fhirPractitionerDetails.setCareTeams(careTeamsList);
     }
 
     private KeycloakUserDetails getKeycloakUserDetails(Authentication authentication) {
@@ -264,20 +284,29 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         practitionerRoleSearchParamMap.add(PRACTITIONER, practitionerRef);
         IBundleProvider practitionerRoleBundle =
                 practitionerRoleIFhirResourceDao.search(practitionerRoleSearchParamMap);
-        List<IBaseResource> practitionerRoles =
-                practitionerRoleBundle != null
-                        ? practitionerRoleBundle.getResources(0, practitionerRoleBundle.size())
-                        : new ArrayList<>();
         List<String> organizationIds = new ArrayList<>();
-        if (practitionerRoles.size() > 0) {
-            for (IBaseResource practitionerRole : practitionerRoles) {
-                PractitionerRole pRole = (PractitionerRole) practitionerRole;
-                if (pRole.getOrganization() != null
-                        && pRole.getOrganization().getIdentifier() != null) {
-                    organizationIds.add(pRole.getOrganization().getIdentifier().getValue());
+        if (practitionerRoleBundle != null && !practitionerRoleBundle.isEmpty()) {
+            logger.info(
+                    practitionerRoleBundle.size()
+                            + "practitioner roles found for the practitioner"
+                            + practitionerId);
+            List<IBaseResource> practitionerRoles =
+                    practitionerRoleBundle.getResources(0, practitionerRoleBundle.size());
+            if (practitionerRoles.size() > 0) {
+                for (IBaseResource practitionerRole : practitionerRoles) {
+                    PractitionerRole pRole = (PractitionerRole) practitionerRole;
+                    if (pRole.getOrganization() != null
+                            && pRole.getOrganization().getIdentifier() != null) {
+                        organizationIds.add(pRole.getOrganization().getIdentifier().getValue());
+                    }
                 }
             }
         }
+
+        logger.info(
+                organizationIds.size()
+                        + "organisations are assigned to the practitioner"
+                        + practitionerId);
         return organizationIds;
     }
 
@@ -329,13 +358,16 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         List<String> locationsIdentifiers = new ArrayList<>();
         SearchParameterMap searchParameterMap = new SearchParameterMap();
         for (Organization team : organizations) {
+            logger.info(" Get Organization Affiliation for team " + team.getName());
             ReferenceAndListParam thePrimaryOrganization = new ReferenceAndListParam();
             ReferenceOrListParam primaryOrganizationRefParam = new ReferenceOrListParam();
             ReferenceParam primaryOrganization = new ReferenceParam();
+
             primaryOrganization.setValue(team.getId());
             primaryOrganizationRefParam.addOr(primaryOrganization);
             thePrimaryOrganization.addAnd(primaryOrganizationRefParam);
             searchParameterMap.add(PRIMARY_ORGANIZATION, thePrimaryOrganization);
+
             IBundleProvider organizationsAffiliationBundle =
                     organizationAffiliationIFhirResourceDao.search(searchParameterMap);
             List<IBaseResource> organizationAffiliations =
@@ -346,9 +378,13 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             OrganizationAffiliation organizationAffiliationObj;
             if (organizationAffiliations.size() > 0) {
                 for (IBaseResource organizationAffiliation : organizationAffiliations) {
+                    logger.info(" Get Locations assigned to team " + team.getName());
                     organizationAffiliationObj = (OrganizationAffiliation) organizationAffiliation;
                     List<Reference> locationList = organizationAffiliationObj.getLocation();
                     for (Reference location : locationList) {
+                        logger.info(
+                                " Get Location Ids for locations assigned to team "
+                                        + team.getName());
                         if (location != null && location.getReference() != null) {
                             locationsIdentifiers.add(location.getReference());
                         }
@@ -362,6 +398,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
     private List<Long> getLocationIdsFromReferences(List<String> locationReferences) {
         List<Long> locationIds = new ArrayList<>();
         for (String locationRef : locationReferences) {
+            logger.info(" Get Location Ids for location reference " + locationRef);
             if (locationRef.contains(FORWARD_SLASH)) {
                 locationRef = locationRef.substring(locationRef.indexOf(FORWARD_SLASH) + 1);
             }
@@ -374,6 +411,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         List<String> locationsIdentifiers = new ArrayList<>();
         SearchParameterMap searchParameterMap = new SearchParameterMap();
         for (Long locationId : locationIds) {
+            logger.info(" Get Location Identifier for location " + locationId);
             TokenAndListParam idParam = new TokenAndListParam();
             TokenParam id = new TokenParam();
             id.setValue(String.valueOf(locationId));
