@@ -16,7 +16,7 @@
 	<artifactId>practitioner</artifactId>
 
 	<properties>
-		<spring.security.version>5.3.3.RELEASE</spring.security.version>
+		<spring.security.version>5.6.2</spring.security.version>
 	</properties>
 
 	<dependencies>
