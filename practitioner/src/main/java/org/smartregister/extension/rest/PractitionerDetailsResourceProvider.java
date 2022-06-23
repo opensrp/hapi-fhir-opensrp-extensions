@@ -20,6 +20,7 @@ import static org.smartregister.utils.Constants.IDENTIFIER;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.model.api.Include;
 import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.*;
@@ -114,16 +115,20 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 practitionerDetails.setUserDetail(keycloakUserDetails);
                 fhirPractitionerDetails.setId(practitionerIdString.getValue());
                 logger.info("Searching for locations by organizations");
-                List<String> locationsIdReferences = getLocationIdentifiersByOrganizations(teams);
-                List<Long> locationIds = getLocationIdsFromReferences(locationsIdReferences);
-                List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
-                logger.info("Searching for location heirarchy list by locations identifiers");
-                List<LocationHierarchy> locationHierarchyList =
-                        getLocationsHierarchy(locationsIdentifiers);
-                fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
+                FhirPractitionerDetails finalLocs = getLocationsByOrganizations(teams);
+                //                List<Long> locationIds =
+                // getLocationIdsFromReferences(locationsIdReferences);
+                //                List<String> locationsIdentifiers =
+                // getLocationIdentifiersByIds(locationIds);
+                //                logger.info("Searching for location heirarchy list by locations
+                // identifiers");
+                //                List<LocationHierarchy> locationHierarchyList =
+                //                        getLocationsHierarchy(locationsIdentifiers);
+                //
+                // fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
                 logger.info("Searching for locations by ids");
-                List<Location> locationsList = getLocationsByIds(locationIds);
-                fhirPractitionerDetails.setLocations(locationsList);
+                //                List<Location> locationsList = getLocationsByIds(locationIds);
+                fhirPractitionerDetails.setLocations(finalLocs.getLocations());
                 practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
             } else {
                 logger.error(
@@ -319,9 +324,12 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         return locationHierarchyList;
     }
 
-    private List<String> getLocationIdentifiersByOrganizations(List<Organization> organizations) {
+    private FhirPractitionerDetails getLocationsByOrganizations(
+            List<Organization> organizations) {
         List<String> locationsIdentifiers = new ArrayList<>();
         SearchParameterMap searchParameterMap = new SearchParameterMap();
+        List<IBaseResource> locations = new ArrayList<>();
+        // separate out search mode = "include"
         for (Organization team : organizations) {
             ReferenceAndListParam thePrimaryOrganization = new ReferenceAndListParam();
             ReferenceOrListParam primaryOrganizationRefParam = new ReferenceOrListParam();
@@ -330,27 +338,69 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             primaryOrganizationRefParam.addOr(primaryOrganization);
             thePrimaryOrganization.addAnd(primaryOrganizationRefParam);
             searchParameterMap.add(PRIMARY_ORGANIZATION, thePrimaryOrganization);
+            Set<Include> theIncludes = new HashSet<>();
+            Include include = new Include("OrganizationAffiliation:location", true);
+            theIncludes.add(include);
+            searchParameterMap.setIncludes(theIncludes);
             IBundleProvider organizationsAffiliationBundle =
                     organizationAffiliationIFhirResourceDao.search(searchParameterMap);
+
             List<IBaseResource> organizationAffiliations =
                     organizationsAffiliationBundle != null
                             ? organizationsAffiliationBundle.getResources(
                                     0, organizationsAffiliationBundle.size())
                             : new ArrayList<>();
+
+            Location locationObj;
+            for (IBaseResource loc : organizationAffiliations) {
+                if (loc.getIdElement() != null
+                        && loc.getIdElement().getResourceType() != null
+                        && loc.getIdElement().getResourceType().equals("Location")) {
+                    locationObj = (Location) loc;
+                    locations.add(locationObj);
+                }
+            }
+
             OrganizationAffiliation organizationAffiliationObj;
             if (organizationAffiliations.size() > 0) {
                 for (IBaseResource organizationAffiliation : organizationAffiliations) {
-                    organizationAffiliationObj = (OrganizationAffiliation) organizationAffiliation;
-                    List<Reference> locationList = organizationAffiliationObj.getLocation();
-                    for (Reference location : locationList) {
-                        if (location != null && location.getReference() != null) {
-                            locationsIdentifiers.add(location.getReference());
+                    if (organizationAffiliation.getIdElement() != null
+                            && organizationAffiliation.getIdElement().getResourceType() != null
+                            && organizationAffiliation
+                                    .getIdElement()
+                                    .getResourceType()
+                                    .equals("OrganizationAffiliation")) {
+                        organizationAffiliationObj =
+                                (OrganizationAffiliation) organizationAffiliation;
+                        List<Reference> locationList = organizationAffiliationObj.getLocation();
+                        for (Reference location : locationList) {
+                            if (location != null && location.getReference() != null) {
+                                locationsIdentifiers.add(location.getReference());
+                            }
                         }
                     }
                 }
             }
         }
-        return locationsIdentifiers;
+        List<Long> ids = getLocationIdsFromReferences(locationsIdentifiers);
+        List<Location> finalLoc = new ArrayList<>();
+        locations =
+                locations.stream()
+                        .filter(e -> ids.contains(e.getIdElement().getIdPartAsLong()))
+                        .collect(Collectors.toList());
+
+        //        finalLoc = locations.stream()
+        //                .flatMap(locationId -> ids.contains(locationId))
+        //                .collect(Collectors.toList());
+        Location locationObj1;
+        for (IBaseResource loc : locations) {
+            locationObj1 = (Location) loc;
+            finalLoc.add(locationObj1);
+        }
+
+        FhirPractitionerDetails fhirPractitionerDetails = new FhirPractitionerDetails();
+        fhirPractitionerDetails.setLocations(finalLoc);
+        return fhirPractitionerDetails;
     }
 
     private List<Long> getLocationIdsFromReferences(List<String> locationReferences) {
