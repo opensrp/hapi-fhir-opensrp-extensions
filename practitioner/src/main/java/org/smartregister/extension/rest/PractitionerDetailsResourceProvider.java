@@ -20,13 +20,14 @@ import static org.smartregister.utils.Constants.IDENTIFIER;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.model.api.Include;
 import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.*;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -42,20 +43,26 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
-    @Autowired private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
+    @Autowired
+    private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
 
-    @Autowired private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
+    @Autowired
+    private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
 
-    @Autowired private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
+    @Autowired
+    private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
 
     @Autowired
     private IFhirResourceDao<OrganizationAffiliation> organizationAffiliationIFhirResourceDao;
 
-    @Autowired private IFhirResourceDao<Organization> organizationIFhirResourceDao;
+    @Autowired
+    private IFhirResourceDao<Organization> organizationIFhirResourceDao;
 
-    @Autowired private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
+    @Autowired
+    private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
 
-    @Autowired private IFhirResourceDao<Location> locationIFhirResourceDao;
+    @Autowired
+    private IFhirResourceDao<Location> locationIFhirResourceDao;
 
     private static Logger logger =
             LogManager.getLogger(PractitionerDetailsResourceProvider.class.toString());
@@ -92,48 +99,54 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                     practitioners.size() > 0 ? practitioners.get(0) : new Practitioner();
             Long practitionerId =
                     practitioner.getIdElement() != null
-                                    && practitioner.getIdElement().getIdPart() != null
+                            && practitioner.getIdElement().getIdPart() != null
                             ? practitioner.getIdElement().getIdPartAsLong()
                             : 0;
+            try {
+                if (practitionerId != null && practitionerId > 0) {
+                    logger.info(
+                            "Searching for care teams for practitioner with id: " + practitionerId);
+                    List<IBaseResource> careTeams = getCareTeams(practitionerId);
+                    List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
+                    fhirPractitionerDetails.setCareTeams(careTeamsList);
+                    StringType practitionerIdString = new StringType();
+                    practitionerIdString.setValue(String.valueOf(practitionerId));
+                    fhirPractitionerDetails.setPractitionerId(practitionerIdString);
+                    logger.info(
+                            "Searching for organizations of practitioner with id: "
+                                    + practitionerId);
+                    List<IBaseResource> organizationTeams =
+                            getOrganizationsOfPractitioner(practitionerId);
+                    logger.info("Organizations are fetched");
+                    List<Organization> teams = mapToTeams(organizationTeams);
+                    fhirPractitionerDetails.setOrganizations(teams);
+                    keycloakUserDetails.setId(identifier.getValue());
+                    practitionerDetails.setId(keycloakUserDetails.getId());
+                    practitionerDetails.setUserDetail(keycloakUserDetails);
+                    fhirPractitionerDetails.setId(practitionerIdString.getValue());
+                    logger.info("Searching for locations by organizations");
+                    List<String> locationsIdReferences =
+                            getLocationIdentifiersByOrganizations(teams);
+                    List<Long> locationIds = getLocationIdsFromReferences(locationsIdReferences);
+                    List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
+                    logger.info("Searching for location heirarchy list by locations identifiers");
+                    List<LocationHierarchy> locationHierarchyList =
+                            getLocationsHierarchy(locationsIdentifiers);
 
-            if (practitionerId != null && practitionerId > 0) {
-                logger.info("Searching for care teams for practitioner with id: " + practitionerId);
-                List<IBaseResource> careTeams = getCareTeams(practitionerId);
-                List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
-                fhirPractitionerDetails.setCareTeams(careTeamsList);
-                StringType practitionerIdString = new StringType();
-                practitionerIdString.setValue(String.valueOf(practitionerId));
-                fhirPractitionerDetails.setPractitionerId(practitionerIdString);
-                logger.info(
-                        "Searching for organizations of practitioner with id: " + practitionerId);
-                List<IBaseResource> organizationTeams =
-                        getOrganizationsOfPractitioner(practitionerId);
-                List<Organization> teams = mapToTeams(organizationTeams);
-                fhirPractitionerDetails.setOrganizations(teams);
-                keycloakUserDetails.setId(identifier.getValue());
-                practitionerDetails.setId(keycloakUserDetails.getId());
-                practitionerDetails.setUserDetail(keycloakUserDetails);
-                fhirPractitionerDetails.setId(practitionerIdString.getValue());
-                logger.info("Searching for locations by organizations");
-                FhirPractitionerDetails finalLocs = getLocationsByOrganizations(teams);
-                //                List<Long> locationIds =
-                // getLocationIdsFromReferences(locationsIdReferences);
-                //                List<String> locationsIdentifiers =
-                // getLocationIdentifiersByIds(locationIds);
-                //                logger.info("Searching for location heirarchy list by locations
-                // identifiers");
-                //                List<LocationHierarchy> locationHierarchyList =
-                //                        getLocationsHierarchy(locationsIdentifiers);
-                //
-                // fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
-                logger.info("Searching for locations by ids");
-                //                List<Location> locationsList = getLocationsByIds(locationIds);
-                fhirPractitionerDetails.setLocations(finalLocs.getLocations());
-                practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
-            } else {
-                logger.error(
-                        "Practitioner with identifier: " + identifier.getValue() + " not found");
-                practitionerDetails.setId(PRACTITIONER_NOT_FOUND);
+                    fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
+                    logger.info("Searching for locations by ids");
+                    List<Location> locationsList = getLocationsByIds(locationIds);
+                    fhirPractitionerDetails.setLocations(locationsList);
+                    practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
+                } else {
+                    logger.error(
+                            "Practitioner with identifier: "
+                                    + identifier.getValue()
+                                    + " not found");
+                    practitionerDetails.setId(PRACTITIONER_NOT_FOUND);
+                }
+            } catch (Exception e) {
+                logger.error("Exception occured: " + e.getMessage());
             }
         } else {
             logger.error("User details are null");
@@ -254,48 +267,63 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         return careTeamList;
     }
 
-    private List<String> getOrganizationIdentifiers(Long practitionerId) {
+    private List<String> getOrganizationIds(Long practitionerId) {
         SearchParameterMap practitionerRoleSearchParamMap = new SearchParameterMap();
         ReferenceParam practitionerRef = new ReferenceParam();
         practitionerRef.setValue(String.valueOf(practitionerId));
         ReferenceOrListParam careTeamRefParam = new ReferenceOrListParam();
         careTeamRefParam.addOr(practitionerRef);
         practitionerRoleSearchParamMap.add(PRACTITIONER, practitionerRef);
+        logger.info("Searching for Practitioner roles  with practitioner id :" + practitionerId);
         IBundleProvider practitionerRoleBundle =
                 practitionerRoleIFhirResourceDao.search(practitionerRoleSearchParamMap);
         List<IBaseResource> practitionerRoles =
                 practitionerRoleBundle != null
                         ? practitionerRoleBundle.getResources(0, practitionerRoleBundle.size())
                         : new ArrayList<>();
-        List<String> organizationIds = new ArrayList<>();
+        List<String> organizationIdsString = new ArrayList<>();
         if (practitionerRoles != null && practitionerRoles.size() > 0) {
             for (IBaseResource practitionerRole : practitionerRoles) {
                 PractitionerRole pRole = (PractitionerRole) practitionerRole;
                 if (pRole.getOrganization() != null
-                        && pRole.getOrganization().getIdentifier() != null) {
-                    organizationIds.add(pRole.getOrganization().getIdentifier().getValue());
+                        && pRole.getOrganization().getReference() != null) {
+                    organizationIdsString.add(pRole.getOrganization().getReference());
                 }
             }
         }
-        return organizationIds;
+        return organizationIdsString;
     }
 
     private List<IBaseResource> getOrganizationsOfPractitioner(Long practitionerId) {
-        List<String> organizationIdentifiers = getOrganizationIdentifiers(practitionerId);
-        SearchParameterMap organizationsSearchMap = new SearchParameterMap();
-        TokenAndListParam theIdentifier = new TokenAndListParam();
-        TokenOrListParam identifiersList = new TokenOrListParam();
-        TokenParam identifier;
-        for (String organizationIdentifier : organizationIdentifiers) {
-            identifier = new TokenParam();
-            identifier.setValue(organizationIdentifier);
-            identifiersList.add(identifier);
-        }
+        List<String> organizationIdsReferences = getOrganizationIds(practitionerId);
+        logger.info(
+                "Organization Ids are retrieved, found to be of size: "
+                        + organizationIdsReferences.size());
 
-        theIdentifier.addAnd(identifiersList);
-        organizationsSearchMap.add(IDENTIFIER, theIdentifier);
-        IBundleProvider organizationsBundle =
-                organizationIFhirResourceDao.search(organizationsSearchMap);
+        List<Long> organizationIds = getOrganizationIdsFromReferences(organizationIdsReferences);
+        SearchParameterMap organizationsSearchMap = new SearchParameterMap();
+        TokenAndListParam theId = new TokenAndListParam();
+        TokenOrListParam theIdList = new TokenOrListParam();
+        TokenParam id;
+        logger.info("Making a list of identifiers from organization identifiers");
+        IBundleProvider organizationsBundle;
+        if (organizationIds.size() > 0) {
+            for (Long organizationId : organizationIds) {
+                id = new TokenParam();
+                id.setValue(organizationId.toString());
+                theIdList.add(id);
+                logger.info("Added organization id : " + organizationId + " in a list");
+            }
+
+            theId.addAnd(theIdList);
+            organizationsSearchMap.add("_id", theId);
+            logger.info(
+                    "Now hitting organization search end point with the idslist param of size: "
+                            + theId.size());
+            organizationsBundle = organizationIFhirResourceDao.search(organizationsSearchMap);
+        } else {
+            return new ArrayList<>();
+        }
         return organizationsBundle != null
                 ? organizationsBundle.getResources(0, organizationsBundle.size())
                 : new ArrayList<>();
@@ -324,12 +352,10 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         return locationHierarchyList;
     }
 
-    private FhirPractitionerDetails getLocationsByOrganizations(
-            List<Organization> organizations) {
+    private List<String> getLocationIdentifiersByOrganizations(List<Organization> organizations) {
         List<String> locationsIdentifiers = new ArrayList<>();
         SearchParameterMap searchParameterMap = new SearchParameterMap();
-        List<IBaseResource> locations = new ArrayList<>();
-        // separate out search mode = "include"
+        logger.info("Traversing organizations");
         for (Organization team : organizations) {
             ReferenceAndListParam thePrimaryOrganization = new ReferenceAndListParam();
             ReferenceOrListParam primaryOrganizationRefParam = new ReferenceOrListParam();
@@ -338,69 +364,28 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             primaryOrganizationRefParam.addOr(primaryOrganization);
             thePrimaryOrganization.addAnd(primaryOrganizationRefParam);
             searchParameterMap.add(PRIMARY_ORGANIZATION, thePrimaryOrganization);
-            Set<Include> theIncludes = new HashSet<>();
-            Include include = new Include("OrganizationAffiliation:location", true);
-            theIncludes.add(include);
-            searchParameterMap.setIncludes(theIncludes);
+            logger.info("Searching organization affiliation from organization id: " + team.getId());
             IBundleProvider organizationsAffiliationBundle =
                     organizationAffiliationIFhirResourceDao.search(searchParameterMap);
-
             List<IBaseResource> organizationAffiliations =
                     organizationsAffiliationBundle != null
                             ? organizationsAffiliationBundle.getResources(
-                                    0, organizationsAffiliationBundle.size())
+                            0, organizationsAffiliationBundle.size())
                             : new ArrayList<>();
-
-            Location locationObj;
-            for (IBaseResource loc : organizationAffiliations) {
-                if (loc.getIdElement() != null
-                        && loc.getIdElement().getResourceType() != null
-                        && loc.getIdElement().getResourceType().equals("Location")) {
-                    locationObj = (Location) loc;
-                    locations.add(locationObj);
-                }
-            }
-
             OrganizationAffiliation organizationAffiliationObj;
             if (organizationAffiliations.size() > 0) {
                 for (IBaseResource organizationAffiliation : organizationAffiliations) {
-                    if (organizationAffiliation.getIdElement() != null
-                            && organizationAffiliation.getIdElement().getResourceType() != null
-                            && organizationAffiliation
-                                    .getIdElement()
-                                    .getResourceType()
-                                    .equals("OrganizationAffiliation")) {
-                        organizationAffiliationObj =
-                                (OrganizationAffiliation) organizationAffiliation;
-                        List<Reference> locationList = organizationAffiliationObj.getLocation();
-                        for (Reference location : locationList) {
-                            if (location != null && location.getReference() != null) {
-                                locationsIdentifiers.add(location.getReference());
-                            }
+                    organizationAffiliationObj = (OrganizationAffiliation) organizationAffiliation;
+                    List<Reference> locationList = organizationAffiliationObj.getLocation();
+                    for (Reference location : locationList) {
+                        if (location != null && location.getReference() != null) {
+                            locationsIdentifiers.add(location.getReference());
                         }
                     }
                 }
             }
         }
-        List<Long> ids = getLocationIdsFromReferences(locationsIdentifiers);
-        List<Location> finalLoc = new ArrayList<>();
-        locations =
-                locations.stream()
-                        .filter(e -> ids.contains(e.getIdElement().getIdPartAsLong()))
-                        .collect(Collectors.toList());
-
-        //        finalLoc = locations.stream()
-        //                .flatMap(locationId -> ids.contains(locationId))
-        //                .collect(Collectors.toList());
-        Location locationObj1;
-        for (IBaseResource loc : locations) {
-            locationObj1 = (Location) loc;
-            finalLoc.add(locationObj1);
-        }
-
-        FhirPractitionerDetails fhirPractitionerDetails = new FhirPractitionerDetails();
-        fhirPractitionerDetails.setLocations(finalLoc);
-        return fhirPractitionerDetails;
+        return locationsIdentifiers;
     }
 
     private List<Long> getLocationIdsFromReferences(List<String> locationReferences) {
@@ -414,6 +399,20 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             locationIds.add(Long.valueOf(locationRef));
         }
         return locationIds;
+    }
+
+    private List<Long> getOrganizationIdsFromReferences(List<String> organizationReferences) {
+        List<Long> organizationIds = new ArrayList<>();
+        for (String organizationRef : organizationReferences) {
+            if (organizationRef.contains(FORWARD_SLASH)) {
+                organizationRef =
+                        organizationRef.substring(
+                                organizationRef.indexOf(FORWARD_SLASH) + 1,
+                                organizationRef.length());
+            }
+            organizationIds.add(Long.valueOf(organizationRef));
+        }
+        return organizationIds;
     }
 
     private List<String> getLocationIdentifiersByIds(List<Long> locationIds) {
