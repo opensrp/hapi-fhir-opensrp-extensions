@@ -102,51 +102,48 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                             && practitioner.getIdElement().getIdPart() != null
                             ? practitioner.getIdElement().getIdPartAsLong()
                             : 0;
-            try {
-                if (practitionerId != null && practitionerId > 0) {
-                    logger.info(
-                            "Searching for care teams for practitioner with id: " + practitionerId);
-                    List<IBaseResource> careTeams = getCareTeams(practitionerId);
-                    List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
-                    fhirPractitionerDetails.setCareTeams(careTeamsList);
-                    StringType practitionerIdString = new StringType();
-                    practitionerIdString.setValue(String.valueOf(practitionerId));
-                    fhirPractitionerDetails.setPractitionerId(practitionerIdString);
-                    logger.info(
-                            "Searching for organizations of practitioner with id: "
-                                    + practitionerId);
-                    List<IBaseResource> organizationTeams =
-                            getOrganizationsOfPractitioner(practitionerId);
-                    logger.info("Organizations are fetched");
-                    List<Organization> teams = mapToTeams(organizationTeams);
-                    fhirPractitionerDetails.setOrganizations(teams);
-                    keycloakUserDetails.setId(identifier.getValue());
-                    practitionerDetails.setId(keycloakUserDetails.getId());
-                    practitionerDetails.setUserDetail(keycloakUserDetails);
-                    fhirPractitionerDetails.setId(practitionerIdString.getValue());
-                    logger.info("Searching for locations by organizations");
-                    List<String> locationsIdReferences =
-                            getLocationIdentifiersByOrganizations(teams);
-                    List<Long> locationIds = getLocationIdsFromReferences(locationsIdReferences);
-                    List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
-                    logger.info("Searching for location heirarchy list by locations identifiers");
-                    List<LocationHierarchy> locationHierarchyList =
-                            getLocationsHierarchy(locationsIdentifiers);
 
-                    fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
-                    logger.info("Searching for locations by ids");
-                    List<Location> locationsList = getLocationsByIds(locationIds);
-                    fhirPractitionerDetails.setLocations(locationsList);
-                    practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
-                } else {
-                    logger.error(
-                            "Practitioner with identifier: "
-                                    + identifier.getValue()
-                                    + " not found");
-                    practitionerDetails.setId(PRACTITIONER_NOT_FOUND);
-                }
-            } catch (Exception e) {
-                logger.error("Exception occured: " + e.getMessage());
+            if (practitionerId != null && practitionerId > 0) {
+                logger.info(
+                        "Searching for care teams for practitioner with id: " + practitionerId);
+                List<IBaseResource> careTeams = getCareTeams(practitionerId);
+                List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
+                fhirPractitionerDetails.setCareTeams(careTeamsList);
+                StringType practitionerIdString = new StringType();
+                practitionerIdString.setValue(String.valueOf(practitionerId));
+                fhirPractitionerDetails.setPractitionerId(practitionerIdString);
+                logger.info(
+                        "Searching for organizations of practitioner with id: "
+                                + practitionerId);
+                List<IBaseResource> organizationTeams =
+                        getOrganizationsOfPractitioner(practitionerId);
+                logger.info("Organizations are fetched");
+                List<Organization> teams = mapToTeams(organizationTeams);
+                fhirPractitionerDetails.setOrganizations(teams);
+                keycloakUserDetails.setId(identifier.getValue());
+                practitionerDetails.setId(keycloakUserDetails.getId());
+                practitionerDetails.setUserDetail(keycloakUserDetails);
+                fhirPractitionerDetails.setId(practitionerIdString.getValue());
+                logger.info("Searching for locations by organizations");
+                List<String> locationsIdReferences =
+                        getLocationIdentifiersByOrganizations(teams);
+                List<Long> locationIds = getLocationIdsFromReferences(locationsIdReferences);
+                List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
+                logger.info("Searching for location heirarchy list by locations identifiers");
+                List<LocationHierarchy> locationHierarchyList =
+                        getLocationsHierarchy(locationsIdentifiers);
+
+                fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
+                logger.info("Searching for locations by ids");
+                List<Location> locationsList = getLocationsByIds(locationIds);
+                fhirPractitionerDetails.setLocations(locationsList);
+                practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
+            } else {
+                logger.error(
+                        "Practitioner with identifier: "
+                                + identifier.getValue()
+                                + " not found");
+                practitionerDetails.setId(PRACTITIONER_NOT_FOUND);
             }
         } else {
             logger.error("User details are null");
