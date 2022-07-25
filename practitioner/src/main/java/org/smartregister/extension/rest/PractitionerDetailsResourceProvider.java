@@ -107,6 +107,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                         "Searching for organizations of practitioner with id: " + practitionerId);
                 List<IBaseResource> organizationTeams =
                         getOrganizationsOfPractitioner(practitionerId);
+                logger.info("Organizations are fetched");
                 List<Organization> teams = mapToTeams(organizationTeams);
                 fhirPractitionerDetails.setOrganizations(teams);
                 keycloakUserDetails.setId(identifier.getValue());
@@ -120,6 +121,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 logger.info("Searching for location heirarchy list by locations identifiers");
                 List<LocationHierarchy> locationHierarchyList =
                         getLocationsHierarchy(locationsIdentifiers);
+
                 fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
                 logger.info("Searching for locations by ids");
                 List<Location> locationsList = getLocationsByIds(locationIds);
@@ -249,48 +251,63 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         return careTeamList;
     }
 
-    private List<String> getOrganizationIdentifiers(Long practitionerId) {
+    private List<String> getOrganizationIds(Long practitionerId) {
         SearchParameterMap practitionerRoleSearchParamMap = new SearchParameterMap();
         ReferenceParam practitionerRef = new ReferenceParam();
         practitionerRef.setValue(String.valueOf(practitionerId));
         ReferenceOrListParam careTeamRefParam = new ReferenceOrListParam();
         careTeamRefParam.addOr(practitionerRef);
         practitionerRoleSearchParamMap.add(PRACTITIONER, practitionerRef);
+        logger.info("Searching for Practitioner roles  with practitioner id :" + practitionerId);
         IBundleProvider practitionerRoleBundle =
                 practitionerRoleIFhirResourceDao.search(practitionerRoleSearchParamMap);
         List<IBaseResource> practitionerRoles =
                 practitionerRoleBundle != null
                         ? practitionerRoleBundle.getResources(0, practitionerRoleBundle.size())
                         : new ArrayList<>();
-        List<String> organizationIds = new ArrayList<>();
+        List<String> organizationIdsString = new ArrayList<>();
         if (practitionerRoles != null && practitionerRoles.size() > 0) {
             for (IBaseResource practitionerRole : practitionerRoles) {
                 PractitionerRole pRole = (PractitionerRole) practitionerRole;
                 if (pRole.getOrganization() != null
-                        && pRole.getOrganization().getIdentifier() != null) {
-                    organizationIds.add(pRole.getOrganization().getIdentifier().getValue());
+                        && pRole.getOrganization().getReference() != null) {
+                    organizationIdsString.add(pRole.getOrganization().getReference());
                 }
             }
         }
-        return organizationIds;
+        return organizationIdsString;
     }
 
     private List<IBaseResource> getOrganizationsOfPractitioner(Long practitionerId) {
-        List<String> organizationIdentifiers = getOrganizationIdentifiers(practitionerId);
-        SearchParameterMap organizationsSearchMap = new SearchParameterMap();
-        TokenAndListParam theIdentifier = new TokenAndListParam();
-        TokenOrListParam identifiersList = new TokenOrListParam();
-        TokenParam identifier;
-        for (String organizationIdentifier : organizationIdentifiers) {
-            identifier = new TokenParam();
-            identifier.setValue(organizationIdentifier);
-            identifiersList.add(identifier);
-        }
+        List<String> organizationIdsReferences = getOrganizationIds(practitionerId);
+        logger.info(
+                "Organization Ids are retrieved, found to be of size: "
+                        + organizationIdsReferences.size());
 
-        theIdentifier.addAnd(identifiersList);
-        organizationsSearchMap.add(IDENTIFIER, theIdentifier);
-        IBundleProvider organizationsBundle =
-                organizationIFhirResourceDao.search(organizationsSearchMap);
+        List<Long> organizationIds = getOrganizationIdsFromReferences(organizationIdsReferences);
+        SearchParameterMap organizationsSearchMap = new SearchParameterMap();
+        TokenAndListParam theId = new TokenAndListParam();
+        TokenOrListParam theIdList = new TokenOrListParam();
+        TokenParam id;
+        logger.info("Making a list of identifiers from organization identifiers");
+        IBundleProvider organizationsBundle;
+        if (organizationIds.size() > 0) {
+            for (Long organizationId : organizationIds) {
+                id = new TokenParam();
+                id.setValue(organizationId.toString());
+                theIdList.add(id);
+                logger.info("Added organization id : " + organizationId + " in a list");
+            }
+
+            theId.addAnd(theIdList);
+            organizationsSearchMap.add("_id", theId);
+            logger.info(
+                    "Now hitting organization search end point with the idslist param of size: "
+                            + theId.size());
+            organizationsBundle = organizationIFhirResourceDao.search(organizationsSearchMap);
+        } else {
+            return new ArrayList<>();
+        }
         return organizationsBundle != null
                 ? organizationsBundle.getResources(0, organizationsBundle.size())
                 : new ArrayList<>();
@@ -322,6 +339,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
     private List<String> getLocationIdentifiersByOrganizations(List<Organization> organizations) {
         List<String> locationsIdentifiers = new ArrayList<>();
         SearchParameterMap searchParameterMap = new SearchParameterMap();
+        logger.info("Traversing organizations");
         for (Organization team : organizations) {
             ReferenceAndListParam thePrimaryOrganization = new ReferenceAndListParam();
             ReferenceOrListParam primaryOrganizationRefParam = new ReferenceOrListParam();
@@ -330,6 +348,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             primaryOrganizationRefParam.addOr(primaryOrganization);
             thePrimaryOrganization.addAnd(primaryOrganizationRefParam);
             searchParameterMap.add(PRIMARY_ORGANIZATION, thePrimaryOrganization);
+            logger.info("Searching organization affiliation from organization id: " + team.getId());
             IBundleProvider organizationsAffiliationBundle =
                     organizationAffiliationIFhirResourceDao.search(searchParameterMap);
             List<IBaseResource> organizationAffiliations =
@@ -364,6 +383,20 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             locationIds.add(Long.valueOf(locationRef));
         }
         return locationIds;
+    }
+
+    private List<Long> getOrganizationIdsFromReferences(List<String> organizationReferences) {
+        List<Long> organizationIds = new ArrayList<>();
+        for (String organizationRef : organizationReferences) {
+            if (organizationRef.contains(FORWARD_SLASH)) {
+                organizationRef =
+                        organizationRef.substring(
+                                organizationRef.indexOf(FORWARD_SLASH) + 1,
+                                organizationRef.length());
+            }
+            organizationIds.add(Long.valueOf(organizationRef));
+        }
+        return organizationIds;
     }
 
     private List<String> getLocationIdentifiersByIds(List<Long> locationIds) {
