@@ -7,7 +7,7 @@
 	<parent>
 		<artifactId>hapi-fhir-opensrp-extensions</artifactId>
 		<groupId>org.smartregister</groupId>
-		<version>0.0.10-SNAPSHOT</version>
+		<version>0.0.11-SNAPSHOT</version>
 	</parent>
 
 	<description>The repository holds the configuration extensions for the HAPI server</description>
@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>5.3.17</version>
+			<version>5.3.19</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api -->
