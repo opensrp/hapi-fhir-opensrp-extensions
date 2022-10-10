@@ -24,8 +24,10 @@ import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.*;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -41,20 +43,26 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
-    @Autowired private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
+    @Autowired
+    private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
 
-    @Autowired private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
+    @Autowired
+    private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
 
-    @Autowired private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
+    @Autowired
+    private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
 
     @Autowired
     private IFhirResourceDao<OrganizationAffiliation> organizationAffiliationIFhirResourceDao;
 
-    @Autowired private IFhirResourceDao<Organization> organizationIFhirResourceDao;
+    @Autowired
+    private IFhirResourceDao<Organization> organizationIFhirResourceDao;
 
-    @Autowired private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
+    @Autowired
+    private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
 
-    @Autowired private IFhirResourceDao<Location> locationIFhirResourceDao;
+    @Autowired
+    private IFhirResourceDao<Location> locationIFhirResourceDao;
 
     private static Logger logger =
             LogManager.getLogger(PractitionerDetailsResourceProvider.class.toString());
@@ -66,17 +74,27 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
     @Search
     public PractitionerDetails getPractitionerDetails(
-            @RequiredParam(name = KEYCLOAK_UUID) TokenParam identifier) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            @RequiredParam(name = KEYCLOAK_UUID) TokenParam identifier,
+            @OptionalParam(name = "isAuthProvided") SpecialParam isAuthProvided) {
+        if (isAuthProvided == null) {
+            isAuthProvided = new SpecialParam();
+            isAuthProvided.setValue("false");
+        } else {
+            isAuthProvided.setValue("true");
+        }
         KeycloakUserDetails keycloakUserDetails = new KeycloakUserDetails();
-        if (authentication != null) {
-            keycloakUserDetails = getKeycloakUserDetails(authentication);
+        if (isAuthProvided != null && isAuthProvided.getValue().equals("true")) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null) {
+                keycloakUserDetails = getKeycloakUserDetails(authentication);
+            }
         }
         PractitionerDetails practitionerDetails = new PractitionerDetails();
 
-        if (keycloakUserDetails != null
+        if ((isAuthProvided != null && isAuthProvided.getValue().equals("false"))
+                || (keycloakUserDetails != null
                 && keycloakUserDetails.getUserBioData() != null
-                && keycloakUserDetails.getUserBioData().getIdentifier() != null) {
+                && keycloakUserDetails.getUserBioData().getIdentifier() != null)) {
             FhirPractitionerDetails fhirPractitionerDetails = new FhirPractitionerDetails();
             SearchParameterMap paramMap = new SearchParameterMap();
             paramMap.add(IDENTIFIER, identifier);
@@ -91,7 +109,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                     practitioners.size() > 0 ? practitioners.get(0) : new Practitioner();
             Long practitionerId =
                     practitioner.getIdElement() != null
-                                    && practitioner.getIdElement().getIdPart() != null
+                            && practitioner.getIdElement().getIdPart() != null
                             ? practitioner.getIdElement().getIdPartAsLong()
                             : 0;
 
@@ -354,7 +372,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             List<IBaseResource> organizationAffiliations =
                     organizationsAffiliationBundle != null
                             ? organizationsAffiliationBundle.getResources(
-                                    0, organizationsAffiliationBundle.size())
+                            0, organizationsAffiliationBundle.size())
                             : new ArrayList<>();
             OrganizationAffiliation organizationAffiliationObj;
             if (organizationAffiliations.size() > 0) {
