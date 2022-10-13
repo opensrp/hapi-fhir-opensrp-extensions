@@ -117,7 +117,8 @@ public class PractitionerDetailsResourceProviderTest {
         SpecialParam isAuthProvided = new SpecialParam();
         isAuthProvided.setValue("true");
         PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam,isAuthProvided);
+                practitionerDetailsResourceProvider.getPractitionerDetails(
+                        identifierParam, isAuthProvided);
         assertNotNull(practitionerDetails);
         assertEquals("Keycloak User Not Found", practitionerDetails.getId());
     }
@@ -163,7 +164,8 @@ public class PractitionerDetailsResourceProviderTest {
         SpecialParam isAuthProvided = new SpecialParam();
         isAuthProvided.setValue("true");
         PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam,isAuthProvided);
+                practitionerDetailsResourceProvider.getPractitionerDetails(
+                        identifierParam, isAuthProvided);
         assertNotNull(practitionerDetails);
         assertEquals("Practitioner Not Found", practitionerDetails.getId());
     }
@@ -246,7 +248,8 @@ public class PractitionerDetailsResourceProviderTest {
         SpecialParam isAuthProvided = new SpecialParam();
         isAuthProvided.setValue("true");
         PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam,isAuthProvided);
+                practitionerDetailsResourceProvider.getPractitionerDetails(
+                        identifierParam, isAuthProvided);
         assertNotNull(practitionerDetails);
         assertNotNull(practitionerDetails.getUserDetail());
         assertNotNull(practitionerDetails.getUserDetail().getUserBioData());

@@ -75,15 +75,13 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
     @Search
     public PractitionerDetails getPractitionerDetails(
             @RequiredParam(name = KEYCLOAK_UUID) TokenParam identifier,
-            @OptionalParam(name = "isAuthProvided") SpecialParam isAuthProvided) {
+            @OptionalParam(name = IS_AUTH_PROVIDED) SpecialParam isAuthProvided) {
         if (isAuthProvided == null) {
             isAuthProvided = new SpecialParam();
-            isAuthProvided.setValue("false");
-        } else {
-            isAuthProvided.setValue("true");
+            isAuthProvided.setValue(TRUE);
         }
         KeycloakUserDetails keycloakUserDetails = new KeycloakUserDetails();
-        if (isAuthProvided != null && isAuthProvided.getValue().equals("true")) {
+        if (isAuthProvided != null && isAuthProvided.getValue().equals(TRUE)) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 keycloakUserDetails = getKeycloakUserDetails(authentication);
@@ -91,7 +89,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         }
         PractitionerDetails practitionerDetails = new PractitionerDetails();
 
-        if ((isAuthProvided != null && isAuthProvided.getValue().equals("false"))
+        if ((isAuthProvided != null && isAuthProvided.getValue().equals(FALSE))
                 || (keycloakUserDetails != null
                 && keycloakUserDetails.getUserBioData() != null
                 && keycloakUserDetails.getUserBioData().getIdentifier() != null)) {
