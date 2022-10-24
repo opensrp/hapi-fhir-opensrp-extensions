@@ -15,8 +15,28 @@
  */
 package org.smartregister.extension.rest;
 
-import static org.smartregister.utils.Constants.*;
+import static org.apache.commons.lang3.BooleanUtils.FALSE;
+import static org.apache.commons.lang3.BooleanUtils.TRUE;
+import static org.smartregister.model.practitioner.PractitionerDetails.SP_IS_AUTH_PROVIDED;
+import static org.smartregister.utils.Constants.COLON;
+import static org.smartregister.utils.Constants.EMAIL;
+import static org.smartregister.utils.Constants.EMAIL_VERIFIED;
+import static org.smartregister.utils.Constants.EMPTY_STRING;
+import static org.smartregister.utils.Constants.FAMILY_NAME;
+import static org.smartregister.utils.Constants.FORWARD_SLASH;
+import static org.smartregister.utils.Constants.GIVEN_NAME;
+import static org.smartregister.utils.Constants.ID;
 import static org.smartregister.utils.Constants.IDENTIFIER;
+import static org.smartregister.utils.Constants.KEYCLOAK_USER_NOT_FOUND;
+import static org.smartregister.utils.Constants.KEYCLOAK_UUID;
+import static org.smartregister.utils.Constants.PARTICIPANT;
+import static org.smartregister.utils.Constants.PRACTITIONER;
+import static org.smartregister.utils.Constants.PRACTITIONER_NOT_FOUND;
+import static org.smartregister.utils.Constants.PREFFERED_USERNAME;
+import static org.smartregister.utils.Constants.PRIMARY_ORGANIZATION;
+import static org.smartregister.utils.Constants.ROLE;
+import static org.smartregister.utils.Constants.SPACE;
+import static org.smartregister.utils.Constants.USERNAME;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
@@ -24,10 +44,8 @@ import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.*;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-
 import java.util.*;
 import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -43,28 +61,22 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
-    @Autowired
-    private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
+    @Autowired private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
 
-    @Autowired
-    private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
+    @Autowired private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
 
-    @Autowired
-    private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
+    @Autowired private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
 
     @Autowired
     private IFhirResourceDao<OrganizationAffiliation> organizationAffiliationIFhirResourceDao;
 
-    @Autowired
-    private IFhirResourceDao<Organization> organizationIFhirResourceDao;
+    @Autowired private IFhirResourceDao<Organization> organizationIFhirResourceDao;
 
-    @Autowired
-    private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
+    @Autowired private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
 
-    @Autowired
-    private IFhirResourceDao<Location> locationIFhirResourceDao;
+    @Autowired private IFhirResourceDao<Location> locationIFhirResourceDao;
 
-    private static Logger logger =
+    private static final Logger logger =
             LogManager.getLogger(PractitionerDetailsResourceProvider.class.toString());
 
     @Override
@@ -75,7 +87,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
     @Search
     public PractitionerDetails getPractitionerDetails(
             @RequiredParam(name = KEYCLOAK_UUID) TokenParam identifier,
-            @OptionalParam(name = IS_AUTH_PROVIDED) SpecialParam isAuthProvided) {
+            @OptionalParam(name = SP_IS_AUTH_PROVIDED) SpecialParam isAuthProvided) {
         if (isAuthProvided == null) {
             isAuthProvided = new SpecialParam();
             isAuthProvided.setValue(TRUE);
@@ -91,8 +103,8 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
         if ((isAuthProvided != null && isAuthProvided.getValue().equals(FALSE))
                 || (keycloakUserDetails != null
-                && keycloakUserDetails.getUserBioData() != null
-                && keycloakUserDetails.getUserBioData().getIdentifier() != null)) {
+                        && keycloakUserDetails.getUserBioData() != null
+                        && keycloakUserDetails.getUserBioData().getIdentifier() != null)) {
             FhirPractitionerDetails fhirPractitionerDetails = new FhirPractitionerDetails();
             SearchParameterMap paramMap = new SearchParameterMap();
             paramMap.add(IDENTIFIER, identifier);
@@ -107,7 +119,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                     practitioners.size() > 0 ? practitioners.get(0) : new Practitioner();
             Long practitionerId =
                     practitioner.getIdElement() != null
-                            && practitioner.getIdElement().getIdPart() != null
+                                    && practitioner.getIdElement().getIdPart() != null
                             ? practitioner.getIdElement().getIdPartAsLong()
                             : 0;
 
@@ -370,7 +382,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             List<IBaseResource> organizationAffiliations =
                     organizationsAffiliationBundle != null
                             ? organizationsAffiliationBundle.getResources(
-                            0, organizationsAffiliationBundle.size())
+                                    0, organizationsAffiliationBundle.size())
                             : new ArrayList<>();
             OrganizationAffiliation organizationAffiliationObj;
             if (organizationAffiliations.size() > 0) {
@@ -392,9 +404,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         List<Long> locationIds = new ArrayList<>();
         for (String locationRef : locationReferences) {
             if (locationRef.contains(FORWARD_SLASH)) {
-                locationRef =
-                        locationRef.substring(
-                                locationRef.indexOf(FORWARD_SLASH) + 1, locationRef.length());
+                locationRef = locationRef.substring(locationRef.indexOf(FORWARD_SLASH) + 1);
             }
             locationIds.add(Long.valueOf(locationRef));
         }
@@ -406,9 +416,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         for (String organizationRef : organizationReferences) {
             if (organizationRef.contains(FORWARD_SLASH)) {
                 organizationRef =
-                        organizationRef.substring(
-                                organizationRef.indexOf(FORWARD_SLASH) + 1,
-                                organizationRef.length());
+                        organizationRef.substring(organizationRef.indexOf(FORWARD_SLASH) + 1);
             }
             organizationIds.add(Long.valueOf(organizationRef));
         }

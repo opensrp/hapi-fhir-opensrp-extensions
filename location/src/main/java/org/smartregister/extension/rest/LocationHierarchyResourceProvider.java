@@ -15,19 +15,30 @@
  */
 package org.smartregister.extension.rest;
 
-import static org.smartregister.utils.Constants.*;
+import static org.smartregister.utils.Constants.FORWARD_SLASH;
+import static org.smartregister.utils.Constants.IDENTIFIER;
+import static org.smartregister.utils.Constants.LOCATION;
+import static org.smartregister.utils.Constants.LOCATION_RESOURCE;
+import static org.smartregister.utils.Constants.LOCATION_RESOURCE_NOT_FOUND;
+import static org.smartregister.utils.Constants.PART_OF;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.annotation.*;
+import ca.uhn.fhir.rest.annotation.RequiredParam;
+import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import ca.uhn.fhir.rest.param.*;
+import ca.uhn.fhir.rest.param.ReferenceAndListParam;
+import ca.uhn.fhir.rest.param.ReferenceOrListParam;
+import ca.uhn.fhir.rest.param.ReferenceParam;
+import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Location;
+import org.hl7.fhir.r4.model.StringType;
 import org.smartregister.model.location.LocationHierarchy;
 import org.smartregister.model.location.LocationHierarchyTree;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +47,7 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
 
     @Autowired IFhirResourceDao<Location> locationIFhirResourceDao;
 
-    private static Logger logger =
+    private static final Logger logger =
             LogManager.getLogger(LocationHierarchyResourceProvider.class.toString());
 
     @Override
@@ -100,12 +111,16 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
         if (parentLocation != null) {
             allLocations.add((Location) parentLocation);
         }
-        for (IBaseResource childLocation :
-                childLocationBundle.getResources(0, childLocationBundle.size())) {
-            Location childLocationEntity = (Location) childLocation;
-            allLocations.add(childLocationEntity);
-            allLocations.addAll(descendants(childLocation.getIdElement().getIdPartAsLong(), null));
+        if (childLocationBundle != null) {
+            for (IBaseResource childLocation :
+                    childLocationBundle.getResources(0, childLocationBundle.size())) {
+                Location childLocationEntity = (Location) childLocation;
+                allLocations.add(childLocationEntity);
+                allLocations.addAll(
+                        descendants(childLocation.getIdElement().getIdPartAsLong(), null));
+            }
         }
+
         return allLocations;
     }
 
