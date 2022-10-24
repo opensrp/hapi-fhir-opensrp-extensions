@@ -26,6 +26,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
+import ca.uhn.fhir.rest.param.SpecialParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -113,8 +114,11 @@ public class PractitionerDetailsResourceProviderTest {
         SecurityContext securityContext = mock(SecurityContext.class);
         SecurityContextHolder.setContext(securityContext);
         when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(null);
+        SpecialParam isAuthProvided = new SpecialParam();
+        isAuthProvided.setValue("true");
         PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam);
+                practitionerDetailsResourceProvider.getPractitionerDetails(
+                        identifierParam, isAuthProvided);
         assertNotNull(practitionerDetails);
         assertEquals("Keycloak User Not Found", practitionerDetails.getId());
     }
@@ -157,8 +161,11 @@ public class PractitionerDetailsResourceProviderTest {
         List<IBaseResource> practitioners = new ArrayList<>();
         when(practitionersBundleProvider.getResources(anyInt(), anyInt()))
                 .thenReturn(practitioners);
+        SpecialParam isAuthProvided = new SpecialParam();
+        isAuthProvided.setValue("true");
         PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam);
+                practitionerDetailsResourceProvider.getPractitionerDetails(
+                        identifierParam, isAuthProvided);
         assertNotNull(practitionerDetails);
         assertEquals("Practitioner Not Found", practitionerDetails.getId());
     }
@@ -238,8 +245,11 @@ public class PractitionerDetailsResourceProviderTest {
 
         TokenParam identifierParam = new TokenParam();
         identifierParam.setValue("0000-11111-2222-3333");
+        SpecialParam isAuthProvided = new SpecialParam();
+        isAuthProvided.setValue("true");
         PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam);
+                practitionerDetailsResourceProvider.getPractitionerDetails(
+                        identifierParam, isAuthProvided);
         assertNotNull(practitionerDetails);
         assertNotNull(practitionerDetails.getUserDetail());
         assertNotNull(practitionerDetails.getUserDetail().getUserBioData());

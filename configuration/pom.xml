@@ -7,7 +7,7 @@
 	<parent>
 		<artifactId>hapi-fhir-opensrp-extensions</artifactId>
 		<groupId>org.smartregister</groupId>
-		<version>0.0.10-SNAPSHOT</version>
+		<version>0.0.12-SNAPSHOT</version>
 	</parent>
 
 	<description>The repository holds the configuration extensions for the HAPI server</description>
