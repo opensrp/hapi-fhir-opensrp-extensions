@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Ona Systems, Inc
+ * Copyright 2022 Ona Systems, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,6 @@ import org.smartregister.model.location.LocationHierarchyTree;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class LocationHierarchyResourceProvider implements IResourceProvider {
-
     @Autowired IFhirResourceDao<Location> locationIFhirResourceDao;
 
     private static final Logger logger =
