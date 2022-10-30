@@ -33,7 +33,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.CareTeam;
+import org.hl7.fhir.r4.model.Location;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.OrganizationAffiliation;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Reference;
 import org.junit.Before;
 import org.junit.Test;
 import org.keycloak.KeycloakPrincipal;
@@ -50,290 +56,290 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class PractitionerDetailsResourceProviderTest {
 
-    @Mock private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
+	private final List<String> roles = Arrays.asList("ROLE_USER", "ROLE_ADMIN");
 
-    @Mock private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
+	@Mock private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
 
-    @Mock private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
+	@Mock private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
 
-    @Mock private IFhirResourceDao<OrganizationAffiliation> organizationAffiliationIFhirResourceDao;
+	@Mock private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
 
-    @Mock private IFhirResourceDao<Organization> organizationIFhirResourceDao;
+	@Mock private IFhirResourceDao<OrganizationAffiliation> organizationAffiliationIFhirResourceDao;
 
-    @Mock private IFhirResourceDao<Location> locationIFhirResourceDao;
+	@Mock private IFhirResourceDao<Organization> organizationIFhirResourceDao;
 
-    @Mock private KeycloakPrincipal<KeycloakSecurityContext> keycloakPrincipal;
+	@Mock private IFhirResourceDao<Location> locationIFhirResourceDao;
 
-    @Mock private RefreshableKeycloakSecurityContext securityContext;
+	@Mock private KeycloakPrincipal<KeycloakSecurityContext> keycloakPrincipal;
 
-    @Mock private AccessToken token;
+	@Mock private RefreshableKeycloakSecurityContext securityContext;
 
-    @Mock private Authentication authentication;
+	@Mock private AccessToken token;
 
-    @Mock private IBundleProvider practitionersBundleProvider;
+	@Mock private Authentication authentication;
 
-    @Mock private IBundleProvider careTeamsBundleProvider;
+	@Mock private IBundleProvider practitionersBundleProvider;
 
-    @Mock private IBundleProvider practitionerRolesBundleProvider;
+	@Mock private IBundleProvider careTeamsBundleProvider;
 
-    @Mock private IBundleProvider organizationsBundleProvider;
+	@Mock private IBundleProvider practitionerRolesBundleProvider;
 
-    @Mock private IBundleProvider organizationsAffiliationBundleProvider;
+	@Mock private IBundleProvider organizationsBundleProvider;
 
-    @Mock private IBundleProvider locationsBundleProvider;
+	@Mock private IBundleProvider organizationsAffiliationBundleProvider;
 
-    @Mock private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
+	@Mock private IBundleProvider locationsBundleProvider;
 
-    private PractitionerDetailsResourceProvider practitionerDetailsResourceProvider;
+	@Mock private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
 
-    private final List<String> roles = Arrays.asList("ROLE_USER", "ROLE_ADMIN");
+	private PractitionerDetailsResourceProvider practitionerDetailsResourceProvider;
 
-    @Before
-    public void setup() {
-        initMocks(this);
-        practitionerDetailsResourceProvider = new PractitionerDetailsResourceProvider();
-        practitionerDetailsResourceProvider.setPractitionerIFhirResourceDao(
-                practitionerIFhirResourceDao);
-        practitionerDetailsResourceProvider.setCareTeamIFhirResourceDao(careTeamIFhirResourceDao);
-        practitionerDetailsResourceProvider.setPractitionerRoleIFhirResourceDao(
-                practitionerRoleIFhirResourceDao);
-        practitionerDetailsResourceProvider.setOrganizationIFhirResourceDao(
-                organizationIFhirResourceDao);
-        practitionerDetailsResourceProvider.setOrganizationAffiliationIFhirResourceDao(
-                organizationAffiliationIFhirResourceDao);
-        practitionerDetailsResourceProvider.setLocationHierarchyResourceProvider(
-                locationHierarchyResourceProvider);
-        practitionerDetailsResourceProvider.setLocationIFhirResourceDao(locationIFhirResourceDao);
-        when(keycloakPrincipal.getKeycloakSecurityContext()).thenReturn(securityContext);
-    }
+	@Before
+	public void setup() {
+		initMocks(this);
+		practitionerDetailsResourceProvider = new PractitionerDetailsResourceProvider();
+		practitionerDetailsResourceProvider.setPractitionerIFhirResourceDao(
+				practitionerIFhirResourceDao);
+		practitionerDetailsResourceProvider.setCareTeamIFhirResourceDao(careTeamIFhirResourceDao);
+		practitionerDetailsResourceProvider.setPractitionerRoleIFhirResourceDao(
+				practitionerRoleIFhirResourceDao);
+		practitionerDetailsResourceProvider.setOrganizationIFhirResourceDao(
+				organizationIFhirResourceDao);
+		practitionerDetailsResourceProvider.setOrganizationAffiliationIFhirResourceDao(
+				organizationAffiliationIFhirResourceDao);
+		practitionerDetailsResourceProvider.setLocationHierarchyResourceProvider(
+				locationHierarchyResourceProvider);
+		practitionerDetailsResourceProvider.setLocationIFhirResourceDao(locationIFhirResourceDao);
+		when(keycloakPrincipal.getKeycloakSecurityContext()).thenReturn(securityContext);
+	}
 
-    @Test
-    public void testGetPractitionerDetailsWhenKeycloakUserNotFound() {
-        TokenParam identifierParam = new TokenParam();
-        identifierParam.setValue("0000-11111-2222-3333");
-        SecurityContext securityContext = mock(SecurityContext.class);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(null);
-        SpecialParam isAuthProvided = new SpecialParam();
-        isAuthProvided.setValue("true");
-        PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(
-                        identifierParam, isAuthProvided);
-        assertNotNull(practitionerDetails);
-        assertEquals("Keycloak User Not Found", practitionerDetails.getId());
-    }
+	@Test
+	public void testGetPractitionerDetailsWhenKeycloakUserNotFound() {
+		TokenParam identifierParam = new TokenParam();
+		identifierParam.setValue("0000-11111-2222-3333");
+		SecurityContext securityContext = mock(SecurityContext.class);
+		SecurityContextHolder.setContext(securityContext);
+		when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(null);
+		SpecialParam isAuthProvided = new SpecialParam();
+		isAuthProvided.setValue("true");
+		PractitionerDetails practitionerDetails =
+				practitionerDetailsResourceProvider.getPractitionerDetails(
+						identifierParam, isAuthProvided);
+		assertNotNull(practitionerDetails);
+		assertEquals("Keycloak User Not Found", practitionerDetails.getId());
+	}
 
-    @Test
-    public void testGetPractitionerDetailsWhenPractitionerNotFound() {
-        TokenParam identifierParam = new TokenParam();
-        identifierParam.setValue("0000-11111-2222-3333");
-        authentication.setAuthenticated(Boolean.TRUE);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(keycloakPrincipal);
-        when(keycloakPrincipal.getKeycloakSecurityContext().getToken()).thenReturn(token);
-        when(token.getPreferredUsername()).thenReturn("TestUser");
-        when(token.getFamilyName()).thenReturn("Test User Family");
-        when(token.getGivenName()).thenReturn("Test User");
-        when(token.getEmail()).thenReturn("user@testing.com");
-        when(token.getEmailVerified()).thenReturn(Boolean.TRUE);
-        when(authentication.getName()).thenReturn("Beta Test User");
-        when(authentication.getAuthorities())
-                .thenAnswer(
-                        a ->
-                                roles.stream()
-                                        .map(
-                                                role ->
-                                                        new GrantedAuthority() {
+	@Test
+	public void testGetPractitionerDetailsWhenPractitionerNotFound() {
+		TokenParam identifierParam = new TokenParam();
+		identifierParam.setValue("0000-11111-2222-3333");
+		authentication.setAuthenticated(Boolean.TRUE);
+		SecurityContext securityContext = mock(SecurityContext.class);
+		SecurityContextHolder.setContext(securityContext);
+		when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(authentication);
+		when(authentication.getPrincipal()).thenReturn(keycloakPrincipal);
+		when(keycloakPrincipal.getKeycloakSecurityContext().getToken()).thenReturn(token);
+		when(token.getPreferredUsername()).thenReturn("TestUser");
+		when(token.getFamilyName()).thenReturn("Test User Family");
+		when(token.getGivenName()).thenReturn("Test User");
+		when(token.getEmail()).thenReturn("user@testing.com");
+		when(token.getEmailVerified()).thenReturn(Boolean.TRUE);
+		when(authentication.getName()).thenReturn("Beta Test User");
+		when(authentication.getAuthorities())
+				.thenAnswer(
+						a ->
+								roles.stream()
+										.map(
+												role ->
+														new GrantedAuthority() {
 
-                                                            private static final long
-                                                                    serialVersionUID = 1L;
+															private static final long
+																	serialVersionUID = 1L;
 
-                                                            @Override
-                                                            public String getAuthority() {
-                                                                return role;
-                                                            }
-                                                        })
-                                        .collect(Collectors.toList()));
-        when(practitionerIFhirResourceDao.search(any(SearchParameterMap.class)))
-                .thenReturn(practitionersBundleProvider);
-        List<IBaseResource> practitioners = new ArrayList<>();
-        when(practitionersBundleProvider.getResources(anyInt(), anyInt()))
-                .thenReturn(practitioners);
-        SpecialParam isAuthProvided = new SpecialParam();
-        isAuthProvided.setValue("true");
-        PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(
-                        identifierParam, isAuthProvided);
-        assertNotNull(practitionerDetails);
-        assertEquals("Practitioner Not Found", practitionerDetails.getId());
-    }
+															@Override
+															public String getAuthority() {
+																return role;
+															}
+														})
+										.collect(Collectors.toList()));
+		when(practitionerIFhirResourceDao.search(any(SearchParameterMap.class)))
+				.thenReturn(practitionersBundleProvider);
+		List<IBaseResource> practitioners = new ArrayList<>();
+		when(practitionersBundleProvider.getResources(anyInt(), anyInt()))
+				.thenReturn(practitioners);
+		SpecialParam isAuthProvided = new SpecialParam();
+		isAuthProvided.setValue("true");
+		PractitionerDetails practitionerDetails =
+				practitionerDetailsResourceProvider.getPractitionerDetails(
+						identifierParam, isAuthProvided);
+		assertNotNull(practitionerDetails);
+		assertEquals("Practitioner Not Found", practitionerDetails.getId());
+	}
 
-    @Test
-    public void testGetPractitionerDetailsReturnsCorrectInformation() {
-        authentication.setAuthenticated(Boolean.TRUE);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        SecurityContextHolder.setContext(securityContext);
+	@Test
+	public void testGetPractitionerDetailsReturnsCorrectInformation() {
+		authentication.setAuthenticated(Boolean.TRUE);
+		SecurityContext securityContext = mock(SecurityContext.class);
+		SecurityContextHolder.setContext(securityContext);
 
-        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(keycloakPrincipal);
-        when(keycloakPrincipal.getKeycloakSecurityContext().getToken()).thenReturn(token);
-        when(token.getPreferredUsername()).thenReturn("TestUser");
-        when(token.getFamilyName()).thenReturn("Test User Family");
-        when(token.getGivenName()).thenReturn("Test User");
-        when(token.getEmail()).thenReturn("user@testing.com");
-        when(token.getEmailVerified()).thenReturn(Boolean.TRUE);
-        when(authentication.getName()).thenReturn("Beta Test User");
-        when(authentication.getAuthorities())
-                .thenAnswer(
-                        a ->
-                                roles.stream()
-                                        .map(
-                                                role ->
-                                                        new GrantedAuthority() {
+		when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(authentication);
+		when(authentication.getPrincipal()).thenReturn(keycloakPrincipal);
+		when(keycloakPrincipal.getKeycloakSecurityContext().getToken()).thenReturn(token);
+		when(token.getPreferredUsername()).thenReturn("TestUser");
+		when(token.getFamilyName()).thenReturn("Test User Family");
+		when(token.getGivenName()).thenReturn("Test User");
+		when(token.getEmail()).thenReturn("user@testing.com");
+		when(token.getEmailVerified()).thenReturn(Boolean.TRUE);
+		when(authentication.getName()).thenReturn("Beta Test User");
+		when(authentication.getAuthorities())
+				.thenAnswer(
+						a ->
+								roles.stream()
+										.map(
+												role ->
+														new GrantedAuthority() {
 
-                                                            private static final long
-                                                                    serialVersionUID = 1L;
+															private static final long
+																	serialVersionUID = 1L;
 
-                                                            @Override
-                                                            public String getAuthority() {
-                                                                return role;
-                                                            }
-                                                        })
-                                        .collect(Collectors.toList()));
+															@Override
+															public String getAuthority() {
+																return role;
+															}
+														})
+										.collect(Collectors.toList()));
 
-        LocationHierarchy locationHierarchy = new LocationHierarchy();
-        when(practitionerIFhirResourceDao.search(any(SearchParameterMap.class)))
-                .thenReturn(practitionersBundleProvider);
-        when(careTeamIFhirResourceDao.search(any(SearchParameterMap.class)))
-                .thenReturn(careTeamsBundleProvider);
-        when(practitionerRoleIFhirResourceDao.search(any(SearchParameterMap.class)))
-                .thenReturn(practitionerRolesBundleProvider);
-        when(organizationIFhirResourceDao.search(any(SearchParameterMap.class)))
-                .thenReturn(organizationsBundleProvider);
-        when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class)))
-                .thenReturn(organizationsAffiliationBundleProvider);
-        when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class)))
-                .thenReturn(organizationsAffiliationBundleProvider);
-        when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class)))
-                .thenReturn(organizationsAffiliationBundleProvider);
-        when(locationIFhirResourceDao.search(any(SearchParameterMap.class)))
-                .thenReturn(locationsBundleProvider);
-        List<IBaseResource> practitioners = getPractitioners();
+		LocationHierarchy locationHierarchy = new LocationHierarchy();
+		when(practitionerIFhirResourceDao.search(any(SearchParameterMap.class)))
+				.thenReturn(practitionersBundleProvider);
+		when(careTeamIFhirResourceDao.search(any(SearchParameterMap.class)))
+				.thenReturn(careTeamsBundleProvider);
+		when(practitionerRoleIFhirResourceDao.search(any(SearchParameterMap.class)))
+				.thenReturn(practitionerRolesBundleProvider);
+		when(organizationIFhirResourceDao.search(any(SearchParameterMap.class)))
+				.thenReturn(organizationsBundleProvider);
+		when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class)))
+				.thenReturn(organizationsAffiliationBundleProvider);
+		when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class)))
+				.thenReturn(organizationsAffiliationBundleProvider);
+		when(organizationAffiliationIFhirResourceDao.search(any(SearchParameterMap.class)))
+				.thenReturn(organizationsAffiliationBundleProvider);
+		when(locationIFhirResourceDao.search(any(SearchParameterMap.class)))
+				.thenReturn(locationsBundleProvider);
+		List<IBaseResource> practitioners = getPractitioners();
 
-        List<IBaseResource> careTeams = getCareTeams();
+		List<IBaseResource> careTeams = getCareTeams();
 
-        List<IBaseResource> practitionerRoles = getPractitionerRoles();
+		List<IBaseResource> practitionerRoles = getPractitionerRoles();
 
-        List<IBaseResource> organizations = getOrganizations();
+		List<IBaseResource> organizations = getOrganizations();
 
-        List<IBaseResource> organizationsAffiliations = getOrganizationAffiliations();
+		List<IBaseResource> organizationsAffiliations = getOrganizationAffiliations();
 
-        List<IBaseResource> locations = getLocations();
+		List<IBaseResource> locations = getLocations();
 
-        when(practitionersBundleProvider.getResources(anyInt(), anyInt()))
-                .thenReturn(practitioners);
-        when(careTeamsBundleProvider.getResources(anyInt(), anyInt())).thenReturn(careTeams);
-        when(practitionerRolesBundleProvider.getResources(anyInt(), anyInt()))
-                .thenReturn(practitionerRoles);
-        when(organizationsBundleProvider.getResources(anyInt(), anyInt()))
-                .thenReturn(organizations);
-        when(organizationsAffiliationBundleProvider.getResources(anyInt(), anyInt()))
-                .thenReturn(organizationsAffiliations);
-        when(locationsBundleProvider.getResources(anyInt(), anyInt())).thenReturn(locations);
+		when(practitionersBundleProvider.getResources(anyInt(), anyInt()))
+				.thenReturn(practitioners);
+		when(careTeamsBundleProvider.getResources(anyInt(), anyInt())).thenReturn(careTeams);
+		when(practitionerRolesBundleProvider.getResources(anyInt(), anyInt()))
+				.thenReturn(practitionerRoles);
+		when(organizationsBundleProvider.getResources(anyInt(), anyInt()))
+				.thenReturn(organizations);
+		when(organizationsAffiliationBundleProvider.getResources(anyInt(), anyInt()))
+				.thenReturn(organizationsAffiliations);
+		when(locationsBundleProvider.getResources(anyInt(), anyInt())).thenReturn(locations);
 
-        TokenParam identifierParam = new TokenParam();
-        identifierParam.setValue("0000-11111-2222-3333");
-        SpecialParam isAuthProvided = new SpecialParam();
-        isAuthProvided.setValue("true");
-        PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(
-                        identifierParam, isAuthProvided);
-        assertNotNull(practitionerDetails);
-        assertNotNull(practitionerDetails.getUserDetail());
-        assertNotNull(practitionerDetails.getUserDetail().getUserBioData());
-        assertNotNull(practitionerDetails.getUserDetail().getRoles());
-        assertEquals(
-                "TestUser",
-                practitionerDetails.getUserDetail().getUserBioData().getUserName().getValue());
-        assertEquals(
-                "Test User Family",
-                practitionerDetails.getUserDetail().getUserBioData().getFamilyName().getValue());
-        assertEquals(
-                "TestUser",
-                practitionerDetails.getUserDetail().getUserBioData().getPreferredName().getValue());
-        assertEquals(
-                "Test User",
-                practitionerDetails.getUserDetail().getUserBioData().getGivenName().getValue());
-        assertEquals(
-                "user@testing.com",
-                practitionerDetails.getUserDetail().getUserBioData().getEmail().getValue());
-        assertEquals(
-                "true",
-                practitionerDetails.getUserDetail().getUserBioData().getEmailVerified().getValue());
-        assertEquals(2, practitionerDetails.getUserDetail().getRoles().size());
-        assertEquals("ROLE_USER", practitionerDetails.getUserDetail().getRoles().get(0).getValue());
-        assertEquals(
-                "ROLE_ADMIN", practitionerDetails.getUserDetail().getRoles().get(1).getValue());
-    }
+		TokenParam identifierParam = new TokenParam();
+		identifierParam.setValue("0000-11111-2222-3333");
+		SpecialParam isAuthProvided = new SpecialParam();
+		isAuthProvided.setValue("true");
+		PractitionerDetails practitionerDetails =
+				practitionerDetailsResourceProvider.getPractitionerDetails(
+						identifierParam, isAuthProvided);
+		assertNotNull(practitionerDetails);
+		assertNotNull(practitionerDetails.getUserDetail());
+		assertNotNull(practitionerDetails.getUserDetail().getUserBioData());
+		assertNotNull(practitionerDetails.getUserDetail().getRoles());
+		assertEquals(
+				"TestUser",
+				practitionerDetails.getUserDetail().getUserBioData().getUserName().getValue());
+		assertEquals(
+				"Test User Family",
+				practitionerDetails.getUserDetail().getUserBioData().getFamilyName().getValue());
+		assertEquals(
+				"TestUser",
+				practitionerDetails.getUserDetail().getUserBioData().getPreferredName().getValue());
+		assertEquals(
+				"Test User",
+				practitionerDetails.getUserDetail().getUserBioData().getGivenName().getValue());
+		assertEquals(
+				"user@testing.com",
+				practitionerDetails.getUserDetail().getUserBioData().getEmail().getValue());
+		assertEquals(
+				"true",
+				practitionerDetails.getUserDetail().getUserBioData().getEmailVerified().getValue());
+		assertEquals(2, practitionerDetails.getUserDetail().getRoles().size());
+		assertEquals("ROLE_USER", practitionerDetails.getUserDetail().getRoles().get(0).getValue());
+		assertEquals(
+				"ROLE_ADMIN", practitionerDetails.getUserDetail().getRoles().get(1).getValue());
+	}
 
-    private List<IBaseResource> getPractitioners() {
-        List<IBaseResource> practitioners = new ArrayList<>();
-        Practitioner practitioner = new Practitioner();
-        practitioner.setActive(true);
-        practitioner.setId("1");
-        practitioners.add(practitioner);
-        return practitioners;
-    }
+	private List<IBaseResource> getPractitioners() {
+		List<IBaseResource> practitioners = new ArrayList<>();
+		Practitioner practitioner = new Practitioner();
+		practitioner.setActive(true);
+		practitioner.setId("1");
+		practitioners.add(practitioner);
+		return practitioners;
+	}
 
-    private List<IBaseResource> getCareTeams() {
-        List<IBaseResource> careTeams = new ArrayList<>();
-        CareTeam careTeam = new CareTeam();
-        careTeam.setName("Test Care Team");
-        careTeam.setId("1");
-        careTeams.add(careTeam);
-        return careTeams;
-    }
+	private List<IBaseResource> getCareTeams() {
+		List<IBaseResource> careTeams = new ArrayList<>();
+		CareTeam careTeam = new CareTeam();
+		careTeam.setName("Test Care Team");
+		careTeam.setId("1");
+		careTeams.add(careTeam);
+		return careTeams;
+	}
 
-    private List<IBaseResource> getPractitionerRoles() {
-        List<IBaseResource> practitionerRoles = new ArrayList<>();
-        PractitionerRole practitionerRole = new PractitionerRole();
-        practitionerRole.setActive(true);
-        practitionerRole.setId("1");
-        practitionerRoles.add(practitionerRole);
-        return practitionerRoles;
-    }
+	private List<IBaseResource> getPractitionerRoles() {
+		List<IBaseResource> practitionerRoles = new ArrayList<>();
+		PractitionerRole practitionerRole = new PractitionerRole();
+		practitionerRole.setActive(true);
+		practitionerRole.setId("1");
+		practitionerRoles.add(practitionerRole);
+		return practitionerRoles;
+	}
 
-    private List<IBaseResource> getOrganizations() {
-        List<IBaseResource> organizations = new ArrayList<>();
-        Organization organization = new Organization();
-        organization.setId("1");
-        organization.setName("Test Organization");
-        organizations.add(organization);
-        return organizations;
-    }
+	private List<IBaseResource> getOrganizations() {
+		List<IBaseResource> organizations = new ArrayList<>();
+		Organization organization = new Organization();
+		organization.setId("1");
+		organization.setName("Test Organization");
+		organizations.add(organization);
+		return organizations;
+	}
 
-    private List<IBaseResource> getOrganizationAffiliations() {
-        List<IBaseResource> organizationsAffiliations = new ArrayList<>();
-        OrganizationAffiliation organizationAffiliation = new OrganizationAffiliation();
-        organizationAffiliation.setId("1");
-        List<Reference> locationReferences = new ArrayList<>();
-        Reference locationRef = new Reference();
-        locationRef.setReference("Location/140");
-        locationRef.setDisplay("Location Reference");
-        locationReferences.add(locationRef);
-        organizationAffiliation.setLocation(locationReferences);
-        organizationsAffiliations.add(organizationAffiliation);
-        return organizationsAffiliations;
-    }
+	private List<IBaseResource> getOrganizationAffiliations() {
+		List<IBaseResource> organizationsAffiliations = new ArrayList<>();
+		OrganizationAffiliation organizationAffiliation = new OrganizationAffiliation();
+		organizationAffiliation.setId("1");
+		List<Reference> locationReferences = new ArrayList<>();
+		Reference locationRef = new Reference();
+		locationRef.setReference("Location/140");
+		locationRef.setDisplay("Location Reference");
+		locationReferences.add(locationRef);
+		organizationAffiliation.setLocation(locationReferences);
+		organizationsAffiliations.add(organizationAffiliation);
+		return organizationsAffiliations;
+	}
 
-    private List<IBaseResource> getLocations() {
-        List<IBaseResource> locations = new ArrayList<>();
-        Location location = new Location();
-        location.setId("1");
-        location.setName("Test Location");
-        locations.add(location);
-        return locations;
-    }
+	private List<IBaseResource> getLocations() {
+		List<IBaseResource> locations = new ArrayList<>();
+		Location location = new Location();
+		location.setId("1");
+		location.setName("Test Location");
+		locations.add(location);
+		return locations;
+	}
 }

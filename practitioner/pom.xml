@@ -1,41 +1,34 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>hapi-fhir-opensrp-extensions</artifactId>
-		<groupId>org.smartregister</groupId>
-		<version>0.0.12-SNAPSHOT</version>
-	</parent>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<description>The repository holds the practitioner details extensions on the HAPI server</description>
-	<groupId>org.smartregister.hapi-fhir-opensrp-extensions</groupId>
-	<name>HAPI FHIR OpenSRP Extensions (Practitioner)</name>
-	<packaging>jar</packaging>
-	<url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
-	<version>0.0.6-SNAPSHOT</version>
-	<artifactId>practitioner</artifactId>
+  <parent>
+    <groupId>org.smartregister</groupId>
+    <artifactId>hapi-fhir-opensrp-extensions</artifactId>
+    <version>0.0.12-SNAPSHOT</version>
+  </parent>
+  <groupId>org.smartregister.hapi-fhir-opensrp-extensions</groupId>
+  <artifactId>practitioner</artifactId>
 
-	<properties>
-		<spring.security.version>5.3.3.RELEASE</spring.security.version>
-	</properties>
+  <version>0.0.6-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>HAPI FHIR OpenSRP Extensions (Practitioner)</name>
+  <description>The repository holds the practitioner details extensions on the HAPI server</description>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-core</artifactId>
-			<version>${spring.security.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.keycloak</groupId>
-			<artifactId>keycloak-spring-security-adapter</artifactId>
-			<version>9.0.3</version>
-		</dependency>
-		<!-- This dependency holds all the code extensions for Location-->
-		<dependency>
-			<groupId>org.smartregister.hapi-fhir-opensrp-extensions</groupId>
-			<artifactId>location</artifactId>
-			<version>0.0.4-SNAPSHOT</version>
-		</dependency>
+  <url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
+  <properties/>
+  <dependencies>
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-spring-security-adapter</artifactId>
+      <version>19.0.3</version>
+    </dependency>
+    <!-- This dependency holds all the code extensions for Location-->
+    <dependency>
+      <groupId>org.smartregister.hapi-fhir-opensrp-extensions</groupId>
+      <artifactId>location</artifactId>
+      <version>0.0.4-SNAPSHOT</version>
+    </dependency>
 
-	</dependencies>
+  </dependencies>
 </project>
