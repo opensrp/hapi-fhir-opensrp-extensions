@@ -44,86 +44,87 @@ import org.smartregister.model.location.LocationHierarchyTree;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class LocationHierarchyResourceProvider implements IResourceProvider {
-    @Autowired IFhirResourceDao<Location> locationIFhirResourceDao;
 
-    private static final Logger logger =
-            LogManager.getLogger(LocationHierarchyResourceProvider.class.toString());
+	private static final Logger logger =
+			LogManager.getLogger(LocationHierarchyResourceProvider.class.toString());
 
-    @Override
-    public Class<? extends IBaseResource> getResourceType() {
-        return LocationHierarchy.class;
-    }
+	@Autowired IFhirResourceDao<Location> locationIFhirResourceDao;
 
-    @Search
-    public LocationHierarchy getLocationHierarchy(
-            @RequiredParam(name = IDENTIFIER) TokenParam identifier) {
+	@Override
+	public Class<? extends IBaseResource> getResourceType() {
+		return LocationHierarchy.class;
+	}
 
-        SearchParameterMap paramMap = new SearchParameterMap();
-        paramMap.add(IDENTIFIER, identifier);
+	@Search
+	public LocationHierarchy getLocationHierarchy(
+			@RequiredParam(name = IDENTIFIER) TokenParam identifier) {
 
-        IBundleProvider locationBundle = locationIFhirResourceDao.search(paramMap);
-        List<IBaseResource> locations =
-                locationBundle != null
-                        ? locationBundle.getResources(0, locationBundle.size())
-                        : new ArrayList<>();
-        Long id = null;
-        if (locations.size() > 0) {
-            id =
-                    locations.get(0) != null && locations.get(0).getIdElement() != null
-                            ? locations.get(0).getIdElement().getIdPartAsLong()
-                            : null;
-        }
+		SearchParameterMap paramMap = new SearchParameterMap();
+		paramMap.add(IDENTIFIER, identifier);
 
-        LocationHierarchyTree locationHierarchyTree = new LocationHierarchyTree();
-        LocationHierarchy locationHierarchy = new LocationHierarchy();
-        if (id != null && locations.size() > 0) {
-            logger.info("Building Location Hierarchy of Location Id : " + id);
-            locationHierarchyTree.buildTreeFromList(getLocationHierarchy(id, locations.get(0)));
-            StringType locationIdString = new StringType().setId(id.toString()).getIdElement();
-            locationHierarchy.setLocationId(locationIdString);
-            locationHierarchy.setId(LOCATION_RESOURCE + id);
+		IBundleProvider locationBundle = locationIFhirResourceDao.search(paramMap);
+		List<IBaseResource> locations =
+				locationBundle != null
+						? locationBundle.getResources(0, locationBundle.size())
+						: new ArrayList<>();
+		Long id = null;
+		if (locations.size() > 0) {
+			id =
+					locations.get(0) != null && locations.get(0).getIdElement() != null
+							? locations.get(0).getIdElement().getIdPartAsLong()
+							: null;
+		}
 
-            locationHierarchy.setLocationHierarchyTree(locationHierarchyTree);
-        } else {
-            locationHierarchy.setId(LOCATION_RESOURCE_NOT_FOUND);
-        }
-        return locationHierarchy;
-    }
+		LocationHierarchyTree locationHierarchyTree = new LocationHierarchyTree();
+		LocationHierarchy locationHierarchy = new LocationHierarchy();
+		if (id != null && locations.size() > 0) {
+			logger.info("Building Location Hierarchy of Location Id : " + id);
+			locationHierarchyTree.buildTreeFromList(getLocationHierarchy(id, locations.get(0)));
+			StringType locationIdString = new StringType().setId(id.toString()).getIdElement();
+			locationHierarchy.setLocationId(locationIdString);
+			locationHierarchy.setId(LOCATION_RESOURCE + id);
 
-    private List<Location> getLocationHierarchy(Long id, IBaseResource parentLocation) {
-        return descendants(id, parentLocation);
-    }
+			locationHierarchy.setLocationHierarchyTree(locationHierarchyTree);
+		} else {
+			locationHierarchy.setId(LOCATION_RESOURCE_NOT_FOUND);
+		}
+		return locationHierarchy;
+	}
 
-    public List<Location> descendants(Long id, IBaseResource parentLocation) {
+	private List<Location> getLocationHierarchy(Long id, IBaseResource parentLocation) {
+		return descendants(id, parentLocation);
+	}
 
-        SearchParameterMap paramMap = new SearchParameterMap();
-        ReferenceAndListParam thePartOf = new ReferenceAndListParam();
-        ReferenceParam partOf = new ReferenceParam();
-        partOf.setValue(LOCATION + FORWARD_SLASH + id);
-        ReferenceOrListParam referenceOrListParam = new ReferenceOrListParam();
-        referenceOrListParam.add(partOf);
-        thePartOf.addValue(referenceOrListParam);
-        paramMap.add(PART_OF, thePartOf);
+	public List<Location> descendants(Long id, IBaseResource parentLocation) {
 
-        IBundleProvider childLocationBundle = locationIFhirResourceDao.search(paramMap);
-        List<Location> allLocations = new ArrayList<>();
-        if (parentLocation != null) {
-            allLocations.add((Location) parentLocation);
-        }
-        if (childLocationBundle != null) {
-            for (IBaseResource childLocation :
-                    childLocationBundle.getResources(0, childLocationBundle.size())) {
-                Location childLocationEntity = (Location) childLocation;
-                allLocations.add(childLocationEntity);
-                allLocations.addAll(
-                        descendants(childLocation.getIdElement().getIdPartAsLong(), null));
-            }
-        }
+		SearchParameterMap paramMap = new SearchParameterMap();
+		ReferenceAndListParam thePartOf = new ReferenceAndListParam();
+		ReferenceParam partOf = new ReferenceParam();
+		partOf.setValue(LOCATION + FORWARD_SLASH + id);
+		ReferenceOrListParam referenceOrListParam = new ReferenceOrListParam();
+		referenceOrListParam.add(partOf);
+		thePartOf.addValue(referenceOrListParam);
+		paramMap.add(PART_OF, thePartOf);
 
-        return allLocations;
-    }
+		IBundleProvider childLocationBundle = locationIFhirResourceDao.search(paramMap);
+		List<Location> allLocations = new ArrayList<>();
+		if (parentLocation != null) {
+			allLocations.add((Location) parentLocation);
+		}
+		if (childLocationBundle != null) {
+			for (IBaseResource childLocation :
+					childLocationBundle.getResources(0, childLocationBundle.size())) {
+				Location childLocationEntity = (Location) childLocation;
+				allLocations.add(childLocationEntity);
+				allLocations.addAll(
+						descendants(childLocation.getIdElement().getIdPartAsLong(), null));
+			}
+		}
 
-    public void setLocationIFhirResourceDao(IFhirResourceDao<Location> locationIFhirResourceDao) {
-        this.locationIFhirResourceDao = locationIFhirResourceDao;
-    }
+		return allLocations;
+	}
+
+	public void setLocationIFhirResourceDao(IFhirResourceDao<Location> locationIFhirResourceDao) {
+		this.locationIFhirResourceDao = locationIFhirResourceDao;
+	}
 }
