@@ -64,6 +64,13 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
     @Autowired
     private IFhirResourceDao<Location> locationIFhirResourceDao;
 
+    private static final String KEYCLOAK_UUID = "keycloak-uuid";
+
+    private static final String IS_AUTH_PROVIDED = "isAuthProvided";
+
+    private static String TRUE = "true";
+
+    private static String FALSE = "false";
     private static Logger logger =
             LogManager.getLogger(PractitionerDetailsResourceProvider.class.toString());
 
