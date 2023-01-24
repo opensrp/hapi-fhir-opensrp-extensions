@@ -15,6 +15,7 @@
  */
 package org.smartregister.extension.configuration.sentry;
 
+
 import io.sentry.Sentry;
 import io.sentry.SentryOptions;
 import java.util.Map;
@@ -26,57 +27,57 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
 @ConditionalOnProperty(
-        prefix = "sentry",
-        name = "enabled",
-        havingValue = "true",
-        matchIfMissing = false)
+		prefix = "sentry",
+		name = "enabled",
+		havingValue = "true",
+		matchIfMissing = false)
 @Configuration
 public class SentryConfiguration {
 
-    @Value("${sentry.options.dsn:}")
-    private String dsn;
+	@Value("${sentry.options.dsn:}")
+	private String dsn;
 
-    @Value("${sentry.options.release:}")
-    private String release;
+	@Value("${sentry.options.release:}")
+	private String release;
 
-    @Value("${sentry.options.environment:}")
-    private String environment;
+	@Value("${sentry.options.environment:}")
+	private String environment;
 
-    @Value("#{${sentry.options.tags: {:}} ?: {:} }")
-    private Map<String, String> tags;
+	@Value("#{${sentry.options.tags: {:}} ?: {:} }")
+	private Map<String, String> tags;
 
-    @Value("${sentry.options.debug: false}")
-    private boolean debug;
+	@Value("${sentry.options.debug: false}")
+	private boolean debug;
 
-    @PostConstruct
-    public void initialize() {
-        if (dsn != null && !dsn.trim().isEmpty()) {
-            initializeSentry();
-        }
-    }
+	@PostConstruct
+	public void initialize() {
+		if (dsn != null && !dsn.trim().isEmpty()) {
+			initializeSentry();
+		}
+	}
 
-    @VisibleForTesting
-    protected void initializeSentry() {
-        Sentry.init(
-                sentryOptions -> {
-                    sentryOptions.setDsn(dsn);
-                    sentryOptions.setRelease(release);
-                    sentryOptions.setEnvironment(environment);
-                    sentryOptions.setDebug(debug);
-                    populateTags(sentryOptions);
-                });
-    }
+	@VisibleForTesting
+	protected void initializeSentry() {
+		Sentry.init(
+				sentryOptions -> {
+					sentryOptions.setDsn(dsn);
+					sentryOptions.setRelease(release);
+					sentryOptions.setEnvironment(environment);
+					sentryOptions.setDebug(debug);
+					populateTags(sentryOptions);
+				});
+	}
 
-    @VisibleForTesting
-    protected void populateTags(SentryOptions sentryOptions) {
-        try {
-            for (Map.Entry<String, String> extraTagsEntry : tags.entrySet()) {
-                String key = extraTagsEntry.getKey();
-                if (key != null && !key.trim().isEmpty())
-                    sentryOptions.setTag(extraTagsEntry.getKey(), extraTagsEntry.getValue());
-            }
-        } catch (Exception e) {
-            LogFactory.getLog(this.getClass()).error(e);
-        }
-    }
+	@VisibleForTesting
+	protected void populateTags(SentryOptions sentryOptions) {
+		try {
+			for (Map.Entry<String, String> extraTagsEntry : tags.entrySet()) {
+				String key = extraTagsEntry.getKey();
+				if (key != null && !key.trim().isEmpty())
+					sentryOptions.setTag(extraTagsEntry.getKey(), extraTagsEntry.getValue());
+			}
+		} catch (Exception e) {
+			LogFactory.getLog(this.getClass()).error(e);
+		}
+	}
 }

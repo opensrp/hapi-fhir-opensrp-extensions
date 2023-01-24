@@ -1,78 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<artifactId>hapi-fhir-opensrp-extensions</artifactId>
-		<groupId>org.smartregister</groupId>
-		<version>0.0.12-SNAPSHOT</version>
-	</parent>
+<parent>
+	<groupId>org.smartregister</groupId>
+	<artifactId>hapi-fhir-opensrp-extensions</artifactId>
+	<version>0.0.12-SNAPSHOT</version>
+</parent>
+<groupId>org.smartregister.hapi-fhir-opensrp-extensions</groupId>
+<artifactId>configuration</artifactId>
+<version>0.0.1-SNAPSHOT</version>
+<packaging>jar</packaging>
+<name>HAPI FHIR OpenSRP Extensions (Configuration)</name>
 
-	<description>The repository holds the configuration extensions for the HAPI server</description>
-	<groupId>org.smartregister.hapi-fhir-opensrp-extensions</groupId>
-	<name>HAPI FHIR OpenSRP Extensions (Configuration)</name>
-	<packaging>jar</packaging>
-	<url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
-	<artifactId>configuration</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+<description>The repository holds the configuration extensions for the HAPI server</description>
+<url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
 
-	<properties>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
-		<powermock.version>2.0.5</powermock.version>
-		<mockito.version>1.8.4</mockito.version>
-	</properties>
+<properties>
+	<maven.compiler.source>11</maven.compiler.source>
+	<maven.compiler.target>11</maven.compiler.target>
+	<powermock.version>2.0.5</powermock.version>
+	<mockito.version>1.8.4</mockito.version>
+</properties>
 
-	<dependencies>
-		<!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>5.3.17</version>
-		</dependency>
+<dependencies>
+	<!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
+	<dependency>
+	<groupId>org.springframework</groupId>
+	<artifactId>spring-context</artifactId>
+	<version>5.3.17</version>
+	</dependency>
 
-		<!-- https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api -->
-		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>javax.annotation-api</artifactId>
-			<version>1.3.2</version>
-		</dependency>
+	<!-- https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api -->
+	<dependency>
+	<groupId>javax.annotation</groupId>
+	<artifactId>javax.annotation-api</artifactId>
+	<version>1.3.2</version>
+	</dependency>
 
-		<dependency>
-			<groupId>io.sentry</groupId>
-			<artifactId>sentry-logback</artifactId>
-			<version>5.7.0</version>
-		</dependency>
+	<dependency>
+	<groupId>io.sentry</groupId>
+	<artifactId>sentry-logback</artifactId>
+	<version>5.7.0</version>
+	</dependency>
 
-		<!-- The org.codehaus.janino:commons-compiler:3.1.6 dependency -->
-		<!-- will be automatically pulled in by Maven's transitivity rules -->
-		<dependency>
-			<groupId>org.codehaus.janino</groupId>
-			<artifactId>janino</artifactId>
-			<version>3.1.6</version>
-		</dependency>
+	<!-- The org.codehaus.janino:commons-compiler:3.1.6 dependency -->
+	<!-- will be automatically pulled in by Maven's transitivity rules -->
+	<dependency>
+	<groupId>org.codehaus.janino</groupId>
+	<artifactId>janino</artifactId>
+	<version>3.1.6</version>
+	</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-autoconfigure</artifactId>
-			<version>2.6.4</version>
-		</dependency>
+	<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure -->
+	<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-autoconfigure</artifactId>
+	<version>2.6.4</version>
+	</dependency>
 
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4</artifactId>
-			<version>${powermock.version}</version>
-			<scope>test</scope>
-		</dependency>
+	<dependency>
+	<groupId>org.powermock</groupId>
+	<artifactId>powermock-module-junit4</artifactId>
+	<version>${powermock.version}</version>
+	<scope>test</scope>
+	</dependency>
 
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito2</artifactId>
-			<version>${powermock.version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+	<dependency>
+	<groupId>org.powermock</groupId>
+	<artifactId>powermock-api-mockito2</artifactId>
+	<version>${powermock.version}</version>
+	<scope>test</scope>
+	</dependency>
+</dependencies>
 </project>

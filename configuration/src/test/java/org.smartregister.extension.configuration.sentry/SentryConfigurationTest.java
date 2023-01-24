@@ -33,46 +33,46 @@ import org.powermock.reflect.internal.WhiteboxImpl;
 @PrepareForTest(Sentry.class)
 public class SentryConfigurationTest {
 
-    private SentryConfiguration sentryConfiguration;
+	private SentryConfiguration sentryConfiguration;
 
-    @Before
-    public void setUp() {
-        sentryConfiguration = spy(new SentryConfiguration());
-    }
+	@Before
+	public void setUp() {
+		sentryConfiguration = spy(new SentryConfiguration());
+	}
 
-    @Test
-    public void testInitializeShouldNotInitializeSentryIfDsnIsEmpty() {
-        WhiteboxImpl.setInternalState(sentryConfiguration, "dsn", "");
-        sentryConfiguration.initialize();
-        verify(sentryConfiguration, never()).initializeSentry();
-    }
+	@Test
+	public void testInitializeShouldNotInitializeSentryIfDsnIsEmpty() {
+		WhiteboxImpl.setInternalState(sentryConfiguration, "dsn", "");
+		sentryConfiguration.initialize();
+		verify(sentryConfiguration, never()).initializeSentry();
+	}
 
-    @Test
-    public void testInitializeShouldInitializeSentryIfDsnIsNotEmpty() {
-        PowerMockito.mockStatic(Sentry.class);
-        WhiteboxImpl.setInternalState(
-                sentryConfiguration, "dsn", "https://examplePublicKey.sdsd.w/0");
-        sentryConfiguration.initialize();
-        verify(sentryConfiguration, atMostOnce()).initializeSentry();
-    }
+	@Test
+	public void testInitializeShouldInitializeSentryIfDsnIsNotEmpty() {
+		PowerMockito.mockStatic(Sentry.class);
+		WhiteboxImpl.setInternalState(
+				sentryConfiguration, "dsn", "https://examplePublicKey.sdsd.w/0");
+		sentryConfiguration.initialize();
+		verify(sentryConfiguration, atMostOnce()).initializeSentry();
+	}
 
-    @Test
-    public void testPopulateTagsShouldNotAddTagsIfNotPresent() {
-        WhiteboxImpl.setInternalState(sentryConfiguration, "tags", new HashMap<>());
-        SentryOptions sentryOptions = mock(SentryOptions.class);
-        sentryConfiguration.populateTags(sentryOptions);
-        verify(sentryOptions, never()).setTag(anyString(), anyString());
-    }
+	@Test
+	public void testPopulateTagsShouldNotAddTagsIfNotPresent() {
+		WhiteboxImpl.setInternalState(sentryConfiguration, "tags", new HashMap<>());
+		SentryOptions sentryOptions = mock(SentryOptions.class);
+		sentryConfiguration.populateTags(sentryOptions);
+		verify(sentryOptions, never()).setTag(anyString(), anyString());
+	}
 
-    @Test
-    public void testPopulateTagsShouldAddTagsToSentryOptions() {
-        String releaseName = "release-name";
-        String release = "release-a";
-        Map<String, String> map = new HashMap<>();
-        map.put(releaseName, release);
-        WhiteboxImpl.setInternalState(sentryConfiguration, "tags", map);
-        SentryOptions sentryOptions = mock(SentryOptions.class);
-        sentryConfiguration.populateTags(sentryOptions);
-        verify(sentryOptions, only()).setTag(eq(releaseName), eq(release));
-    }
+	@Test
+	public void testPopulateTagsShouldAddTagsToSentryOptions() {
+		String releaseName = "release-name";
+		String release = "release-a";
+		Map<String, String> map = new HashMap<>();
+		map.put(releaseName, release);
+		WhiteboxImpl.setInternalState(sentryConfiguration, "tags", map);
+		SentryOptions sentryOptions = mock(SentryOptions.class);
+		sentryConfiguration.populateTags(sentryOptions);
+		verify(sentryOptions, only()).setTag(eq(releaseName), eq(release));
+	}
 }

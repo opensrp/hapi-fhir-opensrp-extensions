@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.smartregister.extension.rest;
 
 import static org.smartregister.utils.Constants.*;
@@ -24,10 +25,8 @@ import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.*;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-
 import java.util.*;
 import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -43,29 +42,22 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
-    @Autowired
-    private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
+    @Autowired private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
 
-    @Autowired
-    private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
+    @Autowired private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
 
-    @Autowired
-    private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
+    @Autowired private IFhirResourceDao<CareTeam> careTeamIFhirResourceDao;
 
     @Autowired
     private IFhirResourceDao<OrganizationAffiliation> organizationAffiliationIFhirResourceDao;
 
-    @Autowired
-    private IFhirResourceDao<Organization> organizationIFhirResourceDao;
+    @Autowired private IFhirResourceDao<Organization> organizationIFhirResourceDao;
 
-    @Autowired
-    private IFhirResourceDao<Group> groupIFhirResourceDao;
+    @Autowired private IFhirResourceDao<Group> groupIFhirResourceDao;
 
-    @Autowired
-    private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
+    @Autowired private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
 
-    @Autowired
-    private IFhirResourceDao<Location> locationIFhirResourceDao;
+    @Autowired private IFhirResourceDao<Location> locationIFhirResourceDao;
 
     private static final String KEYCLOAK_UUID = "keycloak-uuid";
 
@@ -101,8 +93,8 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
         if ((isAuthProvided != null && isAuthProvided.getValue().equals(FALSE))
                 || (keycloakUserDetails != null
-                && keycloakUserDetails.getUserBioData() != null
-                && keycloakUserDetails.getUserBioData().getIdentifier() != null)) {
+                        && keycloakUserDetails.getUserBioData() != null
+                        && keycloakUserDetails.getUserBioData().getIdentifier() != null)) {
             FhirPractitionerDetails fhirPractitionerDetails = new FhirPractitionerDetails();
             SearchParameterMap paramMap = new SearchParameterMap();
             paramMap.add(IDENTIFIER, identifier);
@@ -117,7 +109,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                     practitioners.size() > 0 ? practitioners.get(0) : new Practitioner();
             Long practitionerId =
                     practitioner.getIdElement() != null
-                            && practitioner.getIdElement().getIdPart() != null
+                                    && practitioner.getIdElement().getIdPart() != null
                             ? practitioner.getIdElement().getIdPartAsLong()
                             : 0;
 
@@ -137,9 +129,10 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 List<Organization> teams = mapToTeams(organizationTeams);
                 fhirPractitionerDetails.setOrganizations(teams);
                 List<IBaseResource> practitionerRoles =
-                  getPractitionerRolesOfPractitioner(practitionerId);
+                        getPractitionerRolesOfPractitioner(practitionerId);
                 logger.info("Practitioner Roles are fetched");
-                List<PractitionerRole> practitionerRoleList = mapToPractitionerRoles(practitionerRoles);
+                List<PractitionerRole> practitionerRoleList =
+                        mapToPractitionerRoles(practitionerRoles);
                 fhirPractitionerDetails.setPractitionerRoles(practitionerRoleList);
                 keycloakUserDetails.setId(identifier.getValue());
                 practitionerDetails.setId(keycloakUserDetails.getId());
@@ -291,11 +284,11 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         practitionerRoleSearchParamMap.add(PRACTITIONER, practitionerRef);
         logger.info("Searching for Practitioner roles  with practitioner id :" + practitionerId);
         IBundleProvider practitionerRoleBundle =
-          practitionerRoleIFhirResourceDao.search(practitionerRoleSearchParamMap);
+                practitionerRoleIFhirResourceDao.search(practitionerRoleSearchParamMap);
         List<IBaseResource> practitionerRoles =
-          practitionerRoleBundle != null
-            ? practitionerRoleBundle.getResources(0, practitionerRoleBundle.size())
-            : new ArrayList<>();
+                practitionerRoleBundle != null
+                        ? practitionerRoleBundle.getResources(0, practitionerRoleBundle.size())
+                        : new ArrayList<>();
         return practitionerRoles;
     }
 
@@ -400,7 +393,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             List<IBaseResource> organizationAffiliations =
                     organizationsAffiliationBundle != null
                             ? organizationsAffiliationBundle.getResources(
-                            0, organizationsAffiliationBundle.size())
+                                    0, organizationsAffiliationBundle.size())
                             : new ArrayList<>();
             OrganizationAffiliation organizationAffiliationObj;
             if (organizationAffiliations.size() > 0) {
@@ -481,10 +474,10 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         careTeamRefParam.addOr(participantRef);
         careTeamSerachParameterMap.add(PARTICIPANT, careTeamRefParam);
         IBundleProvider careTeamsBundle =
-          careTeamIFhirResourceDao.search(careTeamSerachParameterMap);
+                careTeamIFhirResourceDao.search(careTeamSerachParameterMap);
         return careTeamsBundle != null
-          ? careTeamsBundle.getResources(0, careTeamsBundle.size())
-          : new ArrayList<>();
+                ? careTeamsBundle.getResources(0, careTeamsBundle.size())
+                : new ArrayList<>();
     }
 
     private String getLocationIdentifierValue(Identifier locationIdentifier) {
