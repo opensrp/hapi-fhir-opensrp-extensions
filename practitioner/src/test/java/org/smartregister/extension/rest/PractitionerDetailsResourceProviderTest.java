@@ -63,6 +63,8 @@ public class PractitionerDetailsResourceProviderTest {
 
     @Mock private IFhirResourceDao<Location> locationIFhirResourceDao;
 
+    @Mock private IFhirResourceDao<Group> groupIFhirResourceDao;
+
     @Mock private KeycloakPrincipal<KeycloakSecurityContext> keycloakPrincipal;
 
     @Mock private RefreshableKeycloakSecurityContext securityContext;
@@ -85,6 +87,8 @@ public class PractitionerDetailsResourceProviderTest {
 
     @Mock private LocationHierarchyResourceProvider locationHierarchyResourceProvider;
 
+    @Mock private IBundleProvider groupsBundleProvider;
+
     private PractitionerDetailsResourceProvider practitionerDetailsResourceProvider;
 
     private final List<String> roles = Arrays.asList("ROLE_USER", "ROLE_ADMIN");
@@ -105,6 +109,7 @@ public class PractitionerDetailsResourceProviderTest {
         practitionerDetailsResourceProvider.setLocationHierarchyResourceProvider(
                 locationHierarchyResourceProvider);
         practitionerDetailsResourceProvider.setLocationIFhirResourceDao(locationIFhirResourceDao);
+        practitionerDetailsResourceProvider.setGroupIFhirResourceDao(groupIFhirResourceDao);
         when(keycloakPrincipal.getKeycloakSecurityContext()).thenReturn(securityContext);
     }
 
@@ -221,6 +226,8 @@ public class PractitionerDetailsResourceProviderTest {
                 .thenReturn(organizationsAffiliationBundleProvider);
         when(locationIFhirResourceDao.search(any(SearchParameterMap.class)))
                 .thenReturn(locationsBundleProvider);
+        when(groupIFhirResourceDao.search(any(SearchParameterMap.class)))
+                .thenReturn(groupsBundleProvider);
         List<IBaseResource> practitioners = getPractitioners();
 
         List<IBaseResource> careTeams = getCareTeams();
@@ -233,6 +240,8 @@ public class PractitionerDetailsResourceProviderTest {
 
         List<IBaseResource> locations = getLocations();
 
+        List<IBaseResource> groups = getGroups();
+
         when(practitionersBundleProvider.getResources(anyInt(), anyInt()))
                 .thenReturn(practitioners);
         when(careTeamsBundleProvider.getResources(anyInt(), anyInt())).thenReturn(careTeams);
@@ -243,6 +252,7 @@ public class PractitionerDetailsResourceProviderTest {
         when(organizationsAffiliationBundleProvider.getResources(anyInt(), anyInt()))
                 .thenReturn(organizationsAffiliations);
         when(locationsBundleProvider.getResources(anyInt(), anyInt())).thenReturn(locations);
+        when(groupsBundleProvider.getResources(anyInt(), anyInt())).thenReturn(groups);
 
         TokenParam identifierParam = new TokenParam();
         identifierParam.setValue("0000-11111-2222-3333");
@@ -336,5 +346,14 @@ public class PractitionerDetailsResourceProviderTest {
         location.setName("Test Location");
         locations.add(location);
         return locations;
+    }
+
+    private List<IBaseResource> getGroups() {
+        List<IBaseResource> groups = new ArrayList<>();
+        Group group = new Group();
+        group.setId("1");
+        group.setName("Test Group");
+        groups.add(group);
+        return groups;
     }
 }
