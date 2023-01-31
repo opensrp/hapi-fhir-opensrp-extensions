@@ -359,7 +359,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
     private List<PractitionerRole> mapToPractitionerRoles(List<IBaseResource> practitionerRoles) {
         List<PractitionerRole> practitionerRoleList = new ArrayList<>();
         PractitionerRole practitionerRoleObj;
-        for (IBaseResource practitionerRole : practitionerRoleList) {
+        for (IBaseResource practitionerRole : practitionerRoles) {
             practitionerRoleObj = (PractitionerRole) practitionerRole;
             practitionerRoleList.add(practitionerRoleObj);
         }
