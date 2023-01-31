@@ -485,11 +485,18 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         TokenAndListParam codeListParam = new TokenAndListParam();
         TokenOrListParam coding = new TokenOrListParam();
         TokenParam code = new TokenParam();
+
+        // Adding the code to the search parameters
         code.setValue("405623001");
         code.setSystem("http://snomed.info/sct");
         coding.add(code);
         codeListParam.addAnd(coding);
         groupSearchParameterMap.add(CODE, codeListParam);
+        code.setValue(practitionerId.toString());
+
+        // Adding the practitioner Id to the search parameters.
+        codeListParam.addAnd(code);
+        groupSearchParameterMap.add(MEMBER, codeListParam);
         IBundleProvider groupsBundle = groupIFhirResourceDao.search(groupSearchParameterMap);
         return groupsBundle != null
                 ? groupsBundle.getResources(0, groupsBundle.size())
