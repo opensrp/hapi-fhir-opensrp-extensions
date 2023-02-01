@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.smartregister.extension.configuration.sentry;
 
 import static org.mockito.Mockito.*;
@@ -53,7 +54,7 @@ public class SentryConfigurationTest {
         WhiteboxImpl.setInternalState(
                 sentryConfiguration, "dsn", "https://examplePublicKey.sdsd.w/0");
         sentryConfiguration.initialize();
-        verify(sentryConfiguration, atMostOnce()).initializeSentry();
+        verify(sentryConfiguration, times(1)).initializeSentry();
     }
 
     @Test

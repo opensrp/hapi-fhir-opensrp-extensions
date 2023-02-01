@@ -5,7 +5,7 @@
 	<groupId>org.smartregister</groupId>
 	<artifactId>hapi-fhir-opensrp-extensions</artifactId>
 	<packaging>pom</packaging>
-	<version>0.0.12-SNAPSHOT</version>
+	<version>0.0.13-SNAPSHOT</version>
 	<name>HAPI FHIR OpenSRP Extensions</name>
 	<description>This repository holds all the code extensions on top of Hapi-FHIR</description>
 	<url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
@@ -33,7 +33,7 @@
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
 		<spring.version>5.2.4.RELEASE</spring.version>
-		<spotless.version>2.13.0</spotless.version>
+		<spotless.version>2.30.0</spotless.version>
 		<servlet.version>2.5</servlet.version>
 		<hapi.fhir.base.version>5.7.0-PRE8-SNAPSHOT</hapi.fhir.base.version>
 		<junit.version>4.13.1</junit.version>
@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>org.smartregister</groupId>
 			<artifactId>fhir-common-utils</artifactId>
-			<version>0.0.3-SNAPSHOT</version>
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 
 		<!--        Test Dependencies-->
@@ -113,8 +113,8 @@
 		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.8.4</version>
+			<artifactId>mockito-core</artifactId>
+			<version>2.23.4</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -162,11 +162,11 @@
 					</formats>
 					<java>
 						<googleJavaFormat>
-							<version>1.8</version>
+							<version>1.15.0</version>
 							<style>AOSP</style>
 						</googleJavaFormat>
 						<licenseHeader>
-							<file>${basedir}/src/license-header.txt</file>
+							<file>${basedir}/license-header.txt</file>
 						</licenseHeader>
 					</java>
 				</configuration>
