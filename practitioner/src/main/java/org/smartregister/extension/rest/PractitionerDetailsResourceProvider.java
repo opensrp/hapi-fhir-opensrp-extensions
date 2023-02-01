@@ -27,6 +27,7 @@ import ca.uhn.fhir.rest.param.*;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -107,34 +108,58 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
             IBaseResource practitioner =
                     practitioners.size() > 0 ? practitioners.get(0) : new Practitioner();
-            Long practitionerId =
-                    practitioner.getIdElement() != null
-                                    && practitioner.getIdElement().getIdPart() != null
-                            ? practitioner.getIdElement().getIdPartAsLong()
-                            : 0;
+            Long practitionerId = null;
+            String practitionerIdStringValue = null;
+            boolean isIdNumeric = false;
+            if (practitioner.getIdElement() != null
+                    && practitioner.getIdElement().getIdPart() != null
+                    && StringUtils.isNumeric(
+                            ((IBaseResource) practitioner).getIdElement().getIdPart())) {
+                practitionerId =
+                        practitioner.getIdElement() != null
+                                        && practitioner.getIdElement().getIdPart() != null
+                                ? practitioner.getIdElement().getIdPartAsLong()
+                                : 0;
+                isIdNumeric = true;
+                practitionerIdStringValue = practitionerId.toString();
+            } else {
+                practitionerIdStringValue =
+                        practitioner.getIdElement() != null
+                                        && practitioner.getIdElement().getIdPart() != null
+                                ? ((IBaseResource) practitioner)
+                                        .getIdElement()
+                                        .getIdPart()
+                                        .toString()
+                                : "";
+            }
 
-            if (practitionerId != null && practitionerId > 0) {
-                logger.info("Searching for care teams for practitioner with id: " + practitionerId);
-                List<IBaseResource> careTeams = getCareTeams(practitionerId);
+            if ((isIdNumeric && practitionerId != null && practitionerId > 0)
+                    || (StringUtils.isNotBlank(practitionerIdStringValue))) {
+                logger.info(
+                        "Searching for care teams for practitioner with id: "
+                                + practitionerIdStringValue);
+                List<IBaseResource> careTeams = getCareTeams(practitionerIdStringValue);
                 List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
                 fhirPractitionerDetails.setCareTeams(careTeamsList);
                 StringType practitionerIdString = new StringType();
-                practitionerIdString.setValue(String.valueOf(practitionerId));
+                practitionerIdString.setValue(practitionerIdStringValue);
                 fhirPractitionerDetails.setPractitionerId(practitionerIdString);
                 logger.info(
-                        "Searching for organizations of practitioner with id: " + practitionerId);
+                        "Searching for organizations of practitioner with id: "
+                                + practitionerIdStringValue);
                 List<IBaseResource> organizationTeams =
-                        getOrganizationsOfPractitioner(practitionerId);
+                        getOrganizationsOfPractitioner(practitionerIdStringValue);
                 logger.info("Organizations are fetched");
                 List<Organization> teams = mapToTeams(organizationTeams);
                 fhirPractitionerDetails.setOrganizations(teams);
                 List<IBaseResource> practitionerRoles =
-                        getPractitionerRolesOfPractitioner(practitionerId);
+                        getPractitionerRolesOfPractitioner(practitionerIdStringValue);
                 logger.info("Practitioner Roles are fetched");
                 List<PractitionerRole> practitionerRoleList =
                         mapToPractitionerRoles(practitionerRoles);
                 fhirPractitionerDetails.setPractitionerRoles(practitionerRoleList);
-                List<IBaseResource> groups = getGroupsAssignedToAPractitioner(practitionerId);
+                List<IBaseResource> groups =
+                        getGroupsAssignedToAPractitioner(practitionerIdStringValue);
                 logger.info("Groups are fetched");
                 List<Group> groupsList = mapToGroups(groups);
                 fhirPractitionerDetails.setGroups(groupsList);
@@ -232,10 +257,10 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         return keycloakUserDetails;
     }
 
-    private List<IBaseResource> getCareTeams(Long practitionerId) {
+    private List<IBaseResource> getCareTeams(String practitionerId) {
         SearchParameterMap careTeamSerachParameterMap = new SearchParameterMap();
         ReferenceParam participantRef = new ReferenceParam();
-        participantRef.setValue(String.valueOf(practitionerId));
+        participantRef.setValue(practitionerId);
         ReferenceOrListParam careTeamRefParam = new ReferenceOrListParam();
         careTeamRefParam.addOr(participantRef);
         careTeamSerachParameterMap.add(PARTICIPANT, careTeamRefParam);
@@ -279,10 +304,10 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         return careTeamList;
     }
 
-    private List<IBaseResource> getPractitionerRolesOfPractitioner(Long practitionerId) {
+    private List<IBaseResource> getPractitionerRolesOfPractitioner(String practitionerId) {
         SearchParameterMap practitionerRoleSearchParamMap = new SearchParameterMap();
         ReferenceParam practitionerRef = new ReferenceParam();
-        practitionerRef.setValue(String.valueOf(practitionerId));
+        practitionerRef.setValue(practitionerId);
         ReferenceOrListParam careTeamRefParam = new ReferenceOrListParam();
         careTeamRefParam.addOr(practitionerRef);
         practitionerRoleSearchParamMap.add(PRACTITIONER, practitionerRef);
@@ -296,7 +321,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         return practitionerRoles;
     }
 
-    private List<String> getOrganizationIds(Long practitionerId) {
+    private List<String> getOrganizationIds(String practitionerId) {
         List<IBaseResource> practitionerRoles = getPractitionerRolesOfPractitioner(practitionerId);
         List<String> organizationIdsString = new ArrayList<>();
         if (practitionerRoles != null && practitionerRoles.size() > 0) {
@@ -311,7 +336,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         return organizationIdsString;
     }
 
-    private List<IBaseResource> getOrganizationsOfPractitioner(Long practitionerId) {
+    private List<IBaseResource> getOrganizationsOfPractitioner(String practitionerId) {
         List<String> organizationIdsReferences = getOrganizationIds(practitionerId);
         logger.info(
                 "Organization Ids are retrieved, found to be of size: "
@@ -480,7 +505,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         return locationsIdentifiers;
     }
 
-    private List<IBaseResource> getGroupsAssignedToAPractitioner(Long practitionerId) {
+    private List<IBaseResource> getGroupsAssignedToAPractitioner(String practitionerId) {
         SearchParameterMap groupSearchParameterMap = new SearchParameterMap();
         TokenAndListParam codeListParam = new TokenAndListParam();
         TokenOrListParam coding = new TokenOrListParam();
@@ -492,11 +517,13 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         coding.add(code);
         codeListParam.addAnd(coding);
         groupSearchParameterMap.add(CODE, codeListParam);
-        code.setValue(practitionerId.toString());
-
-        // Adding the practitioner Id to the search parameters.
-        codeListParam.addAnd(code);
-        groupSearchParameterMap.add(MEMBER, codeListParam);
+        ReferenceAndListParam theMember = new ReferenceAndListParam();
+        ReferenceOrListParam memberRefParam = new ReferenceOrListParam();
+        ReferenceParam member = new ReferenceParam();
+        member.setValue(practitionerId);
+        memberRefParam.addOr(member);
+        theMember.addAnd(memberRefParam);
+        groupSearchParameterMap.add(MEMBER, theMember);
         IBundleProvider groupsBundle = groupIFhirResourceDao.search(groupSearchParameterMap);
         return groupsBundle != null
                 ? groupsBundle.getResources(0, groupsBundle.size())
