@@ -16,6 +16,8 @@
 
 package org.smartregister.extension.rest;
 
+import static org.smartregister.extension.utils.Constants.HTTP_SNOMED_INFO_SCT;
+import static org.smartregister.extension.utils.Constants.PRACTITIONER_GROUP_CODE;
 import static org.smartregister.utils.Constants.*;
 import static org.smartregister.utils.Constants.IDENTIFIER;
 
@@ -36,7 +38,6 @@ import org.jetbrains.annotations.NotNull;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
-import org.smartregister.extension.utils.Constants;
 import org.smartregister.model.location.LocationHierarchy;
 import org.smartregister.model.practitioner.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -500,8 +501,8 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         TokenParam code = new TokenParam();
 
         // Adding the code to the search parameters
-        code.setValue(Constants.PRACTITIONER_GROUP_CODE);
-        code.setSystem(Constants.HTTP_SNOMED_INFO_SCT);
+        code.setValue(PRACTITIONER_GROUP_CODE);
+        code.setSystem(HTTP_SNOMED_INFO_SCT);
         coding.add(code);
         codeListParam.addAnd(coding);
         groupSearchParameterMap.add(CODE, codeListParam);
