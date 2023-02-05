@@ -155,9 +155,7 @@ public class PractitionerDetailsResourceProviderTest {
 
                                                             private static final long
                                                                     serialVersionUID = 1L;
-
-                                                            @Override
-                                                            public String getAuthority() {
+                                                            @Override public String getAuthority() {
                                                                 return role;
                                                             }
                                                         })
