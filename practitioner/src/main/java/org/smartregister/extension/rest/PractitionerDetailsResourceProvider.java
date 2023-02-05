@@ -45,7 +45,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
-@Autowired private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
+    @Autowired private IFhirResourceDao<Practitioner> practitionerIFhirResourceDao;
 
     @Autowired private IFhirResourceDao<PractitionerRole> practitionerRoleIFhirResourceDao;
 
@@ -113,24 +113,29 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             Long practitionerId = null;
             String practitionerIdStringValue;
             boolean isIdNumeric = false;
-            if (practitioner.getIdElement() != null && practitioner.getIdElement().getIdPart() != null
+            if (practitioner.getIdElement() != null
+                    && practitioner.getIdElement().getIdPart() != null
                     && StringUtils.isNumeric(practitioner.getIdElement().getIdPart())) {
-                practitionerId = practitioner.getIdElement() != null && practitioner.getIdElement().getIdPart() != null
-                                ? practitioner.getIdElement().getIdPartAsLong() : 0;
+                practitionerId =
+                        practitioner.getIdElement() != null
+                                        && practitioner.getIdElement().getIdPart() != null
+                                ? practitioner.getIdElement().getIdPartAsLong()
+                                : 0;
                 isIdNumeric = true;
                 practitionerIdStringValue = practitionerId.toString();
             } else {
                 practitionerIdStringValue =
                         practitioner.getIdElement() != null
                                         && practitioner.getIdElement().getIdPart() != null
-                                ? practitioner
-                                        .getIdElement()
-                                        .getIdPart()
+                                ? practitioner.getIdElement().getIdPart()
                                 : "";
             }
 
-            if (isIdNumeric && practitionerId > 0 || StringUtils.isNotBlank(practitionerIdStringValue)) {
-                logger.info("Searching for care teams for practitioner with id: " + practitionerIdStringValue);
+            if (isIdNumeric && practitionerId > 0
+                    || StringUtils.isNotBlank(practitionerIdStringValue)) {
+                logger.info(
+                        "Searching for care teams for practitioner with id: "
+                                + practitionerIdStringValue);
                 List<IBaseResource> careTeams = getCareTeams(practitionerIdStringValue);
                 List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
                 fhirPractitionerDetails.setCareTeams(careTeamsList);
@@ -272,7 +277,8 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         SearchParameterMap searchParameterMap = new SearchParameterMap();
         for (String locationId : locationIds) {
             Location location;
-            for (IBaseResource locationResource :  generateLocationResource(searchParameterMap, locationId)) {
+            for (IBaseResource locationResource :
+                    generateLocationResource(searchParameterMap, locationId)) {
                 location = (Location) locationResource;
                 locations.add(location);
             }
@@ -438,27 +444,29 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
         return getResourceIds(locationReferences);
     }
 
-@NotNull
-private List<String> getResourceIds(List<String> locationReferences) {
-    List<String> locationIds = new ArrayList<>();
-    for (String locationReference : locationReferences) {
-        if (locationReference.contains(FORWARD_SLASH)) {
-            locationReference = locationReference.substring(locationReference.indexOf(FORWARD_SLASH) + 1);
+    @NotNull
+    private List<String> getResourceIds(List<String> locationReferences) {
+        List<String> locationIds = new ArrayList<>();
+        for (String locationReference : locationReferences) {
+            if (locationReference.contains(FORWARD_SLASH)) {
+                locationReference =
+                        locationReference.substring(locationReference.indexOf(FORWARD_SLASH) + 1);
+            }
+            locationIds.add(locationReference);
         }
-        locationIds.add(locationReference);
+        return locationIds;
     }
-    return locationIds;
-}
 
-private List<String> getOrganizationIdsFromReferences(List<String> organizationReferences) {
-    return getResourceIds(organizationReferences);
-}
+    private List<String> getOrganizationIdsFromReferences(List<String> organizationReferences) {
+        return getResourceIds(organizationReferences);
+    }
 
     private List<String> getLocationIdentifiersByIds(List<String> locationIds) {
         List<String> locationsIdentifiers = new ArrayList<>();
         SearchParameterMap searchParameterMap = new SearchParameterMap();
         for (String locationId : locationIds) {
-            List<IBaseResource> locationsResources = generateLocationResource(searchParameterMap, locationId);
+            List<IBaseResource> locationsResources =
+                    generateLocationResource(searchParameterMap, locationId);
             Location locationObject;
             for (IBaseResource locationResource : locationsResources) {
                 locationObject = (Location) locationResource;
@@ -471,18 +479,21 @@ private List<String> getOrganizationIdsFromReferences(List<String> organizationR
         return locationsIdentifiers;
     }
 
-private List<IBaseResource> generateLocationResource(SearchParameterMap searchParameterMap, String locationId) {
-    TokenAndListParam idParam = new TokenAndListParam();
-    TokenParam id = new TokenParam();
-    id.setValue(String.valueOf(locationId));
-    idParam.addAnd(id);
-    searchParameterMap.add(ID, idParam);
-    IBundleProvider locationsBundle = locationIFhirResourceDao.search(searchParameterMap);
+    private List<IBaseResource> generateLocationResource(
+            SearchParameterMap searchParameterMap, String locationId) {
+        TokenAndListParam idParam = new TokenAndListParam();
+        TokenParam id = new TokenParam();
+        id.setValue(String.valueOf(locationId));
+        idParam.addAnd(id);
+        searchParameterMap.add(ID, idParam);
+        IBundleProvider locationsBundle = locationIFhirResourceDao.search(searchParameterMap);
 
-    return locationsBundle != null ? locationsBundle.getResources(0, locationsBundle.size()) : new ArrayList<>();
-}
+        return locationsBundle != null
+                ? locationsBundle.getResources(0, locationsBundle.size())
+                : new ArrayList<>();
+    }
 
-private List<IBaseResource> getGroupsAssignedToAPractitioner(String practitionerId) {
+    private List<IBaseResource> getGroupsAssignedToAPractitioner(String practitionerId) {
         SearchParameterMap groupSearchParameterMap = new SearchParameterMap();
         TokenAndListParam codeListParam = new TokenAndListParam();
         TokenOrListParam coding = new TokenOrListParam();
