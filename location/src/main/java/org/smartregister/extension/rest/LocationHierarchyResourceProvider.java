@@ -59,9 +59,10 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
                         ? locationBundle.getResources(0, locationBundle.size())
                         : new ArrayList<>();
         String locationId = EMPTY_STRING;
-        if (locations.size() > 0) {
-            if (locations.get(0) != null && locations.get(0).getIdElement() != null)
-                locationId = locations.get(0).getIdElement().getIdPart();
+        if (locations.size() > 0
+                && locations.get(0) != null
+                && locations.get(0).getIdElement() != null) {
+            locationId = locations.get(0).getIdElement().getIdPart();
         }
 
         LocationHierarchyTree locationHierarchyTree = new LocationHierarchyTree();
