@@ -25,6 +25,7 @@ import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.*;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import java.util.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -37,7 +38,7 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
 
     @Autowired IFhirResourceDao<Location> locationIFhirResourceDao;
 
-    private static Logger logger =
+    private static final Logger logger =
             LogManager.getLogger(LocationHierarchyResourceProvider.class.toString());
 
     @Override
@@ -57,22 +58,22 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
                 locationBundle != null
                         ? locationBundle.getResources(0, locationBundle.size())
                         : new ArrayList<>();
-        Long id = null;
-        if (locations.size() > 0) {
-            id =
-                    locations.get(0) != null && locations.get(0).getIdElement() != null
-                            ? locations.get(0).getIdElement().getIdPartAsLong()
-                            : null;
+        String locationId = EMPTY_STRING;
+        if (locations.size() > 0
+                && locations.get(0) != null
+                && locations.get(0).getIdElement() != null) {
+            locationId = locations.get(0).getIdElement().getIdPart();
         }
 
         LocationHierarchyTree locationHierarchyTree = new LocationHierarchyTree();
         LocationHierarchy locationHierarchy = new LocationHierarchy();
-        if (id != null && locations.size() > 0) {
-            logger.info("Building Location Hierarchy of Location Id : " + id);
-            locationHierarchyTree.buildTreeFromList(getLocationHierarchy(id, locations.get(0)));
-            StringType locationIdString = new StringType().setId(id.toString()).getIdElement();
+        if (StringUtils.isNotBlank(locationId) && locations.size() > 0) {
+            logger.info("Building Location Hierarchy of Location Id : " + locationId);
+            locationHierarchyTree.buildTreeFromList(
+                    getLocationHierarchy(locationId, locations.get(0)));
+            StringType locationIdString = new StringType().setId(locationId).getIdElement();
             locationHierarchy.setLocationId(locationIdString);
-            locationHierarchy.setId(LOCATION_RESOURCE + id);
+            locationHierarchy.setId(LOCATION_RESOURCE + locationId);
 
             locationHierarchy.setLocationHierarchyTree(locationHierarchyTree);
         } else {
@@ -81,16 +82,16 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
         return locationHierarchy;
     }
 
-    private List<Location> getLocationHierarchy(Long id, IBaseResource parentLocation) {
-        return descendants(id, parentLocation);
+    private List<Location> getLocationHierarchy(String locationId, IBaseResource parentLocation) {
+        return descendants(locationId, parentLocation);
     }
 
-    public List<Location> descendants(Long id, IBaseResource parentLocation) {
+    public List<Location> descendants(String locationId, IBaseResource parentLocation) {
 
         SearchParameterMap paramMap = new SearchParameterMap();
         ReferenceAndListParam thePartOf = new ReferenceAndListParam();
         ReferenceParam partOf = new ReferenceParam();
-        partOf.setValue(LOCATION + FORWARD_SLASH + id);
+        partOf.setValue(LOCATION + FORWARD_SLASH + locationId);
         ReferenceOrListParam referenceOrListParam = new ReferenceOrListParam();
         referenceOrListParam.add(partOf);
         thePartOf.addValue(referenceOrListParam);
@@ -101,12 +102,15 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
         if (parentLocation != null) {
             allLocations.add((Location) parentLocation);
         }
-        for (IBaseResource childLocation :
-                childLocationBundle.getResources(0, childLocationBundle.size())) {
-            Location childLocationEntity = (Location) childLocation;
-            allLocations.add(childLocationEntity);
-            allLocations.addAll(descendants(childLocation.getIdElement().getIdPartAsLong(), null));
+        if (childLocationBundle != null) {
+            for (IBaseResource childLocation :
+                    childLocationBundle.getResources(0, childLocationBundle.size())) {
+                Location childLocationEntity = (Location) childLocation;
+                allLocations.add(childLocationEntity);
+                allLocations.addAll(descendants(childLocation.getIdElement().getIdPart(), null));
+            }
         }
+
         return allLocations;
     }
 

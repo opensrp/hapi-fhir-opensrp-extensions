@@ -5,7 +5,7 @@
 <parent>
 	<groupId>org.smartregister</groupId>
 	<artifactId>hapi-fhir-opensrp-extensions</artifactId>
-	<version>0.0.15-SNAPSHOT</version>
+	<version>0.0.16-SNAPSHOT</version>
 </parent>
 <groupId>org.smartregister.hapi-fhir-opensrp-extensions</groupId>
 <artifactId>configuration</artifactId>
