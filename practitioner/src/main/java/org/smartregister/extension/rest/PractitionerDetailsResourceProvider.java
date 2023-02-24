@@ -35,9 +35,15 @@ import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.jetbrains.annotations.NotNull;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.representations.AccessToken;
 import org.smartregister.model.location.LocationHierarchy;
 import org.smartregister.model.practitioner.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
@@ -75,72 +81,162 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
     @Search
     public PractitionerDetails getPractitionerDetails(
-            @RequiredParam(name = KEYCLOAK_UUID) TokenParam identifier) {
+            @RequiredParam(name = KEYCLOAK_UUID) TokenParam identifier,
+            @OptionalParam(name = IS_AUTH_PROVIDED) SpecialParam isAuthProvided) {
+        if (isAuthProvided == null) {
+            isAuthProvided = new SpecialParam();
+            isAuthProvided.setValue(TRUE);
+        }
+        KeycloakUserDetails keycloakUserDetails = new KeycloakUserDetails();
+        if (isAuthProvided.getValue().equals(TRUE)) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null) {
+                keycloakUserDetails = getKeycloakUserDetails(authentication);
+            }
+        }
         PractitionerDetails practitionerDetails = new PractitionerDetails();
-        FhirPractitionerDetails fhirPractitionerDetails = new FhirPractitionerDetails();
-        SearchParameterMap paramMap = new SearchParameterMap();
-        paramMap.add(IDENTIFIER, identifier);
-        logger.info("Searching for practitioner with identifier: " + identifier.getValue());
-        IBundleProvider practitionerBundle = practitionerIFhirResourceDao.search(paramMap);
-        List<IBaseResource> practitioners =
-                practitionerBundle != null
-                        ? practitionerBundle.getResources(0, practitionerBundle.size())
-                        : new ArrayList<>();
 
-        IBaseResource practitioner =
-                practitioners.size() > 0 ? practitioners.get(0) : new Practitioner();
-        String practitionerId = EMPTY_STRING;
-        if (practitioner.getIdElement() != null
-                && practitioner.getIdElement().getIdPart() != null) {
-            practitionerId = practitioner.getIdElement().getIdPart();
-        }
+        if (isAuthProvided.getValue().equals(FALSE)
+                || keycloakUserDetails.getUserBioData() != null
+                        && keycloakUserDetails.getUserBioData().getIdentifier() != null) {
+            FhirPractitionerDetails fhirPractitionerDetails = new FhirPractitionerDetails();
+            SearchParameterMap paramMap = new SearchParameterMap();
+            paramMap.add(IDENTIFIER, identifier);
+            logger.info("Searching for practitioner with identifier: " + identifier.getValue());
+            IBundleProvider practitionerBundle = practitionerIFhirResourceDao.search(paramMap);
+            List<IBaseResource> practitioners =
+                    practitionerBundle != null
+                            ? practitionerBundle.getResources(0, practitionerBundle.size())
+                            : new ArrayList<>();
 
-        if (StringUtils.isNotBlank(practitionerId)) {
-            logger.info("Searching for care teams for practitioner with id: " + practitionerId);
-            List<IBaseResource> careTeams = getCareTeams(practitionerId);
-            List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
-            fhirPractitionerDetails.setCareTeams(careTeamsList);
-            StringType practitionerIdString = new StringType();
-            practitionerIdString.setValue(practitionerId);
-            fhirPractitionerDetails.setPractitionerId(practitionerIdString);
+            IBaseResource practitioner =
+                    practitioners.size() > 0 ? practitioners.get(0) : new Practitioner();
+            String practitionerId = EMPTY_STRING;
+            if (practitioner.getIdElement() != null
+                    && practitioner.getIdElement().getIdPart() != null) {
+                practitionerId = practitioner.getIdElement().getIdPart();
+            }
 
-            logger.info("Searching for organizations of practitioner with id: " + practitionerId);
-            List<IBaseResource> organizationTeams = getOrganizationsOfPractitioner(practitionerId);
-            logger.info("Organizations are fetched");
-            List<Organization> teams = mapToTeams(organizationTeams);
-            fhirPractitionerDetails.setOrganizations(teams);
+            if (StringUtils.isNotBlank(practitionerId)) {
+                logger.info("Searching for care teams for practitioner with id: " + practitionerId);
+                List<IBaseResource> careTeams = getCareTeams(practitionerId);
+                List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
+                fhirPractitionerDetails.setCareTeams(careTeamsList);
+                StringType practitionerIdString = new StringType();
+                practitionerIdString.setValue(practitionerId);
+                fhirPractitionerDetails.setPractitionerId(practitionerIdString);
 
-            List<IBaseResource> practitionerRoles =
-                    getPractitionerRolesOfPractitioner(practitionerId);
-            logger.info("Practitioner Roles are fetched");
-            List<PractitionerRole> practitionerRoleList = mapToPractitionerRoles(practitionerRoles);
-            fhirPractitionerDetails.setPractitionerRoles(practitionerRoleList);
+                logger.info(
+                        "Searching for organizations of practitioner with id: " + practitionerId);
+                List<IBaseResource> organizationTeams =
+                        getOrganizationsOfPractitioner(practitionerId);
+                logger.info("Organizations are fetched");
+                List<Organization> teams = mapToTeams(organizationTeams);
+                fhirPractitionerDetails.setOrganizations(teams);
 
-            List<IBaseResource> groups = getGroupsAssignedToAPractitioner(practitionerId);
-            logger.info("Groups are fetched");
-            List<Group> groupsList = mapToGroups(groups);
-            fhirPractitionerDetails.setGroups(groupsList);
-            fhirPractitionerDetails.setId(practitionerIdString.getValue());
+                List<IBaseResource> practitionerRoles =
+                        getPractitionerRolesOfPractitioner(practitionerId);
+                logger.info("Practitioner Roles are fetched");
+                List<PractitionerRole> practitionerRoleList =
+                        mapToPractitionerRoles(practitionerRoles);
+                fhirPractitionerDetails.setPractitionerRoles(practitionerRoleList);
 
-            logger.info("Searching for locations by organizations");
-            List<String> locationsIdReferences = getLocationIdentifiersByOrganizations(teams);
-            List<String> locationIds = getLocationIdsFromReferences(locationsIdReferences);
-            List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
-            logger.info("Searching for location hierarchy list by locations identifiers");
-            List<LocationHierarchy> locationHierarchyList =
-                    getLocationsHierarchy(locationsIdentifiers);
-            fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
-            logger.info("Searching for locations by ids");
-            List<Location> locationsList = getLocationsByIds(locationIds);
-            fhirPractitionerDetails.setLocations(locationsList);
-            practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
+                List<IBaseResource> groups = getGroupsAssignedToAPractitioner(practitionerId);
+                logger.info("Groups are fetched");
+                List<Group> groupsList = mapToGroups(groups);
+                fhirPractitionerDetails.setGroups(groupsList);
+                keycloakUserDetails.setId(identifier.getValue());
+                practitionerDetails.setId(keycloakUserDetails.getId());
+                practitionerDetails.setUserDetail(keycloakUserDetails);
+                fhirPractitionerDetails.setId(practitionerIdString.getValue());
+
+                logger.info("Searching for locations by organizations");
+                List<String> locationsIdReferences = getLocationIdentifiersByOrganizations(teams);
+                List<String> locationIds = getLocationIdsFromReferences(locationsIdReferences);
+                List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
+                logger.info("Searching for location hierarchy list by locations identifiers");
+                List<LocationHierarchy> locationHierarchyList =
+                        getLocationsHierarchy(locationsIdentifiers);
+                fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
+                logger.info("Searching for locations by ids");
+                List<Location> locationsList = getLocationsByIds(locationIds);
+                fhirPractitionerDetails.setLocations(locationsList);
+                practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
+            } else {
+                logger.error(
+                        "Practitioner with identifier: " + identifier.getValue() + " not found");
+                practitionerDetails.setId(PRACTITIONER_NOT_FOUND);
+            }
         } else {
-            logger.error("Practitioner with identifier: " + identifier.getValue() + " not found");
-            practitionerDetails.setId(PRACTITIONER_NOT_FOUND);
+            logger.error("User details are null");
+            practitionerDetails.setId(KEYCLOAK_USER_NOT_FOUND);
         }
-        practitionerDetails.setId(practitionerId);
-
         return practitionerDetails;
+    }
+
+    private KeycloakUserDetails getKeycloakUserDetails(Authentication authentication) {
+        KeycloakUserDetails keycloakUserDetails = new KeycloakUserDetails();
+        if (authentication != null) {
+            logger.info("Authentication is not null");
+            KeycloakPrincipal<KeycloakSecurityContext> authenticationPrincipal =
+                    (KeycloakPrincipal<KeycloakSecurityContext>) authentication.getPrincipal();
+            AccessToken token = authenticationPrincipal.getKeycloakSecurityContext().getToken();
+
+            StringType authenticationIdentifier = new StringType();
+            authenticationIdentifier.setId(authentication.getName());
+            authenticationIdentifier.setValue(authentication.getName());
+
+            UserBioData userBioData = new UserBioData();
+            userBioData.setIdentifier(authenticationIdentifier);
+
+            StringType userName = new StringType();
+            userName.setId(USERNAME);
+            userName.setValue(token.getPreferredUsername());
+            userBioData.setUserName(userName);
+
+            StringType preferredUserName = new StringType();
+            preferredUserName.setId(PREFFERED_USERNAME);
+            preferredUserName.setValue(token.getPreferredUsername());
+            userBioData.setPreferredName(preferredUserName);
+
+            StringType familyName = new StringType();
+            familyName.setId(FAMILY_NAME);
+            familyName.setValue(token.getFamilyName());
+            userBioData.setFamilyName(familyName);
+
+            StringType givenName = new StringType();
+            givenName.setId(GIVEN_NAME);
+            givenName.setValue(token.getGivenName());
+            userBioData.setGivenName(givenName);
+
+            StringType email = new StringType();
+            email.setId(EMAIL);
+            email.setValue(token.getEmail());
+            userBioData.setEmail(email);
+
+            StringType emailVerified = new StringType();
+            emailVerified.setId(EMAIL_VERIFIED);
+            emailVerified.setValue(String.valueOf(token.getEmailVerified()));
+            userBioData.setEmailVerified(emailVerified);
+
+            List<StringType> roles = new ArrayList<>();
+            List<String> rolesInString =
+                    authentication.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .collect(Collectors.toList());
+            int i = 0;
+            for (String role : rolesInString) {
+                StringType userRole = new StringType();
+                userRole.setId(ROLE + SPACE + COLON + SPACE + i);
+                userRole.setValue(role);
+                roles.add(userRole);
+                i++;
+            }
+
+            keycloakUserDetails.setUserBioData(userBioData);
+            keycloakUserDetails.setRoles(roles);
+        }
+        return keycloakUserDetails;
     }
 
     private List<IBaseResource> getCareTeams(String practitionerId) {
