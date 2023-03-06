@@ -446,14 +446,14 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
     @NotNull
     private List<String> getResourceIds(List<String> resourceReferences) {
-        List<String> locationIds = new ArrayList<>();
+        List<String> resourceIds = new ArrayList<>();
         for (String reference : resourceReferences) {
             if (reference.contains(FORWARD_SLASH)) {
                 reference = reference.substring(reference.indexOf(FORWARD_SLASH) + 1);
             }
-            locationIds.add(reference);
+            resourceIds.add(reference);
         }
-        return locationIds;
+        return resourceIds;
     }
 
     private List<String> getOrganizationIdsFromReferences(List<String> organizationReferences) {
