@@ -126,13 +126,28 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 practitionerIdString.setValue(practitionerId);
                 fhirPractitionerDetails.setPractitionerId(practitionerIdString);
 
+                logger.info("Searching for Organizations tied with CareTeams: ");
+                List<IBaseResource> managingOrganizationsOfCareTeams =
+                        getManagingOrganizationsOfCareTeams(careTeamsList);
+                logger.info("Managing Organization are fetched");
+                List<Organization> managingOrganizationTeams =
+                        mapToTeams(managingOrganizationsOfCareTeams);
+
                 logger.info(
                         "Searching for organizations of practitioner with id: " + practitionerId);
                 List<IBaseResource> organizationTeams =
                         getOrganizationsOfPractitioner(practitionerId);
                 logger.info("Organizations are fetched");
                 List<Organization> teams = mapToTeams(organizationTeams);
-                fhirPractitionerDetails.setOrganizations(teams);
+
+                List<Organization> bothOrganizations;
+                // Add items from Lists into Set
+                Set<Organization> set = new LinkedHashSet<>(managingOrganizationTeams);
+                set.addAll(teams);
+
+                bothOrganizations = new ArrayList<>(set);
+
+                fhirPractitionerDetails.setOrganizations(bothOrganizations);
 
                 List<IBaseResource> practitionerRoles =
                         getPractitionerRolesOfPractitioner(practitionerId);
@@ -313,6 +328,10 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 "Organization Ids are retrieved, found to be of size: "
                         + organizationIdsReferences.size());
 
+        return searchOrganizationsById(organizationIdsReferences);
+    }
+
+    private List<IBaseResource> searchOrganizationsById(List<String> organizationIdsReferences) {
         List<String> organizationIds = getOrganizationIdsFromReferences(organizationIdsReferences);
         SearchParameterMap organizationsSearchMap = new SearchParameterMap();
         TokenAndListParam theId = new TokenAndListParam();
@@ -426,14 +445,13 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
     }
 
     @NotNull
-    private List<String> getResourceIds(List<String> locationReferences) {
+    private List<String> getResourceIds(List<String> resourceReferences) {
         List<String> locationIds = new ArrayList<>();
-        for (String locationReference : locationReferences) {
-            if (locationReference.contains(FORWARD_SLASH)) {
-                locationReference =
-                        locationReference.substring(locationReference.indexOf(FORWARD_SLASH) + 1);
+        for (String reference : resourceReferences) {
+            if (reference.contains(FORWARD_SLASH)) {
+                reference = reference.substring(reference.indexOf(FORWARD_SLASH) + 1);
             }
-            locationIds.add(locationReference);
+            locationIds.add(reference);
         }
         return locationIds;
     }
@@ -505,6 +523,22 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             return locationIdentifier.getValue();
         }
         return EMPTY_STRING;
+    }
+
+    private List<IBaseResource> getManagingOrganizationsOfCareTeams(List<CareTeam> careTeamsList) {
+        List<String> organizationIdReferences = new ArrayList<>();
+        List<Reference> managingOrganizations = new ArrayList<>();
+        for (CareTeam careTeam : careTeamsList) {
+            if (careTeam.hasManagingOrganization()) {
+                managingOrganizations.addAll(careTeam.getManagingOrganization());
+            }
+        }
+        for (Reference managingOrganization : managingOrganizations) {
+            if (managingOrganization != null && managingOrganization.getReference() != null) {
+                organizationIdReferences.add(managingOrganization.getReference());
+            }
+        }
+        return searchOrganizationsById(organizationIdReferences);
     }
 
     public IFhirResourceDao<Practitioner> getPractitionerIFhirResourceDao() {
