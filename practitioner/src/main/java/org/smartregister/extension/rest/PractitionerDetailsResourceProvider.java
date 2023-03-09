@@ -166,7 +166,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 fhirPractitionerDetails.setId(practitionerIdString.getValue());
 
                 logger.info("Searching for locations by organizations");
-                List<String> locationsIdReferences = getLocationIdentifiersByOrganizations(teams);
+                List<String> locationsIdReferences = getLocationIdentifiersByOrganizations(bothOrganizations);
                 List<String> locationIds = getLocationIdsFromReferences(locationsIdReferences);
                 List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
                 logger.info("Searching for location hierarchy list by locations identifiers");
