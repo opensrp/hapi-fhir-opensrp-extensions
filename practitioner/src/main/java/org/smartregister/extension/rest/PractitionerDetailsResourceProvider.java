@@ -166,7 +166,8 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                 fhirPractitionerDetails.setId(practitionerIdString.getValue());
 
                 logger.info("Searching for locations by organizations");
-                List<String> locationsIdReferences = getLocationIdentifiersByOrganizations(bothOrganizations);
+                List<String> locationsIdReferences =
+                        getLocationIdentifiersByOrganizations(bothOrganizations);
                 List<String> locationIds = getLocationIdsFromReferences(locationsIdReferences);
                 List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
                 logger.info("Searching for location hierarchy list by locations identifiers");
@@ -430,8 +431,9 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                     organizationAffiliationObj = (OrganizationAffiliation) organizationAffiliation;
                     List<Reference> locationList = organizationAffiliationObj.getLocation();
                     for (Reference location : locationList) {
-                        if (location != null && location.getReference() != null) {
-                            locationsIdentifiers.add(location.getReference());
+                        if (location != null && location.getReference() != null && locationsIdentifiers.size() > 0 &&
+                                !(locationsIdentifiers.contains(location.getReference()))) {
+                                locationsIdentifiers.add(location.getReference());
                         }
                     }
                 }
