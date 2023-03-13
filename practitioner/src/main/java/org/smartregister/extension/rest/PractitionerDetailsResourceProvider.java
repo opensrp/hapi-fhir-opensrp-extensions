@@ -431,9 +431,11 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                     organizationAffiliationObj = (OrganizationAffiliation) organizationAffiliation;
                     List<Reference> locationList = organizationAffiliationObj.getLocation();
                     for (Reference location : locationList) {
-                        if (location != null && location.getReference() != null && locationsIdentifiers.size() > 0 &&
-                                !(locationsIdentifiers.contains(location.getReference()))) {
-                                locationsIdentifiers.add(location.getReference());
+                        if (location != null
+                                && location.getReference() != null
+                                && locationsIdentifiers != null
+                                && !(locationsIdentifiers.contains(location.getReference()))) {
+                            locationsIdentifiers.add(location.getReference());
                         }
                     }
                 }
