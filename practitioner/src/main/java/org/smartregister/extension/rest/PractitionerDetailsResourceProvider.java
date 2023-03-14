@@ -407,6 +407,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
 
     private List<String> getLocationIdentifiersByOrganizations(List<Organization> organizations) {
         List<String> locationsIdentifiers = new ArrayList<>();
+        Set<String> locationsIdentifiersSet = new HashSet<>();
         SearchParameterMap searchParameterMap = new SearchParameterMap();
         logger.info("Traversing organizations");
         for (Organization team : organizations) {
@@ -433,14 +434,15 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                     for (Reference location : locationList) {
                         if (location != null
                                 && location.getReference() != null
-                                && locationsIdentifiers != null
-                                && !(locationsIdentifiers.contains(location.getReference()))) {
-                            locationsIdentifiers.add(location.getReference());
+                                && locationsIdentifiersSet != null
+                                && !(locationsIdentifiersSet.contains(location.getReference()))) {
+                            locationsIdentifiersSet.add(location.getReference());
                         }
                     }
                 }
             }
         }
+        locationsIdentifiers = new ArrayList<>(locationsIdentifiersSet);
         return locationsIdentifiers;
     }
 
