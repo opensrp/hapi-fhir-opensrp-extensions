@@ -434,8 +434,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
                     for (Reference location : locationList) {
                         if (location != null
                                 && location.getReference() != null
-                                && locationsIdentifiersSet != null
-                                && !(locationsIdentifiersSet.contains(location.getReference()))) {
+                                && locationsIdentifiersSet != null) {
                             locationsIdentifiersSet.add(location.getReference());
                         }
                     }
