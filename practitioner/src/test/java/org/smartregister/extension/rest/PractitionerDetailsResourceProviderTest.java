@@ -20,34 +20,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import ca.uhn.fhir.rest.param.SpecialParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.KeycloakSecurityContext;
-import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
-import org.keycloak.representations.AccessToken;
 import org.mockito.Mock;
 import org.smartregister.model.location.LocationHierarchy;
 import org.smartregister.model.practitioner.PractitionerDetails;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 public class PractitionerDetailsResourceProviderTest {
 
@@ -64,14 +53,6 @@ public class PractitionerDetailsResourceProviderTest {
     @Mock private IFhirResourceDao<Location> locationIFhirResourceDao;
 
     @Mock private IFhirResourceDao<Group> groupIFhirResourceDao;
-
-    @Mock private KeycloakPrincipal<KeycloakSecurityContext> keycloakPrincipal;
-
-    @Mock private RefreshableKeycloakSecurityContext securityContext;
-
-    @Mock private AccessToken token;
-
-    @Mock private Authentication authentication;
 
     @Mock private IBundleProvider practitionersBundleProvider;
 
@@ -110,105 +91,25 @@ public class PractitionerDetailsResourceProviderTest {
                 locationHierarchyResourceProvider);
         practitionerDetailsResourceProvider.setLocationIFhirResourceDao(locationIFhirResourceDao);
         practitionerDetailsResourceProvider.setGroupIFhirResourceDao(groupIFhirResourceDao);
-        when(keycloakPrincipal.getKeycloakSecurityContext()).thenReturn(securityContext);
-    }
-
-    @Test
-    public void testGetPractitionerDetailsWhenKeycloakUserNotFound() {
-        TokenParam identifierParam = new TokenParam();
-        identifierParam.setValue("0000-11111-2222-3333");
-        SecurityContext securityContext = mock(SecurityContext.class);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(null);
-        SpecialParam isAuthProvided = new SpecialParam();
-        isAuthProvided.setValue("true");
-        PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(
-                        identifierParam, isAuthProvided);
-        assertNotNull(practitionerDetails);
-        assertEquals("Keycloak User Not Found", practitionerDetails.getId());
     }
 
     @Test
     public void testGetPractitionerDetailsWhenPractitionerNotFound() {
         TokenParam identifierParam = new TokenParam();
         identifierParam.setValue("0000-11111-2222-3333");
-        authentication.setAuthenticated(Boolean.TRUE);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(keycloakPrincipal);
-        when(keycloakPrincipal.getKeycloakSecurityContext().getToken()).thenReturn(token);
-        when(token.getPreferredUsername()).thenReturn("TestUser");
-        when(token.getFamilyName()).thenReturn("Test User Family");
-        when(token.getGivenName()).thenReturn("Test User");
-        when(token.getEmail()).thenReturn("user@testing.com");
-        when(token.getEmailVerified()).thenReturn(Boolean.TRUE);
-        when(authentication.getName()).thenReturn("Beta Test User");
-        when(authentication.getAuthorities())
-                .thenAnswer(
-                        a ->
-                                roles.stream()
-                                        .map(
-                                                role ->
-                                                        new GrantedAuthority() {
-
-                                                            private static final long
-                                                                    serialVersionUID = 1L;
-
-                                                            @Override
-                                                            public String getAuthority() {
-                                                                return role;
-                                                            }
-                                                        })
-                                        .collect(Collectors.toList()));
         when(practitionerIFhirResourceDao.search(any(SearchParameterMap.class)))
                 .thenReturn(practitionersBundleProvider);
         List<IBaseResource> practitioners = new ArrayList<>();
         when(practitionersBundleProvider.getResources(anyInt(), anyInt()))
                 .thenReturn(practitioners);
-        SpecialParam isAuthProvided = new SpecialParam();
-        isAuthProvided.setValue("true");
         PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(
-                        identifierParam, isAuthProvided);
+                practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam);
         assertNotNull(practitionerDetails);
         assertEquals("Practitioner Not Found", practitionerDetails.getId());
     }
 
     @Test
     public void testGetPractitionerDetailsReturnsCorrectInformation() {
-        authentication.setAuthenticated(Boolean.TRUE);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        SecurityContextHolder.setContext(securityContext);
-
-        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(keycloakPrincipal);
-        when(keycloakPrincipal.getKeycloakSecurityContext().getToken()).thenReturn(token);
-        when(token.getPreferredUsername()).thenReturn("TestUser");
-        when(token.getFamilyName()).thenReturn("Test User Family");
-        when(token.getGivenName()).thenReturn("Test User");
-        when(token.getEmail()).thenReturn("user@testing.com");
-        when(token.getEmailVerified()).thenReturn(Boolean.TRUE);
-        when(authentication.getName()).thenReturn("Beta Test User");
-        when(authentication.getAuthorities())
-                .thenAnswer(
-                        a ->
-                                roles.stream()
-                                        .map(
-                                                role ->
-                                                        new GrantedAuthority() {
-
-                                                            private static final long
-                                                                    serialVersionUID = 1L;
-
-                                                            @Override
-                                                            public String getAuthority() {
-                                                                return role;
-                                                            }
-                                                        })
-                                        .collect(Collectors.toList()));
-
         LocationHierarchy locationHierarchy = new LocationHierarchy();
         when(practitionerIFhirResourceDao.search(any(SearchParameterMap.class)))
                 .thenReturn(practitionersBundleProvider);
@@ -256,37 +157,9 @@ public class PractitionerDetailsResourceProviderTest {
 
         TokenParam identifierParam = new TokenParam();
         identifierParam.setValue("0000-11111-2222-3333");
-        SpecialParam isAuthProvided = new SpecialParam();
-        isAuthProvided.setValue("true");
         PractitionerDetails practitionerDetails =
-                practitionerDetailsResourceProvider.getPractitionerDetails(
-                        identifierParam, isAuthProvided);
+                practitionerDetailsResourceProvider.getPractitionerDetails(identifierParam);
         assertNotNull(practitionerDetails);
-        assertNotNull(practitionerDetails.getUserDetail());
-        assertNotNull(practitionerDetails.getUserDetail().getUserBioData());
-        assertNotNull(practitionerDetails.getUserDetail().getRoles());
-        assertEquals(
-                "TestUser",
-                practitionerDetails.getUserDetail().getUserBioData().getUserName().getValue());
-        assertEquals(
-                "Test User Family",
-                practitionerDetails.getUserDetail().getUserBioData().getFamilyName().getValue());
-        assertEquals(
-                "TestUser",
-                practitionerDetails.getUserDetail().getUserBioData().getPreferredName().getValue());
-        assertEquals(
-                "Test User",
-                practitionerDetails.getUserDetail().getUserBioData().getGivenName().getValue());
-        assertEquals(
-                "user@testing.com",
-                practitionerDetails.getUserDetail().getUserBioData().getEmail().getValue());
-        assertEquals(
-                "true",
-                practitionerDetails.getUserDetail().getUserBioData().getEmailVerified().getValue());
-        assertEquals(2, practitionerDetails.getUserDetail().getRoles().size());
-        assertEquals("ROLE_USER", practitionerDetails.getUserDetail().getRoles().get(0).getValue());
-        assertEquals(
-                "ROLE_ADMIN", practitionerDetails.getUserDetail().getRoles().get(1).getValue());
     }
 
     private List<IBaseResource> getPractitioners() {

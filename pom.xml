@@ -5,7 +5,7 @@
 	<groupId>org.smartregister</groupId>
 	<artifactId>hapi-fhir-opensrp-extensions</artifactId>
 	<packaging>pom</packaging>
-	<version>0.0.18-SNAPSHOT</version>
+	<version>0.0.19-SNAPSHOT</version>
 	<name>HAPI FHIR OpenSRP Extensions</name>
 	<description>This repository holds all the code extensions on top of Hapi-FHIR</description>
 	<url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>org.smartregister</groupId>
 			<artifactId>fhir-common-utils</artifactId>
-			<version>0.0.5-SNAPSHOT</version>
+			<version>0.0.6-SNAPSHOT</version>
 		</dependency>
 
 		<!--        Test Dependencies-->
