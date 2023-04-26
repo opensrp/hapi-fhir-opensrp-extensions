@@ -149,6 +149,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             logger.info("Searching for locations by ids");
             List<Location> locationsList = getLocationsByIds(locationIds);
             fhirPractitionerDetails.setLocations(locationsList);
+            practitionerDetails.setId(practitionerId);
             practitionerDetails.setFhirPractitionerDetails(fhirPractitionerDetails);
         } else {
             logger.error("Practitioner with identifier: " + identifier.getValue() + " not found");
