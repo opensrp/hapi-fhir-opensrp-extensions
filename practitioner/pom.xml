@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>hapi-fhir-opensrp-extensions</artifactId>
 		<groupId>org.smartregister</groupId>
-		<version>0.0.20-SNAPSHOT</version>
+		<version>0.0.21-SNAPSHOT</version>
 	</parent>
 
 	<description>The repository holds the practitioner details extensions on the HAPI server</description>
