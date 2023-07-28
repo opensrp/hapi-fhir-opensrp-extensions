@@ -100,9 +100,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             List<IBaseResource> careTeams = getCareTeams(practitionerId);
             List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
             fhirPractitionerDetails.setCareTeams(careTeamsList);
-            StringType practitionerIdString = new StringType();
-            practitionerIdString.setValue(practitionerId);
-            fhirPractitionerDetails.setPractitionerId(practitionerIdString);
+            fhirPractitionerDetails.setPractitioner((Practitioner) practitioner);
 
             logger.info("Searching for Organizations tied with CareTeams: ");
             List<IBaseResource> managingOrganizationsOfCareTeams =
@@ -135,7 +133,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             logger.info("Groups are fetched");
             List<Group> groupsList = mapToGroups(groups);
             fhirPractitionerDetails.setGroups(groupsList);
-            fhirPractitionerDetails.setId(practitionerIdString.getValue());
+            fhirPractitionerDetails.setId(practitionerId);
 
             logger.info("Searching for locations by organizations");
             List<String> locationsIdReferences =
