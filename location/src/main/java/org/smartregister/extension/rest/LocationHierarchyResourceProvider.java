@@ -47,30 +47,19 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
     }
 
     @Search
-    public LocationHierarchy getLocationHierarchy(
-            @RequiredParam(name = IDENTIFIER) TokenParam identifier) {
+    public LocationHierarchy getLocationHierarchy(@RequiredParam(name = ID) TokenParam id) {
 
         SearchParameterMap paramMap = new SearchParameterMap();
-        paramMap.add(IDENTIFIER, identifier);
+        paramMap.add(ID, id);
 
-        IBundleProvider locationBundle = locationIFhirResourceDao.search(paramMap);
-        List<IBaseResource> locations =
-                locationBundle != null
-                        ? locationBundle.getResources(0, locationBundle.size())
-                        : new ArrayList<>();
-        String locationId = EMPTY_STRING;
-        if (locations.size() > 0
-                && locations.get(0) != null
-                && locations.get(0).getIdElement() != null) {
-            locationId = locations.get(0).getIdElement().getIdPart();
-        }
-
+        Location location = locationIFhirResourceDao.read(new IdType(id.getValue()));
+        String locationId = location != null ? location.getIdElement().getIdPart() : EMPTY_STRING;
         LocationHierarchyTree locationHierarchyTree = new LocationHierarchyTree();
         LocationHierarchy locationHierarchy = new LocationHierarchy();
-        if (StringUtils.isNotBlank(locationId) && locations.size() > 0) {
+
+        if (StringUtils.isNotBlank(locationId)) {
             logger.info("Building Location Hierarchy of Location Id : " + locationId);
-            locationHierarchyTree.buildTreeFromList(
-                    getLocationHierarchy(locationId, locations.get(0)));
+            locationHierarchyTree.buildTreeFromList(getLocationHierarchy(locationId, location));
             StringType locationIdString = new StringType().setId(locationId).getIdElement();
             locationHierarchy.setLocationId(locationIdString);
             locationHierarchy.setId(LOCATION_RESOURCE + locationId);
