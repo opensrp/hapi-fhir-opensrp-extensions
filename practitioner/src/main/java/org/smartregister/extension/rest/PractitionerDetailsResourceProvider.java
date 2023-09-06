@@ -139,10 +139,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             List<String> locationsIdReferences =
                     getLocationIdentifiersByOrganizations(bothOrganizations);
             List<String> locationIds = getLocationIdsFromReferences(locationsIdReferences);
-            List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
-            logger.info("Searching for location hierarchy list by locations identifiers");
-            List<LocationHierarchy> locationHierarchyList =
-                    getLocationsHierarchy(locationsIdentifiers);
+            List<LocationHierarchy> locationHierarchyList = getLocationsHierarchy(locationIds);
             fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
             logger.info("Searching for locations by ids");
             List<Location> locationsList = getLocationsByIds(locationIds);
