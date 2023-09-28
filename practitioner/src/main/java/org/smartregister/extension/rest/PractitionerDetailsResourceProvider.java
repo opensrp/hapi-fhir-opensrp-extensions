@@ -100,7 +100,8 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             List<IBaseResource> careTeams = getCareTeams(practitionerId);
             List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
             fhirPractitionerDetails.setCareTeams(careTeamsList);
-            fhirPractitionerDetails.setPractitioner((Practitioner) practitioner);
+            fhirPractitionerDetails.setPractitioners(
+                    Collections.singletonList((Practitioner) practitioner));
 
             logger.info("Searching for Organizations tied with CareTeams: ");
             List<IBaseResource> managingOrganizationsOfCareTeams =
