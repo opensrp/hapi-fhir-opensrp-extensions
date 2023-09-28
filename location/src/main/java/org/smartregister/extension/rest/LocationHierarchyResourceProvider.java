@@ -16,22 +16,28 @@
 
 package org.smartregister.extension.rest;
 
-import static org.smartregister.utils.Constants.*;
-
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.annotation.*;
+import ca.uhn.fhir.rest.annotation.RequiredParam;
+import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import ca.uhn.fhir.rest.param.*;
+import ca.uhn.fhir.rest.param.ReferenceAndListParam;
+import ca.uhn.fhir.rest.param.ReferenceOrListParam;
+import ca.uhn.fhir.rest.param.ReferenceParam;
+import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Location;
+import org.hl7.fhir.r4.model.StringType;
 import org.smartregister.model.location.LocationHierarchy;
 import org.smartregister.model.location.LocationHierarchyTree;
+import org.smartregister.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class LocationHierarchyResourceProvider implements IResourceProvider {
@@ -39,7 +45,7 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
     @Autowired IFhirResourceDao<Location> locationIFhirResourceDao;
 
     private static final Logger logger =
-            LogManager.getLogger(LocationHierarchyResourceProvider.class.toString());
+            Logger.getLogger(LocationHierarchyResourceProvider.class.toString());
 
     @Override
     public Class<? extends IBaseResource> getResourceType() {
@@ -47,26 +53,30 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
     }
 
     @Search
-    public LocationHierarchy getLocationHierarchy(@RequiredParam(name = ID) TokenParam id) {
+    public LocationHierarchy getLocationHierarchy(
+            @RequiredParam(name = Constants.ID) TokenParam id) {
 
         SearchParameterMap paramMap = new SearchParameterMap();
-        paramMap.add(ID, id);
+        paramMap.add(Constants.ID, id);
 
         Location location = locationIFhirResourceDao.read(new IdType(id.getValue()));
-        String locationId = location != null ? location.getIdElement().getIdPart() : EMPTY_STRING;
+        String locationId =
+                location != null ? location.getIdElement().getIdPart() : Constants.EMPTY_STRING;
         LocationHierarchyTree locationHierarchyTree = new LocationHierarchyTree();
         LocationHierarchy locationHierarchy = new LocationHierarchy();
 
         if (StringUtils.isNotBlank(locationId)) {
+
             logger.info("Building Location Hierarchy of Location Id : " + locationId);
             locationHierarchyTree.buildTreeFromList(getLocationHierarchy(locationId, location));
+
             StringType locationIdString = new StringType().setId(locationId).getIdElement();
             locationHierarchy.setLocationId(locationIdString);
-            locationHierarchy.setId(LOCATION_RESOURCE + locationId);
+            locationHierarchy.setId(Constants.LOCATION_RESOURCE + locationId);
 
             locationHierarchy.setLocationHierarchyTree(locationHierarchyTree);
         } else {
-            locationHierarchy.setId(LOCATION_RESOURCE_NOT_FOUND);
+            locationHierarchy.setId(Constants.LOCATION_RESOURCE_NOT_FOUND);
         }
         return locationHierarchy;
     }
@@ -75,29 +85,35 @@ public class LocationHierarchyResourceProvider implements IResourceProvider {
         return descendants(locationId, parentLocation);
     }
 
-    public List<Location> descendants(String locationId, IBaseResource parentLocation) {
+    public List<Location> descendants(String parentLocationId, IBaseResource parentLocation) {
 
         SearchParameterMap paramMap = new SearchParameterMap();
         ReferenceAndListParam thePartOf = new ReferenceAndListParam();
         ReferenceParam partOf = new ReferenceParam();
-        partOf.setValue(LOCATION + FORWARD_SLASH + locationId);
+        partOf.setValue(Constants.LOCATION + Constants.FORWARD_SLASH + parentLocationId);
         ReferenceOrListParam referenceOrListParam = new ReferenceOrListParam();
         referenceOrListParam.add(partOf);
         thePartOf.addValue(referenceOrListParam);
-        paramMap.add(PART_OF, thePartOf);
+        paramMap.add(Constants.PART_OF, thePartOf);
 
         IBundleProvider childLocationBundle = locationIFhirResourceDao.search(paramMap);
-        List<Location> allLocations = new ArrayList<>();
+        List<Location> allLocations = Collections.synchronizedList(new ArrayList<>());
         if (parentLocation != null) {
             allLocations.add((Location) parentLocation);
         }
         if (childLocationBundle != null) {
-            for (IBaseResource childLocation :
-                    childLocationBundle.getResources(0, childLocationBundle.size())) {
-                Location childLocationEntity = (Location) childLocation;
-                allLocations.add(childLocationEntity);
-                allLocations.addAll(descendants(childLocation.getIdElement().getIdPart(), null));
-            }
+            List<IBaseResource> childLocations =
+                    childLocationBundle.getResources(0, childLocationBundle.size());
+
+            childLocations.parallelStream()
+                    .forEach(
+                            childLocation -> {
+                                Location childLocationEntity = (Location) childLocation;
+                                allLocations.add(childLocationEntity);
+                                allLocations.addAll(
+                                        descendants(
+                                                childLocation.getIdElement().getIdPart(), null));
+                            });
         }
 
         return allLocations;
