@@ -32,7 +32,7 @@
 	<properties>
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
-		<spring.version>5.2.4.RELEASE</spring.version>
+		<spring.version>6.0.0</spring.version>
 		<spotless.version>2.30.0</spotless.version>
 		<servlet.version>2.5</servlet.version>
 		<hapi.fhir.base.version>5.7.0-PRE8-SNAPSHOT</hapi.fhir.base.version>
