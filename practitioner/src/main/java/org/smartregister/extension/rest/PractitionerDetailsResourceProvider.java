@@ -100,7 +100,8 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             List<IBaseResource> careTeams = getCareTeams(practitionerId);
             List<CareTeam> careTeamsList = mapToCareTeams(careTeams);
             fhirPractitionerDetails.setCareTeams(careTeamsList);
-            fhirPractitionerDetails.setPractitioner((Practitioner) practitioner);
+            fhirPractitionerDetails.setPractitioners(
+                    Collections.singletonList((Practitioner) practitioner));
 
             logger.info("Searching for Organizations tied with CareTeams: ");
             List<IBaseResource> managingOrganizationsOfCareTeams =
@@ -139,10 +140,7 @@ public class PractitionerDetailsResourceProvider implements IResourceProvider {
             List<String> locationsIdReferences =
                     getLocationIdentifiersByOrganizations(bothOrganizations);
             List<String> locationIds = getLocationIdsFromReferences(locationsIdReferences);
-            List<String> locationsIdentifiers = getLocationIdentifiersByIds(locationIds);
-            logger.info("Searching for location hierarchy list by locations identifiers");
-            List<LocationHierarchy> locationHierarchyList =
-                    getLocationsHierarchy(locationsIdentifiers);
+            List<LocationHierarchy> locationHierarchyList = getLocationsHierarchy(locationIds);
             fhirPractitionerDetails.setLocationHierarchyList(locationHierarchyList);
             logger.info("Searching for locations by ids");
             List<Location> locationsList = getLocationsByIds(locationIds);

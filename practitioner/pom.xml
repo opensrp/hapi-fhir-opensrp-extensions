@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>hapi-fhir-opensrp-extensions</artifactId>
 		<groupId>org.smartregister</groupId>
-		<version>0.0.21-SNAPSHOT</version>
+		<version>0.0.24-SNAPSHOT</version>
 	</parent>
 
 	<description>The repository holds the practitioner details extensions on the HAPI server</description>
@@ -12,7 +12,7 @@
 	<name>HAPI FHIR OpenSRP Extensions (Practitioner)</name>
 	<packaging>jar</packaging>
 	<url>https://github.com/opensrp/hapi-fhir-opensrp-extensions</url>
-	<version>0.0.12-SNAPSHOT</version>
+	<version>0.0.14-SNAPSHOT</version>
 	<artifactId>practitioner</artifactId>
 
 	<properties>
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>org.smartregister.hapi-fhir-opensrp-extensions</groupId>
 			<artifactId>location</artifactId>
-			<version>0.0.5-SNAPSHOT</version>
+			<version>0.0.10-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>
